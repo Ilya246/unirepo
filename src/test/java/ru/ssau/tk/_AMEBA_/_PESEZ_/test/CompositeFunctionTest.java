@@ -61,4 +61,20 @@ class CompositeFunctionTest {
 
         assertEquals(expected, composite.apply(2.5), 1e-9);
     }
+
+    @Test
+    void testAndThen() {
+        MathFunction inner = new SqrFunction();
+        MathFunction f1 = inner.andThen(new SqrFunction());
+
+        assertEquals(16, f1.apply(2));
+        assertEquals(81, f1.apply(-3));
+
+        MathFunction f2 = f1.andThen(new RungeKuttaFunction(2));
+
+        assertTrue(Math.abs(f2.apply(2) - 512) < 0.1);
+        assertTrue(Math.abs(f2.apply(-3) - 13122) < 0.1);
+
+        assertEquals(25, new ConstantFunction(5).andThen(new SqrFunction()).andThen(new IdentityFunction()).apply(0));
+    }
 }
