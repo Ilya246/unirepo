@@ -1,8 +1,8 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.functions.test;
+package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.main.IdentityFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.IdentityFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
