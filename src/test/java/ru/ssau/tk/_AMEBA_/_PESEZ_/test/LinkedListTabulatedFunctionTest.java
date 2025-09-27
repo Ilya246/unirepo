@@ -139,4 +139,26 @@ class LinkedListTabulatedFunctionTest {
         LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(xValues, yValues);
         assertEquals(2, func.rightBound());
     }
+
+    @Test
+    void testApply() {
+        double[] xValues = {0, 1, 2};
+        double[] yValues = {1, 3, 5};
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(xValues, yValues);
+
+        // Экстраполяция слева
+        assertEquals(-1, func.apply(-1));
+
+        // Точное совпадение с узлом
+        assertEquals(1, func.apply(0));
+        assertEquals(3, func.apply(1));
+        assertEquals(5, func.apply(2));
+
+        // Интерполяция
+        assertEquals(2, func.apply(0.5));
+        assertEquals(4, func.apply(1.5));
+
+        // Экстраполяцию справа
+        assertEquals(7, func.apply(3));
+    }
 }

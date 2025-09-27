@@ -67,6 +67,18 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
         return index;
     }
 
+    private Node floorNodeOfX(double x) {
+        if (head == null) return null;
+        if (x < head.x) return head;
+        if (x > head.prev.x) return head.prev;
+
+        Node current = head;
+        while (current.next != head && current.next.x <= x) {
+            current = current.next;
+        }
+        return current;
+    }
+
     @Override
     public double extrapolateLeft(double x) {
         return interpolate(x, head.x, head.next.x, head.y, head.next.y);
@@ -151,5 +163,22 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
     @Override
     public double rightBound() {
         return head.prev.x;
+    }
+
+    @Override
+    public  double apply(double x){
+        if (count == 0) {
+            throw new IllegalStateException("Список пустой");
+        }
+
+        Node floorNode = floorNodeOfX(x);
+
+        if (x < head.x) return extrapolateLeft(x);
+        if (x > head.prev.x) return extrapolateRight(x);
+        if (x == floorNode.x) return floorNode.y;
+
+        Node nextNode = floorNode.next;
+        return interpolate(x, floorNode.x, nextNode.x, floorNode.y, nextNode.y);
+
     }
 }
