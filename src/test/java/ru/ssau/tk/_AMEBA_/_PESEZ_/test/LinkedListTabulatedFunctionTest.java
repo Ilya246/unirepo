@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
+
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 
@@ -161,4 +162,5 @@ class LinkedListTabulatedFunctionTest {
         // Экстраполяцию справа
         assertEquals(7, func.apply(3));
     }
+
 }

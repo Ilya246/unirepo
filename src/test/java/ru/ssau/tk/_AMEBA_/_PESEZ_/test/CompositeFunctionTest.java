@@ -116,4 +116,52 @@ class CompositeFunctionTest {
         assertEquals(144.0, composite.apply(2.0)); // func1(2) = 6, func2(6) = 12, 12^2 = 144
         assertEquals(81.0, composite.apply(1.5));  // func1(1.5) = 4.5, func2(4.5) = 9, 9^2 = 81
     }
+
+    @Test
+    void testCompositeOfCompositeTabulatedFunctions() {
+        ArrayTabulatedFunction arrayFunc = new ArrayTabulatedFunction(new double[] {0, 1, 2}, new double[] {0, 1, 4});
+        LinkedListTabulatedFunction listFunc = new LinkedListTabulatedFunction(new double[] {0, 1, 4}, new double[] {0, 2, 8});
+
+        // first = listFunc(arrayFunc(x))
+        CompositeFunction first = new CompositeFunction(arrayFunc, listFunc);
+
+        // second = SqrFunction(first(x))
+        CompositeFunction second = new CompositeFunction(first, new SqrFunction());
+
+        assertEquals(0, second.apply(0));     // arrayFunc(0)=0 -> listFunc(0)=0 -> sqr(0)=0
+        assertEquals(4, second.apply(1));     // arrayFunc(1)=1 -> listFunc(1)=2 -> sqr(2)=4
+        assertEquals(64, second.apply(2));    // arrayFunc(2)=4 -> listFunc(4)=8 -> sqr(8)=64
+    }
+
+    @Test
+    void testTabulatedWithSimpleAndSimpleWithTabulated() {
+        ArrayTabulatedFunction arrayFunc = new ArrayTabulatedFunction(new double[] {0, 1, 2}, new double[] {0, 1, 2});
+        SqrFunction sqrFunc = new SqrFunction();
+
+        // arrayFunc -> sqrFunc
+        CompositeFunction comp1 = new CompositeFunction(arrayFunc, sqrFunc);
+        assertEquals(0, comp1.apply(0));
+        assertEquals(1, comp1.apply(1));
+        assertEquals(4, comp1.apply(2));
+
+        // sqrFunc -> arrayFunc
+        CompositeFunction comp2 = new CompositeFunction(sqrFunc, arrayFunc);
+        assertEquals(0, comp2.apply(0)); // sqr(0)=0 -> arrayFunc(0)=0
+        assertEquals(1, comp2.apply(1)); // sqr(1)=1 -> arrayFunc(1)=1
+        assertEquals(4, comp2.apply(2)); // sqr(2)=4 -> arrayFunc(4)=2
+    }
+
+    @Test
+    void testCompositeTabulatedExtrapolation() {
+        ArrayTabulatedFunction arrayFunc = new ArrayTabulatedFunction(new double[] {0, 1, 2}, new double[] {0, 2, 4});
+        LinkedListTabulatedFunction listFunc = new LinkedListTabulatedFunction(new double[] {0, 2, 4}, new double[] {0, 4, 8});
+
+        CompositeFunction composite = new CompositeFunction(arrayFunc, listFunc);
+
+        // Проверяем экстраполяцию слева
+        assertEquals(-4, composite.apply(-1));
+
+        // Проверяем экстраполяцию справа
+        assertEquals(12, composite.apply(3));
+    }
 }
