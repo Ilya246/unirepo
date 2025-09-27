@@ -1,8 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
-public interface TabulatedFunction {
-    double apply(double x);
-
+public interface TabulatedFunction extends MathFunction {
     //Метод получения количества табулированных значений
     int getCount();
 
