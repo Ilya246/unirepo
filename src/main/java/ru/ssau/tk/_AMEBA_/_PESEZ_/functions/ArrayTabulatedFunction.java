@@ -16,8 +16,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         }
 
         this.count = xValues.length;
-        this.xValues=Arrays.copyOf(xValues, count*2);
-        this.yValues=Arrays.copyOf(yValues, count*2);
+        this.xValues=Arrays.copyOf(xValues, count);
+        this.yValues=Arrays.copyOf(yValues, count);
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
@@ -122,16 +122,26 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             return;
         }
 
-        if (count==xValues.length) throw new RuntimeException("Массив переполнен");
+        double[] newXValues = new double[count + 1];
+        double[] newYValues = new double[count + 1];
 
-        int index = 0;
-        while (index<count && xValues[index]<x) index++;
+        int insertIdx;
+        if (x < xValues[0]) insertIdx = 0;
+        else if (x > xValues[count - 1]) insertIdx = count;
+        else insertIdx = floorIndexOfX(x) + 1;
 
-        System.arraycopy(xValues, index, xValues,index+1, count-index);
-        System.arraycopy(yValues, index, yValues,index+1, count-index);
+        System.arraycopy(xValues, 0, newXValues, 0, insertIdx);
+        if (insertIdx < count)
+            System.arraycopy(xValues, insertIdx, newXValues, insertIdx + 1, count - insertIdx);
 
-        xValues[index]=x;
-        yValues[index]=y;
+        System.arraycopy(yValues, 0, newYValues, 0, insertIdx);
+        if (insertIdx < count)
+            System.arraycopy(yValues, insertIdx, newYValues, insertIdx + 1, count - insertIdx);
+
+        newXValues[insertIdx] = x;
+        newYValues[insertIdx] = y;
+        xValues = newXValues;
+        yValues = newYValues;
         count++;
     }
 
