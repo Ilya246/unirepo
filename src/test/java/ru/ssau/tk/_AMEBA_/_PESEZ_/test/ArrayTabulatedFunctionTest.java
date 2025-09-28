@@ -3,8 +3,6 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayTabulatedFunctionTest {
@@ -111,6 +109,48 @@ class ArrayTabulatedFunctionTest {
         assertEquals(4, func.getCount());
         assertEquals(4, func.getX(3));
         assertEquals(40, func.getY(3));
+    }
+
+    @Test
+    void testDeleteAtBeginning() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        assertEquals(1, func.getX(0));
+        assertEquals(10, func.getY(0));
+        assertEquals(2, func.getX(1));
+        assertEquals(20, func.getY(1));
+        assertEquals(3, func.getX(2));
+        assertEquals(30, func.getY(2));
+        func.remove(0);
+        assertEquals(2, func.getX(0));
+        assertEquals(20, func.getY(0));
+        assertEquals(3, func.getX(1));
+        assertEquals(30, func.getY(1));
+        func.remove(0);
+        assertEquals(3, func.getX(0));
+        assertEquals(30, func.getY(0));
+    }
+
+    @Test
+    void testDeleteInMiddleAndEnd() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        assertEquals(1, func.getX(0));
+        assertEquals(10, func.getY(0));
+        assertEquals(2, func.getX(1));
+        assertEquals(20, func.getY(1));
+        assertEquals(3, func.getX(2));
+        assertEquals(30, func.getY(2));
+        func.remove(1);
+        assertEquals(1, func.getX(0));
+        assertEquals(10, func.getY(0));
+        assertEquals(3, func.getX(1));
+        assertEquals(30, func.getY(1));
+        func.remove(1);
+        assertEquals(1, func.getX(0));
+        assertEquals(10, func.getY(0));
     }
 
 }

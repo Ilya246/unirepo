@@ -2,8 +2,8 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
 import java.util.Arrays;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable{
-    final private double[] xValues, yValues;
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable {
+    private double[] xValues, yValues;
     private int count;
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
@@ -133,5 +133,21 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         xValues[index]=x;
         yValues[index]=y;
         count++;
+    }
+
+    @Override
+    public void remove(int index) {
+        double[] newXValues = new double[count - 1];
+        double[] newYValues = new double[count - 1];
+
+        System.arraycopy(xValues, 0, newXValues, 0, index);
+        System.arraycopy(xValues, index + 1, newXValues, index, count - index - 1);
+
+        System.arraycopy(yValues, 0, newYValues, 0, index);
+        System.arraycopy(yValues, index + 1, newYValues, index, count - index - 1);
+
+        xValues = newXValues;
+        yValues = newYValues;
+        count--;
     }
 }
