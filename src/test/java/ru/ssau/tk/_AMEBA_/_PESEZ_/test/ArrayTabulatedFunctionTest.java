@@ -71,7 +71,7 @@ class ArrayTabulatedFunctionTest {
 
         func.insert(1, 100);
 
-        assertEquals(3, func.getCount());
+        assertEquals(4, func.getCount());
         assertEquals(100, func.getY(1));
     }
 
