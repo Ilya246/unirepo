@@ -162,5 +162,78 @@ class LinkedListTabulatedFunctionTest {
         // Экстраполяцию справа
         assertEquals(7, func.apply(3));
     }
+    
+    @Test
+    void testInsertReplaceExistingX() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{0, 1, 2}, new double[]{0, 10, 20});
+
+        func.insert(1, 100);
+
+        assertEquals(3, func.getCount());
+        assertEquals(100, func.getY(1));
+    }
+
+    @Test
+    void testInsertNewInside() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{0, 2, 4}, new double[]{0, 20, 40});
+
+        func.insert(3, 30);
+
+        assertEquals(4, func.getCount());
+        assertEquals(2, func.indexOfX(3));
+        assertEquals(30, func.getY(2));
+        assertEquals(40, func.getY(3));
+    }
+
+    @Test
+    void testInsertNewAtStart() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        func.insert(0, 0); // вставка в начало
+
+        assertEquals(4, func.getCount());
+        assertEquals(0, func.getX(0));
+        assertEquals(0, func.getY(0));
+        assertEquals(10, func.getY(1));
+    }
+
+    @Test
+    void testInsertNewAtEnd() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        func.insert(4, 40);
+
+        assertEquals(4, func.getCount());
+        assertEquals(4, func.getX(3));
+        assertEquals(40, func.getY(3));
+    }
+
+    @Test
+    void testInsertChained() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{}, new double[]{});
+
+        func.insert(1, 40);
+        func.insert(2, 50);
+        func.insert(-2, 60);
+        func.insert(5, 70);
+        func.insert(1.5, 80);
+
+        assertEquals(5, func.getCount());
+        assertEquals(-2, func.getX(0));
+        assertEquals(60, func.getY(0));
+        assertEquals(1, func.getX(1));
+        assertEquals(40, func.getY(1));
+        assertEquals(1.5, func.getX(2));
+        assertEquals(80, func.getY(2));
+        assertEquals(2, func.getX(3));
+        assertEquals(50, func.getY(3));
+        assertEquals(5, func.getX(4));
+        assertEquals(70, func.getY(4));
+    }
 
 }

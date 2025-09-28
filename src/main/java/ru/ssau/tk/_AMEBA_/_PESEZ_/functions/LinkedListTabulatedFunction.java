@@ -1,6 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable {
     private  int count;
     private  Node head;
     private void addNode(double x, double y){
@@ -23,9 +23,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
         if (xValues.length != yValues.length) {
             throw new IllegalArgumentException("Размеры массивов не совпадают");
-        }
-        if (xValues.length < 2) {
-            throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         }
         for (int i = 1; i < xValues.length; i++) {
             if (xValues[i] <= xValues[i - 1]) {
@@ -180,5 +177,32 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction{
         Node nextNode = floorNode.next;
         return interpolate(x, floorNode.x, nextNode.x, floorNode.y, nextNode.y);
 
+    }
+
+    @Override
+    public void insert(double x, double y) {
+        if (head == null) {
+            addNode(x, y);
+            return;
+        }
+
+        int idx = indexOfX(x);
+        if (idx != -1) {
+            setY(idx, y);
+            return;
+        }
+
+        Node beforeNode;
+        if (x < head.x) beforeNode = head.prev;
+        else beforeNode = floorNodeOfX(x);
+
+        Node newNode = new Node(x, y);
+        newNode.prev = beforeNode;
+        newNode.next = beforeNode.next;
+        beforeNode.next.prev = newNode;
+        beforeNode.next = newNode;
+
+        if (x < head.x) head = newNode;
+        count++;
     }
 }
