@@ -117,7 +117,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     public void insert(double x, double y) {
-        if (indexOfX(x)!=-1) yValues[indexOfX(x)]=y;
+        if (indexOfX(x)!=-1) {
+            yValues[indexOfX(x)]=y;
+            return;
+        }
 
         if (count==xValues.length) throw new RuntimeException("Массив переполнен");
 
