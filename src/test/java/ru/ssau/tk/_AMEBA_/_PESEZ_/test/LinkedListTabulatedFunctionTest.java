@@ -212,28 +212,52 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(40, func.getY(3));
     }
 
+
+
     @Test
-    void testInsertChained() {
+    void removeHead() {
         LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
-                new double[]{}, new double[]{});
+                new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0}
+        );
+        func.remove(0); // удаляем голову
+        assertEquals(2, func.getCount());
+        assertEquals(2.0, func.getX(0));
+        assertEquals(20.0, func.getY(0));
+    }
 
-        func.insert(1, 40);
-        func.insert(2, 50);
-        func.insert(-2, 60);
-        func.insert(5, 70);
-        func.insert(1.5, 80);
+    @Test
+    void removeMiddle() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0}
+        );
+        func.remove(1); // удаляем середину
+        assertEquals(2, func.getCount());
+        assertEquals(1.0, func.getX(0));
+        assertEquals(10.0, func.getY(0));
+        assertEquals(3.0, func.getX(1));
+        assertEquals(30.0, func.getY(1));
+    }
 
-        assertEquals(5, func.getCount());
-        assertEquals(-2, func.getX(0));
-        assertEquals(60, func.getY(0));
-        assertEquals(1, func.getX(1));
-        assertEquals(40, func.getY(1));
-        assertEquals(1.5, func.getX(2));
-        assertEquals(80, func.getY(2));
-        assertEquals(2, func.getX(3));
-        assertEquals(50, func.getY(3));
-        assertEquals(5, func.getX(4));
-        assertEquals(70, func.getY(4));
+    @Test
+    void removeTail() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0}
+        );
+        func.remove(2); // удаляем хвост
+        assertEquals(2, func.getCount());
+        assertEquals(1.0, func.getX(0));
+        assertEquals(10.0, func.getY(0));
+        assertEquals(2.0, func.getX(1));
+        assertEquals(20.0, func.getY(1));
+    }
+
+    @Test
+    void removeInvalidIndex() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1.0, 2.0}, new double[]{10.0, 20.0}
+        );
+        assertThrows(IllegalArgumentException.class, () -> func.remove(-1));
+        assertThrows(IllegalArgumentException.class, () -> func.remove(2));
     }
 
 }

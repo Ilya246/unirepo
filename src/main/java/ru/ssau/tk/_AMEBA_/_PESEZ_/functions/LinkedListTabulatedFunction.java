@@ -1,6 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable {
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable{
     private  int count;
     private  Node head;
     private void addNode(double x, double y){
@@ -23,6 +23,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
         if (xValues.length != yValues.length) {
             throw new IllegalArgumentException("Размеры массивов не совпадают");
+        }
+        if (xValues.length < 2) {
+            throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         }
         for (int i = 1; i < xValues.length; i++) {
             if (xValues[i] <= xValues[i - 1]) {
@@ -177,6 +180,28 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         Node nextNode = floorNode.next;
         return interpolate(x, floorNode.x, nextNode.x, floorNode.y, nextNode.y);
 
+    }
+
+    @Override
+    public void remove(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index out of bounds");
+        }
+
+        Node toRemove = getNode(index);
+
+        if (count == 1) {
+            head = null;
+        } else {
+            toRemove.prev.next = toRemove.next;
+            toRemove.next.prev = toRemove.prev;
+
+            if (toRemove == head) {
+                head = toRemove.next;
+            }
+        }
+
+        count--;
     }
 
     @Override
