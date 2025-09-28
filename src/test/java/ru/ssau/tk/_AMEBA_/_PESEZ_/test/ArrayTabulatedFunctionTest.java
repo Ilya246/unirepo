@@ -3,6 +3,8 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayTabulatedFunctionTest {
@@ -62,4 +64,53 @@ class ArrayTabulatedFunctionTest {
         assertEquals(1, func.apply(1));
         assertEquals(1, func.apply(2));
     }
+    @Test
+    void testInsertReplaceExistingX() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{0, 1, 2}, new double[]{0, 10, 20});
+
+        func.insert(1, 100);
+
+        assertEquals(3, func.getCount());
+        assertEquals(100, func.getY(1));
+    }
+
+    @Test
+    void testInsertNewInside() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{0, 2, 4}, new double[]{0, 20, 40});
+
+        func.insert(3, 30);
+
+        assertEquals(4, func.getCount());
+        assertEquals(2, func.indexOfX(3));
+        assertEquals(30, func.getY(2));
+        assertEquals(40, func.getY(3));
+    }
+
+    @Test
+    void testInsertNewAtStart() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        func.insert(0, 0); // вставка в начало
+
+        assertEquals(4, func.getCount());
+        assertEquals(0, func.getX(0));
+        assertEquals(0, func.getY(0));
+        assertEquals(10, func.getY(1));
+    }
+
+    @Test
+    void testInsertNewAtEnd() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        func.insert(4, 40);
+
+        assertEquals(4, func.getCount());
+        assertEquals(4, func.getX(3));
+        assertEquals(40, func.getY(3));
+    }
+
 }

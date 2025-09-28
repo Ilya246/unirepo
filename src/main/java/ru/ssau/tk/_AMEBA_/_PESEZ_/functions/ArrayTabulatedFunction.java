@@ -2,9 +2,9 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
 import java.util.Arrays;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable{
     final private double[] xValues, yValues;
-    final private int count;
+    private int count;
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
         if (xValues.length != yValues.length) throw new RuntimeException("xValues and yValues sizes not equal.");
@@ -16,8 +16,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
         }
 
         this.count = xValues.length;
-        this.xValues = Arrays.copyOf(xValues, count);
-        this.yValues = Arrays.copyOf(yValues, count);
+        this.xValues=Arrays.copyOf(xValues, count*2);
+        this.yValues=Arrays.copyOf(yValues, count*2);
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
@@ -113,5 +113,31 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction {
     @Override
     public double rightBound() {
         return getX(count - 1);
+    }
+
+    @Override
+    public void insert(double x, double y) {
+        for (int i=0; i<count; i++){
+            if (x==xValues[i]){
+                yValues[i]=y;
+                return;
+            }
+        }
+
+        if (count==xValues.length){
+            throw new RuntimeException("Массив переполнен");
+        }
+
+        int index = 0;
+        while (index<count && xValues[index]<x){
+            index++;
+        }
+
+        System.arraycopy(xValues, index, xValues,index+1, count-index);
+        System.arraycopy(yValues, index, yValues,index+1, count-index);
+
+        xValues[index]=x;
+        yValues[index]=y;
+        count++;
     }
 }
