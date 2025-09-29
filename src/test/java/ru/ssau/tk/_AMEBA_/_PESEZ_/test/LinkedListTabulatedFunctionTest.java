@@ -47,6 +47,17 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(1, func.getY(0));
         assertEquals(3, func.getY(1));
         assertEquals(5, func.getY(2));
+
+        func = new LinkedListTabulatedFunction(f, 2, 0, 3);
+
+        assertEquals(3, func.getCount());
+        assertEquals(0, func.getX(0));
+        assertEquals(1, func.getX(1));
+        assertEquals(2, func.getX(2));
+
+        assertEquals(1, func.getY(0));
+        assertEquals(3, func.getY(1));
+        assertEquals(5, func.getY(2));
     }
 
     @Test
@@ -249,6 +260,17 @@ class LinkedListTabulatedFunctionTest {
         assertEquals(10.0, func.getY(0));
         assertEquals(2.0, func.getX(1));
         assertEquals(20.0, func.getY(1));
+
+        // пробуем опустошить
+        func.remove(1);
+        assertEquals(1.0, func.getX(0));
+        assertEquals(10.0, func.getY(0));
+        func.remove(0);
+        assertEquals(0, func.getCount());
+        func.insert(5, 50);
+        assertEquals(1, func.getCount());
+        assertEquals(5.0, func.getX(0));
+        assertEquals(50.0, func.getY(0));
     }
 
     @Test
