@@ -7,11 +7,12 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     private int count;
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
-        if (xValues.length != yValues.length) throw new RuntimeException("xValues and yValues sizes not equal.");
+        if (xValues.length < 2) throw new IllegalArgumentException("Length of tabulated function must be at least 2");
+        if (xValues.length != yValues.length) throw new IllegalArgumentException("xValues and yValues sizes not equal.");
         double px = xValues[0];
         for (int i = 1; i < xValues.length; i++) {
             double cx = xValues[i];
-            if (cx <= px) throw new RuntimeException("ArrayTabulatedFunction input array not sorted.");
+            if (cx <= px) throw new IllegalArgumentException("ArrayTabulatedFunction input array not sorted.");
             px = cx;
         }
 
@@ -21,14 +22,13 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
+        if (count < 2) {
+            throw new IllegalArgumentException("Length of tabulated function must be at least 2");
+        }
+
         xValues = new double[count];
         yValues = new double[count];
         this.count = count;
-        if (count == 1) {
-            xValues[0] = xFrom;
-            yValues[0] = source.apply(xFrom);
-            return;
-        }
 
         double step = Math.abs(xTo - xFrom) / (count - 1);
         double x0 = Math.min(xFrom, xTo);
@@ -44,6 +44,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         // по заданию, >x5 - вернуть count (5), меньше x1 - вернуть 0
         //  0    0    1    2    3    5
         // ---x1---x2---x3---x4---x5---
+        if (x < xValues[0]) {
+            throw new IllegalArgumentException("x is less than left bound");
+        }
+
         for (int i = 1; i < count; i++) {
             if (getX(i) >= x) return i - 1;
         }
@@ -52,19 +56,16 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     protected double extrapolateLeft(double x) {
-        if (count == 1) return getY(0);
         return interpolate(x, getX(0), getX(1), getY(0), getY(1));
     }
 
     @Override
     protected double extrapolateRight(double x) {
-        if (count == 1) return getY(0);
         return interpolate(x, getX(count - 2), getX(count - 1), getY(count - 2), getY(count - 1));
     }
 
     @Override
     protected double interpolate(double x, int floorIndex) {
-        if (count == 1) return getY(0);
         return interpolate(x, getX(floorIndex), getX(floorIndex + 1), getY(floorIndex), getY(floorIndex + 1));
     }
 
@@ -75,16 +76,25 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     public double getX(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index " + index + " is out of bounds [0, " + (count - 1) + "]");
+        }
         return xValues[index];
     }
 
     @Override
     public double getY(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index " + index + " is out of bounds [0, " + (count - 1) + "]");
+        }
         return yValues[index];
     }
 
     @Override
     public void setY(int index, double value) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index " + index + " is out of bounds [0, " + (count - 1) + "]");
+        }
         yValues[index] = value;
     }
 
@@ -147,6 +157,9 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override
     public void remove(int index) {
+        if (index < 0 || index >= count) {
+            throw new IllegalArgumentException("Index " + index + " is out of bounds [0, " + (count - 1) + "]");
+        }
         double[] newXValues = new double[count - 1];
         double[] newYValues = new double[count - 1];
 

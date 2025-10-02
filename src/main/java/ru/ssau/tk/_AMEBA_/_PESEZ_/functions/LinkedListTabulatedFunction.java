@@ -68,7 +68,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public int floorIndexOfX(double x) {
-        if (x < head.x) return 0;
+
+        if (x < head.x) throw new IllegalArgumentException("x is less than left bound");
+
         if (x > head.prev.x) return count;
 
         Node current = head;
@@ -116,7 +118,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     private Node getNode(int index){
         if (index<0 || index>=count){
-            throw new IndexOutOfBoundsException();
+            throw new IllegalArgumentException();
         }
         Node current;
         if (index<count/2){
@@ -180,9 +182,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public  double apply(double x){
-        if (count == 0) {
-            throw new IllegalStateException("Список пустой");
-        }
 
         Node floorNode = floorNodeOfX(x);
 
