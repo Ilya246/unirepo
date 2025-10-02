@@ -3,6 +3,8 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable {
     private double[] xValues, yValues;
@@ -172,5 +174,27 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         xValues = newXValues;
         yValues = newYValues;
         count--;
+    }
+
+    @Override
+    public Iterator<Point> iterator() {
+        class ArrayTabulatedFunctionIterator implements Iterator<Point> {
+            int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i < count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                Point point = new Point(getX(i), getY(i));
+                i++;
+                return point;
+            }
+        }
+
+        return new ArrayTabulatedFunctionIterator();
     }
 }

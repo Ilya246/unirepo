@@ -418,4 +418,26 @@ class ArrayTabulatedFunctionTest {
         assertThrows(InterpolationException.class, () -> func.interpolate(0.5, 0));
     }
 
+    @Test
+    void testIterator() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        var it = func.iterator();
+        double val = 1;
+        while (it.hasNext()) {
+            Point point = it.next();
+            assertEquals(point.getX(), val);
+            assertEquals(point.getY(), val * 10);
+            val += 1;
+        }
+
+        val = 1;
+        for (Point point : func) {
+            assertEquals(point.getX(), val);
+            assertEquals(point.getY(), val * 10);
+            val += 1;
+        }
+    }
+
 }
