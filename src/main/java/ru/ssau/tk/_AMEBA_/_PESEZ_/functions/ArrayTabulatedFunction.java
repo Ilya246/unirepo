@@ -1,5 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
+
 import java.util.Arrays;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable {
@@ -8,13 +10,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
         if (xValues.length < 2) throw new IllegalArgumentException("Length of tabulated function must be at least 2");
-        if (xValues.length != yValues.length) throw new IllegalArgumentException("xValues and yValues sizes not equal.");
-        double px = xValues[0];
-        for (int i = 1; i < xValues.length; i++) {
-            double cx = xValues[i];
-            if (cx <= px) throw new IllegalArgumentException("ArrayTabulatedFunction input array not sorted.");
-            px = cx;
-        }
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
 
         this.count = xValues.length;
         this.xValues=Arrays.copyOf(xValues, count);
@@ -65,8 +62,11 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     @Override
-    protected double interpolate(double x, int floorIndex) {
-        return interpolate(x, getX(floorIndex), getX(floorIndex + 1), getY(floorIndex), getY(floorIndex + 1));
+    public double interpolate(double x, int floorIndex) {
+        double ourX = getX(floorIndex);
+        double nextX = getX(floorIndex + 1);
+        if (x < ourX || x > nextX) throw new InterpolationException();
+        return interpolate(x, ourX, nextX, getY(floorIndex), getY(floorIndex + 1));
     }
 
     @Override

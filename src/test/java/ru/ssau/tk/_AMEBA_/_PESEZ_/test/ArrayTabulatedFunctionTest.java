@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,32 +21,29 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testConstructorWithDifferentLengths() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        DifferentLengthOfArraysException exception = assertThrows(DifferentLengthOfArraysException.class, () -> {
             double[] x = {1.0, 2.0};
             double[] y = {1.0};
             new ArrayTabulatedFunction(x, y);
         });
-        assertTrue(exception.getMessage().contains("xValues and yValues sizes not equal"));
     }
 
     @Test
     void testConstructorWithUnsortedX() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ArrayIsNotSortedException exception = assertThrows(ArrayIsNotSortedException.class, () -> {
             double[] x = {2.0, 1.0, 3.0};
             double[] y = {2.0, 1.0, 3.0};
             new ArrayTabulatedFunction(x, y);
         });
-        assertTrue(exception.getMessage().contains("ArrayTabulatedFunction input array not sorted"));
     }
 
     @Test
     void testConstructorWithDuplicatedX() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        ArrayIsNotSortedException exception = assertThrows(ArrayIsNotSortedException.class, () -> {
             double[] x = {1.0, 2.0, 2.0, 3.0};
             double[] y = {1.0, 4.0, 4.0, 9.0};
             new ArrayTabulatedFunction(x, y);
         });
-        assertTrue(exception.getMessage().contains("ArrayTabulatedFunction input array not sorted"));
     }
 
     @Test
@@ -411,6 +409,13 @@ class ArrayTabulatedFunctionTest {
         assertEquals(10, func.getY(0));
     }
 
+    @Test
+    void testInterpolationException() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
 
+        assertThrows(InterpolationException.class, () -> func.interpolate(2.5, 0));
+        assertThrows(InterpolationException.class, () -> func.interpolate(0.5, 0));
+    }
 
 }

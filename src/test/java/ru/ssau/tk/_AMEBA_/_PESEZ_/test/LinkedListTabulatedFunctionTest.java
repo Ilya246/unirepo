@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
 
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 
@@ -22,18 +23,31 @@ class LinkedListTabulatedFunctionTest {
     private double[] yValues = {1, 3, 5};
 
     @Test
-    void testConstructorWithInvalidArrays() {
+    void testConstructorWithMismatchedArrays() {
         // Несовпадающие размеры массивов
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(DifferentLengthOfArraysException.class, () ->
                 new LinkedListTabulatedFunction(new double[]{1, 2}, new double[]{1}));
+    }
 
+    @Test
+    void testConstructorWithTooSmallArrays() {
         // Меньше 2 точек
         assertThrows(IllegalArgumentException.class, () ->
                 new LinkedListTabulatedFunction(new double[]{1}, new double[]{1}));
+    }
 
+    @Test
+    void testConstructorWithUnsortedX() {
         // Неупорядоченные xValues
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(ArrayIsNotSortedException.class, () ->
                 new LinkedListTabulatedFunction(new double[]{2, 1}, new double[]{1, 2}));
+    }
+
+    @Test
+    void testConstructorWithDuplicateX() {
+        // Дублированные xValues
+        assertThrows(ArrayIsNotSortedException.class, () ->
+                new LinkedListTabulatedFunction(new double[]{2, 2}, new double[]{1, 2}));
     }
 
     @Test
@@ -317,4 +331,12 @@ class LinkedListTabulatedFunctionTest {
         assertThrows(IllegalArgumentException.class, () -> func.remove(2));
     }
 
+    @Test
+    void testInterpolationException() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        assertThrows(InterpolationException.class, () -> func.interpolate(2.5, 0));
+        assertThrows(InterpolationException.class, () -> func.interpolate(0.5, 0));
+    }
 }
