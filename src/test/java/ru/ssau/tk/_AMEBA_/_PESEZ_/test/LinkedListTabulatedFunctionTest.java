@@ -3,8 +3,12 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 import org.junit.jupiter.api.Test;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.Point;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -338,5 +342,28 @@ class LinkedListTabulatedFunctionTest {
 
         assertThrows(InterpolationException.class, () -> func.interpolate(2.5, 0));
         assertThrows(InterpolationException.class, () -> func.interpolate(0.5, 0));
+    }
+    @Test
+    void testIterator() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        var it = func.iterator();
+        double val = 1;
+        while (it.hasNext()) {
+            Point point = it.next();
+            assertEquals(point.getX(), val);
+            assertEquals(point.getY(), val * 10);
+            val += 1;
+        }
+        assertThrows(NoSuchElementException.class, () -> it.next());
+
+        val = 1;
+        for (Point point : func) {
+            assertEquals(point.getX(), val);
+            assertEquals(point.getY(), val * 10);
+            val += 1;
+        }
+
     }
 }

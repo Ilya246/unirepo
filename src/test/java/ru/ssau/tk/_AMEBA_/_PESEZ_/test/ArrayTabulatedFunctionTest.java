@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayTabulatedFunctionTest {
@@ -321,7 +323,7 @@ class ArrayTabulatedFunctionTest {
         assertEquals(4, func.getCount()); // Количество точек должно увеличиться
         assertEquals(2, func.indexOfX(3)); // Новая точка должна быть на позиции 2
         assertEquals(30, func.getY(2)); // Проверка значения новой точки
-        assertEquals(40, func.getY(3)); // Проверка что старая точка сдвинулась
+        assertEquals(40, func.getY(3)); // Проверка, что старая точка сдвинулась
     }
 
     @Test
@@ -431,6 +433,7 @@ class ArrayTabulatedFunctionTest {
             assertEquals(point.getY(), val * 10);
             val += 1;
         }
+        assertThrows(NoSuchElementException.class, () -> it.next());
 
         val = 1;
         for (Point point : func) {

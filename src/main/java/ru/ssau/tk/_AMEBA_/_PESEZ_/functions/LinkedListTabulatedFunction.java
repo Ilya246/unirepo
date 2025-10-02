@@ -2,6 +2,9 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable{
 
     static class Node {
@@ -239,5 +242,30 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         if (x < head.x) head = newNode;
         count++;
+    }
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new Iterator<Point>() {
+            private Node node = head;
+            private int i = 0;
+
+            @Override
+            public boolean hasNext() {
+                return i<count;
+            }
+
+            @Override
+            public Point next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+
+                Point point = new Point(node.x, node.y);
+                node = node.next;
+                i++;
+                return point;
+            }
+        };
     }
 }
