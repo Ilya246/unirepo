@@ -3,6 +3,8 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.ArrayIsNotSortedException;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.DifferentLengthOfArraysException;
 
+import java.util.Iterator;
+
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected abstract int floorIndexOfX(double x);
 
@@ -26,6 +28,11 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
 
         int floorPos = floorIndexOfX(x);
         return interpolate(x, floorPos);
+    }
+
+    @Override
+    public Iterator<Point> iterator() {
+        throw new UnsupportedOperationException();
     }
 
     public static void checkLengthIsTheSame(double[] xValues, double[] yValues) {

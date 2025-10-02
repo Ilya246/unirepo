@@ -1,6 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
-public interface TabulatedFunction extends MathFunction {
+public interface TabulatedFunction extends MathFunction, Iterable<Point> {
     //Метод получения количества табулированных значений
     int getCount();
 
