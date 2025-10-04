@@ -5,7 +5,7 @@ import java.util.Iterator;
 public class StrictTabulatedFunction implements TabulatedFunction{
     TabulatedFunction function;
 
-    StrictTabulatedFunction(TabulatedFunction function){
+    public StrictTabulatedFunction(TabulatedFunction function){
         this.function=function;
     }
 

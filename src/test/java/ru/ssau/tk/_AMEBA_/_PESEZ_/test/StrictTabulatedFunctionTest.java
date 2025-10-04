@@ -1,6 +1,9 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.functions;
+package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.StrictTabulatedFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
