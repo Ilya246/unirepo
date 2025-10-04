@@ -8,62 +8,32 @@ import static org.junit.jupiter.api.Assertions.*;
 class UnmodifiableTabulatedFunctionTest {
 
     @Test
-    void testErrorArrayTable() {
+    void testWrapArrayTable() {
         ArrayTabulatedFunction _func = new ArrayTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
         UnmodifiableTabulatedFunction constFunc = new UnmodifiableTabulatedFunction(_func);
+
+        realAssert(constFunc);
 
         assertThrows(UnsupportedOperationException.class, () -> constFunc.setY(0, 15));
     }
 
     @Test
-    void testFunctionalityArrayTable() {
-        ArrayTabulatedFunction _func = new ArrayTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
-        UnmodifiableTabulatedFunction constFunc = new UnmodifiableTabulatedFunction(_func);
-
-        assertEquals(10, constFunc.apply(1));
-        assertEquals(30, constFunc.apply(3));
-        assertEquals(-5, constFunc.apply(-0.5));
-        assertEquals(25, constFunc.apply(2.5));
-        assertEquals(45, constFunc.apply(4.5));
-        assertEquals(1, constFunc.leftBound());
-        assertEquals(3, constFunc.rightBound());
-        assertEquals(2, constFunc.getX(1));
-        assertEquals(20, constFunc.getY(1));
-        assertEquals(1, constFunc.indexOfX(2));
-        assertEquals(3, constFunc.getCount());
-    }
-
-    @Test
-    void testErrorLinkedListTable() {
+    void testWrapLinkedListTable() {
         LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
         UnmodifiableTabulatedFunction constFunc = new UnmodifiableTabulatedFunction(_func);
+
+        realAssert(constFunc);
 
         assertThrows(UnsupportedOperationException.class, () -> constFunc.setY(0, 15));
     }
 
     @Test
-    void testFunctionalityLinkedListTable() {
-        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
-        UnmodifiableTabulatedFunction constFunc = new UnmodifiableTabulatedFunction(_func);
-
-        assertEquals(10, constFunc.apply(1));
-        assertEquals(30, constFunc.apply(3));
-        assertEquals(-5, constFunc.apply(-0.5));
-        assertEquals(25, constFunc.apply(2.5));
-        assertEquals(45, constFunc.apply(4.5));
-        assertEquals(1, constFunc.leftBound());
-        assertEquals(3, constFunc.rightBound());
-        assertEquals(2, constFunc.getX(1));
-        assertEquals(20, constFunc.getY(1));
-        assertEquals(1, constFunc.indexOfX(2));
-        assertEquals(3, constFunc.getCount());
-    }
-
-    @Test
-    void testErrorWrapStrictTable() {
+    void testWrapStrictTable() {
         LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
         StrictTabulatedFunction _strict = new StrictTabulatedFunction(_func);
         UnmodifiableTabulatedFunction wrapFunc = new UnmodifiableTabulatedFunction(_strict);
+
+        integerAssert(wrapFunc);
 
         assertThrows(UnsupportedOperationException.class, () -> wrapFunc.setY(0, 15));
         assertThrows(UnsupportedOperationException.class, () -> wrapFunc.apply(1.5));
@@ -71,20 +41,22 @@ class UnmodifiableTabulatedFunctionTest {
         assertThrows(UnsupportedOperationException.class, () -> wrapFunc.apply(4.5));
     }
 
-    @Test
-    void testFunctionalityWrapStrictTable() {
-        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
-        StrictTabulatedFunction _strict = new StrictTabulatedFunction(_func);
-        UnmodifiableTabulatedFunction wrapFunc = new UnmodifiableTabulatedFunction(_strict);
+    void integerAssert(TabulatedFunction func) {
+        assertEquals(10, func.apply(1));
+        assertEquals(20, func.apply(2));
+        assertEquals(30, func.apply(3));
+        assertEquals(1, func.leftBound());
+        assertEquals(3, func.rightBound());
+        assertEquals(2, func.getX(1));
+        assertEquals(20, func.getY(1));
+        assertEquals(1, func.indexOfX(2));
+        assertEquals(3, func.getCount());
+    }
 
-        assertEquals(10, wrapFunc.apply(1));
-        assertEquals(20, wrapFunc.apply(2));
-        assertEquals(30, wrapFunc.apply(3));
-        assertEquals(1, wrapFunc.leftBound());
-        assertEquals(3, wrapFunc.rightBound());
-        assertEquals(2, wrapFunc.getX(1));
-        assertEquals(20, wrapFunc.getY(1));
-        assertEquals(1, wrapFunc.indexOfX(2));
-        assertEquals(3, wrapFunc.getCount());
+    void realAssert(TabulatedFunction func) {
+        integerAssert(func);
+        assertEquals(-5, func.apply(-0.5));
+        assertEquals(25, func.apply(2.5));
+        assertEquals(45, func.apply(4.5));
     }
 }
