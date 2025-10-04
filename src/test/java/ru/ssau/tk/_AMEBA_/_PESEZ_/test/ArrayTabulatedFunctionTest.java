@@ -3,6 +3,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.operations.*;
 
 import java.util.NoSuchElementException;
 
@@ -441,6 +442,21 @@ class ArrayTabulatedFunctionTest {
             assertEquals(point.getY(), val * 10);
             val += 1;
         }
+    }
+
+    @Test
+    void testAsPoints() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(
+                new double[]{1, 2, 3}, new double[]{10, 20, 30});
+
+        Point[] pts = TabulatedFunctionOperationService.asPoints(func);
+        assertEquals(3, pts.length);
+        assertEquals(1, pts[0].getX());
+        assertEquals(2, pts[1].getX());
+        assertEquals(3, pts[2].getX());
+        assertEquals(10, pts[0].getY());
+        assertEquals(20, pts[1].getY());
+        assertEquals(30, pts[2].getY());
     }
 
 }
