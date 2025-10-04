@@ -41,6 +41,12 @@ class TabulatedFunctionFactoryTest {
     }
 
     @Test
+    void testCreateStrictUnmodifiable() {
+        var factory = new ArrayTabulatedFunctionFactory();
+        testStrictUnmodifiable(factory);
+    }
+
+    @Test
     void testCreateUnmodifiableList() {
         var factory = new LinkedListTabulatedFunctionFactory();
 
@@ -76,6 +82,18 @@ class TabulatedFunctionFactoryTest {
         assertThrows(UnsupportedOperationException.class, () -> function.apply(1.5));
 
     }
+
+    void testStrictUnmodifiable(TabulatedFunctionFactory factory) {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        TabulatedFunction function = factory.createStrictUnmodifiable(xValues, yValues);
+
+        testFunction(function);
+        assertThrows(UnsupportedOperationException.class, () -> function.apply(1.5));
+        assertThrows(UnsupportedOperationException.class, () -> function.setY(0, 15.0));
+    }
+
 
     void testFunction(TabulatedFunction function) {
         assertEquals(3, function.getCount());
