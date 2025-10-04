@@ -49,6 +49,19 @@ public class TabulatedFunctionOperationService {
         return doOperation(a, b, (double yA, double yB) -> yA - yB);
     }
 
+    public TabulatedFunction multiply(TabulatedFunction a, TabulatedFunction b){
+        return doOperation(a, b, (double yA, double yB) -> yA * yB);
+    }
+
+    public TabulatedFunction divide(TabulatedFunction a, TabulatedFunction b){
+        return doOperation(a, b, (double yA, double yB) -> {
+            if (yB == 0) {
+                throw new ArithmeticException("Division by zero");
+            }
+            return yA / yB;
+        });
+    }
+
     public TabulatedFunctionFactory getFactory() {
         return factory;
     }
