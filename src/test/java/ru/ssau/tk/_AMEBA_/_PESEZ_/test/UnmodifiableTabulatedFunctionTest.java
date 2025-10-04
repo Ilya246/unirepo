@@ -58,4 +58,33 @@ class UnmodifiableTabulatedFunctionTest {
         assertEquals(1, constFunc.indexOfX(2));
         assertEquals(3, constFunc.getCount());
     }
+
+    @Test
+    void testErrorWrapStrictTable() {
+        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
+        StrictTabulatedFunction _strict = new StrictTabulatedFunction(_func);
+        UnmodifiableTabulatedFunction wrapFunc = new UnmodifiableTabulatedFunction(_strict);
+
+        assertThrows(UnsupportedOperationException.class, () -> wrapFunc.setY(0, 15));
+        assertThrows(UnsupportedOperationException.class, () -> wrapFunc.apply(1.5));
+        assertThrows(UnsupportedOperationException.class, () -> wrapFunc.apply(-0.5));
+        assertThrows(UnsupportedOperationException.class, () -> wrapFunc.apply(4.5));
+    }
+
+    @Test
+    void testFunctionalityWrapStrictTable() {
+        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
+        StrictTabulatedFunction _strict = new StrictTabulatedFunction(_func);
+        UnmodifiableTabulatedFunction wrapFunc = new UnmodifiableTabulatedFunction(_strict);
+
+        assertEquals(10, wrapFunc.apply(1));
+        assertEquals(20, wrapFunc.apply(2));
+        assertEquals(30, wrapFunc.apply(3));
+        assertEquals(1, wrapFunc.leftBound());
+        assertEquals(3, wrapFunc.rightBound());
+        assertEquals(2, wrapFunc.getX(1));
+        assertEquals(20, wrapFunc.getY(1));
+        assertEquals(1, wrapFunc.indexOfX(2));
+        assertEquals(3, wrapFunc.getCount());
+    }
 }
