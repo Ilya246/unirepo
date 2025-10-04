@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.StrictTabulatedFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.UnmodifiableTabulatedFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,6 +115,46 @@ class StrictTabulatedFunctionTest {
         assertEquals(25.0, strictFunc.getY(1));
     }
 
+    @Test
+    void testStrictAndUnmodifiableCombination() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        ArrayTabulatedFunction arrayFunc = new ArrayTabulatedFunction(xValues, yValues);
+
+        UnmodifiableTabulatedFunction unmodifiableFunc = new UnmodifiableTabulatedFunction(arrayFunc);
+        StrictTabulatedFunction strictUnmodifiable = new StrictTabulatedFunction(unmodifiableFunc);
+
+        // Тест чтения
+        assertEquals(3, strictUnmodifiable.getCount());
+        assertEquals(1.0, strictUnmodifiable.getX(0));
+        assertEquals(10.0, strictUnmodifiable.getY(0));
+
+        // Тест изменения значений
+        assertThrows(UnsupportedOperationException.class, () -> strictUnmodifiable.setY(0, 15.0));
+
+        // Тест запрета интерполяции
+        assertThrows(UnsupportedOperationException.class, () -> strictUnmodifiable.apply(1.5));
+    }
+
+    @Test
+    void testStrictUnmodifiableWithLinkedList() {
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+
+        LinkedListTabulatedFunction linkedListFunc = new LinkedListTabulatedFunction(xValues, yValues);
+
+        UnmodifiableTabulatedFunction unmodifiableFunc = new UnmodifiableTabulatedFunction(linkedListFunc);
+        StrictTabulatedFunction strictUnmodifiable = new StrictTabulatedFunction(unmodifiableFunc);
+
+        assertEquals(3, strictUnmodifiable.getCount());
+        assertEquals(1.0, strictUnmodifiable.getX(0));
+        assertEquals(10.0, strictUnmodifiable.getY(0));
+
+        assertThrows(UnsupportedOperationException.class, () -> strictUnmodifiable.setY(0, 15.0));
+
+        assertThrows(UnsupportedOperationException.class, () -> strictUnmodifiable.apply(1.5));
+    }
 
 
 }
