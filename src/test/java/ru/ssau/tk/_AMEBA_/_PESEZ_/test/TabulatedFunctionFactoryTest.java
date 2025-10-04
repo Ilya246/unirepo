@@ -34,6 +34,13 @@ class TabulatedFunctionFactoryTest {
     }
 
     @Test
+    void testCreateStrict() {
+        var factory = new ArrayTabulatedFunctionFactory();
+
+        testStrict(factory);
+    }
+
+    @Test
     void testCreateUnmodifiableList() {
         var factory = new LinkedListTabulatedFunctionFactory();
 
@@ -58,6 +65,16 @@ class TabulatedFunctionFactoryTest {
 
         testFunction(function);
         assertThrows(UnsupportedOperationException.class, () -> function.setY(0, 5));
+    }
+
+    void testStrict(TabulatedFunctionFactory factory){
+        double[] xValues = {1.0, 2.0, 3.0};
+        double[] yValues = {10.0, 20.0, 30.0};
+        TabulatedFunction function=factory.createStrict(xValues, yValues);
+
+        testFunction(function);
+        assertThrows(UnsupportedOperationException.class, () -> function.apply(1.5));
+
     }
 
     void testFunction(TabulatedFunction function) {
