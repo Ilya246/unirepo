@@ -21,6 +21,19 @@ public final class FunctionsIO {
         print.flush();
     }
 
+    public static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction function) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+
+        dataOutputStream.writeInt(function.getCount());
+
+        for (Point point : function) {
+            dataOutputStream.writeDouble(point.getX());
+            dataOutputStream.writeDouble(point.getY());
+        }
+
+        dataOutputStream.flush();
+    }
+
     public static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory) throws IOException {
         int count = Integer.parseInt(reader.readLine());
         var xValues = new double[count];
