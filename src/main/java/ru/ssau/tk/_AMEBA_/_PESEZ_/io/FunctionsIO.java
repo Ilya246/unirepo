@@ -1,14 +1,17 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.io;
 
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.Point;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
-
 import java.io.*;
+import java.text.*;
+import java.util.Locale;
+
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.TabulatedFunctionFactory;
 
 public final class FunctionsIO {
     private FunctionsIO() {
         throw new UnsupportedOperationException();
     }
+
     public static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction function) {
         var print = new PrintWriter(writer);
         print.println(function.getCount());
@@ -17,17 +20,25 @@ public final class FunctionsIO {
         }
         print.flush();
     }
-    public static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction function) throws IOException {
-        DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 
-        dataOutputStream.writeInt(function.getCount());
+    public static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory) throws IOException {
+        int count = Integer.parseInt(reader.readLine());
+        var xValues = new double[count];
+        var yValues = new double[count];
 
-        for (Point point : function) {
-            dataOutputStream.writeDouble(point.getX());
-            dataOutputStream.writeDouble(point.getY());
+        try {
+            var formatter = NumberFormat.getInstance(Locale.forLanguageTag("ru"));
+            for (int i = 0; i < count; i++) {
+                String line = reader.readLine();
+                String[] numbers = line.split(" ");
+                xValues[i] = formatter.parse(numbers[0]).doubleValue();
+                yValues[i] = formatter.parse(numbers[1]).doubleValue();
+            }
+        } catch (ParseException error) {
+            throw new IOException(error);
         }
 
-        dataOutputStream.flush();
+        return factory.create(xValues, yValues);
     }
 
 }
