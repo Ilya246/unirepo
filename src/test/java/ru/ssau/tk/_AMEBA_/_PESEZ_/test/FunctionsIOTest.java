@@ -68,7 +68,7 @@ class FunctionsIOTest {
         double[] yValues = {4.5, 5.5, 6.5};
         TabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        File testFile = new File(TEMP_DIR, "test_write_buffered_stream.bin");
+        var testFile = new File(TEMP_DIR, "test_write_buffered_stream.bin");
 
         // Вызов тестируемого метода
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(testFile))) {
@@ -78,7 +78,7 @@ class FunctionsIOTest {
         // Проверка результата
         assertTrue(testFile.exists());
 
-        try (DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(testFile)))) {
+        try (var dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(testFile)))) {
             assertEquals(3, dataInputStream.readInt());
             assertEquals(1.5, dataInputStream.readDouble(), 0.0001);
             assertEquals(4.5, dataInputStream.readDouble(), 0.0001);
@@ -92,9 +92,9 @@ class FunctionsIOTest {
     @Test
     void readTabulatedFunctionWithBufferedInputStream() throws IOException {
         // Подготовка тестовых данных
-        File testFile = new File(TEMP_DIR, "test_read_buffered_stream.bin");
+        var testFile = new File(TEMP_DIR, "test_read_buffered_stream.bin");
 
-        try (DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(testFile)))) {
+        try (var dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(testFile)))) {
             dataOutputStream.writeInt(2);
             dataOutputStream.writeDouble(1.5);
             dataOutputStream.writeDouble(4.5);
@@ -103,8 +103,8 @@ class FunctionsIOTest {
         }
 
         // Вызов тестируемого метода
-        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
-            ArrayTabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
+        try (var inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
+            var factory = new ArrayTabulatedFunctionFactory();
             TabulatedFunction function = FunctionsIO.readTabulatedFunction(inputStream, factory);
 
             // Проверка результата
@@ -125,13 +125,13 @@ class FunctionsIOTest {
         double[] yValues = {10.0, 20.0, 30.0};
         TabulatedFunction originalFunction = new ArrayTabulatedFunction(xValues, yValues);
 
-        File testFile = new File(TEMP_DIR, "test_deserialize_array.bin");
+        var testFile = new File(TEMP_DIR, "test_deserialize_array.bin");
 
-        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(testFile))) {
+        try (var outputStream = new BufferedOutputStream(new FileOutputStream(testFile))) {
             FunctionsIO.serialize(outputStream, originalFunction);
         }
 
-        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
+        try (var inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
             TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
 
             assertNotNull(deserializedFunction);
@@ -153,13 +153,13 @@ class FunctionsIOTest {
         double[] yValues = {1.5, 2.5, 3.5};
         TabulatedFunction originalFunction = new LinkedListTabulatedFunction(xValues, yValues);
 
-        File testFile = new File(TEMP_DIR, "test_deserialize_linkedlist.bin");
+        var testFile = new File(TEMP_DIR, "test_deserialize_linkedlist.bin");
 
-        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(testFile))) {
+        try (var outputStream = new BufferedOutputStream(new FileOutputStream(testFile))) {
             FunctionsIO.serialize(outputStream, originalFunction);
         }
 
-        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
+        try (var inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
             TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
 
             assertNotNull(deserializedFunction);
@@ -177,10 +177,10 @@ class FunctionsIOTest {
 
     @Test
     void deserializeWithInvalidFile() {
-        File nonExistentFile = new File(TEMP_DIR, "non_existent.bin");
+        var nonExistentFile = new File(TEMP_DIR, "non_existent.bin");
 
         assertThrows(IOException.class, () -> {
-            try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(nonExistentFile))) {
+            try (var inputStream = new BufferedInputStream(new FileInputStream(nonExistentFile))) {
                 FunctionsIO.deserialize(inputStream);
             }
         });
@@ -188,15 +188,15 @@ class FunctionsIOTest {
 
     @Test
     void deserializeWithInvalidData() throws IOException {
-        File invalidFile = new File(TEMP_DIR, "invalid_data.bin");
+        var invalidFile = new File(TEMP_DIR, "invalid_data.bin");
 
 
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(invalidFile))) {
+        try (var dos = new DataOutputStream(new FileOutputStream(invalidFile))) {
             dos.writeUTF("This is not a serialized object");
         }
 
         assertThrows(IOException.class, () -> {
-            try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(invalidFile))) {
+            try (var inputStream = new BufferedInputStream(new FileInputStream(invalidFile))) {
                 FunctionsIO.deserialize(inputStream);
             }
         });
