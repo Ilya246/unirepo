@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,5 +34,12 @@ class AbstractTabulatedFunctionTests {
         assertEquals(-17, func.apply(-9.5));
         assertEquals(28, func.apply(-32));
         assertEquals(-62, func.apply(13));
+    }
+    @Test
+    void testToString() {
+        var function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+        var result = function.toString();
+
+        assertEquals("ArrayTabulatedFunction size = 3\n[1.0; 10.0]\n[2.0; 20.0]\n[3.0; 30.0]", result);
     }
 }
