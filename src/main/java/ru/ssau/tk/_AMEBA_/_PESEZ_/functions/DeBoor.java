@@ -3,18 +3,18 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 public class DeBoor implements MathFunction {
 
 
-    static int segmentIndex;
-    static double[] knots;
-    static double[] controlPoints;
-    static int degree;
+    int segmentIndex;
+    double[] knots;
+    double[] controlPoints;
+    int degree;
     public DeBoor(int segmentIndex, double[] knots, double[] controlPoints, int degree) {
-        DeBoor.segmentIndex=segmentIndex;
-        DeBoor.knots=knots;
-        DeBoor.controlPoints=controlPoints;
-        DeBoor.degree=degree;
+        this.segmentIndex=segmentIndex;
+        this.knots=knots;
+        this.controlPoints=controlPoints;
+        this.degree=degree;
     }
 
-    public static double deBoor(double x) {
+    public double deBoor(double x) {
         // Массив для хранения текущих вычислений, размер degree+1
         double[] tempPoints = new double[degree + 1];
 

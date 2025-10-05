@@ -16,6 +16,6 @@ class DeBoorTest {
         double expect=3;
         DeBoor boor = new DeBoor(segmentIndex, knots, controlPoints, degree);
         double res=boor.apply(x);
-        assertEquals(res, expect);
+        assertEquals(expect, res);
     }
 }
