@@ -2,11 +2,16 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable {
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
+    @Serial
+    private static final long serialVersionUID = 8245354040289733450L;
+    
     private double[] xValues, yValues;
     private int count;
 
