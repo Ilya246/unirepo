@@ -1,12 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
+import org.junit.jupiter.api.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.io.FunctionsIO;
 
 import java.io.*;
@@ -117,7 +113,6 @@ class FunctionsIOTest {
         }
     }
 
-
     @Test
     void deserializeArrayTabulatedFunction() throws IOException, ClassNotFoundException {
         // Подготовка тестовых данных
@@ -134,15 +129,7 @@ class FunctionsIOTest {
         try (var inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
             TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
 
-            assertNotNull(deserializedFunction);
-            assertEquals(3, deserializedFunction.getCount());
-
-            for (int i = 0; i < originalFunction.getCount(); i++) {
-                assertEquals(originalFunction.getX(i), deserializedFunction.getX(i), 0.0001);
-                assertEquals(originalFunction.getY(i), deserializedFunction.getY(i), 0.0001);
-            }
-
-            assertInstanceOf(ArrayTabulatedFunction.class, deserializedFunction);
+            assertEquals(originalFunction, deserializedFunction);
         }
     }
 
@@ -162,18 +149,49 @@ class FunctionsIOTest {
         try (var inputStream = new BufferedInputStream(new FileInputStream(testFile))) {
             TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
 
-            assertNotNull(deserializedFunction);
-            assertEquals(3, deserializedFunction.getCount());
-
-            for (int i = 0; i < originalFunction.getCount(); i++) {
-                assertEquals(originalFunction.getX(i), deserializedFunction.getX(i), 0.0001);
-                assertEquals(originalFunction.getY(i), deserializedFunction.getY(i), 0.0001);
-            }
-
-            assertInstanceOf(LinkedListTabulatedFunction.class, deserializedFunction);
+            assertEquals(originalFunction, deserializedFunction);
         }
     }
 
+    @Test
+    void readWriteArrayTabulatedFunction() throws IOException, ClassNotFoundException {
+        // Подготовка тестовых данных
+        double[] xValues = {0.5, 1.5, 2.5};
+        double[] yValues = {1.5, 2.5, 3.5};
+        TabulatedFunction originalFunction = new ArrayTabulatedFunction(xValues, yValues);
+
+        var testFile = new File(TEMP_DIR, "test_readwrite_array.txt");
+
+        try (var outputStream = new BufferedWriter(new FileWriter(testFile))) {
+            FunctionsIO.writeTabulatedFunction(outputStream, originalFunction);
+        }
+
+        try (var inputStream = new BufferedReader(new FileReader(testFile))) {
+            TabulatedFunction deserializedFunction = FunctionsIO.readTabulatedFunction(inputStream, new ArrayTabulatedFunctionFactory());
+
+            assertEquals(originalFunction, deserializedFunction);
+        }
+    }
+
+    @Test
+    void readWriteLinkedListTabulatedFunction() throws IOException, ClassNotFoundException {
+        // Подготовка тестовых данных
+        double[] xValues = {0.5, 1.5, 2.5};
+        double[] yValues = {1.5, 2.5, 3.5};
+        TabulatedFunction originalFunction = new LinkedListTabulatedFunction(xValues, yValues);
+
+        var testFile = new File(TEMP_DIR, "test_readwrite_linkedlist.txt");
+
+        try (var outputStream = new BufferedWriter(new FileWriter(testFile))) {
+            FunctionsIO.writeTabulatedFunction(outputStream, originalFunction);
+        }
+
+        try (var inputStream = new BufferedReader(new FileReader(testFile))) {
+            TabulatedFunction deserializedFunction = FunctionsIO.readTabulatedFunction(inputStream, new ArrayTabulatedFunctionFactory());
+
+            assertEquals(originalFunction, deserializedFunction);
+        }
+    }
 
     @Test
     void deserializeWithInvalidFile() {
@@ -201,6 +219,4 @@ class FunctionsIOTest {
             }
         });
     }
-
-
 }

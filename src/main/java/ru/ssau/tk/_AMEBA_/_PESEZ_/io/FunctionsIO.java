@@ -2,9 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.io;
 
 import java.io.*;
 import java.text.*;
-import java.util.Locale;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
@@ -42,8 +40,8 @@ public final class FunctionsIO {
         var xValues = new double[count];
         var yValues = new double[count];
 
-        try {
-            var formatter = NumberFormat.getInstance(Locale.forLanguageTag("ru"));
+        try {                                        // числа записываются через точку, а это пытается читать их через запятую
+            var formatter = NumberFormat.getInstance(/*Locale.forLanguageTag("ru")*/);
             for (int i = 0; i < count; i++) {
                 String line = reader.readLine();
                 String[] numbers = line.split(" ");
@@ -71,7 +69,6 @@ public final class FunctionsIO {
 
         return factory.create(xValues, yValues);
     }
-
 
     public static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
         var output = new ObjectOutputStream(stream);

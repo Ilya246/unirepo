@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.ArrayIsNotSortedException;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.DifferentLengthOfArraysException;
+import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
 
 import java.util.Iterator;
 
@@ -53,5 +54,21 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
             sb.append("\n[").append(getX(i)).append("; ").append(getY(i)).append("]");
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TabulatedFunction otherTab)) return false;
+
+        int count = otherTab.getCount();
+        if (count != otherTab.getCount()) return false;
+
+        Point[] ourPoints = TabulatedFunctionOperationService.asPoints(this);
+        Point[] otherPoints = TabulatedFunctionOperationService.asPoints(otherTab);
+        for (int i = 0; i < count; ++i) {
+            if (!ourPoints[i].equals(otherPoints[i])) return false;
+        }
+
+        return true;
     }
 }

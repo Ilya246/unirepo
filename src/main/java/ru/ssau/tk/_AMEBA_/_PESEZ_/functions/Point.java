@@ -15,4 +15,9 @@ public class Point {
     public double getY() {
         return y;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof Point p) && x == p.x && y == p.y;
+    }
 }
