@@ -4,6 +4,7 @@ import java.io.*;
 import java.text.*;
 import java.util.Locale;
 
+import com.thoughtworks.xstream.XStream;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.TabulatedFunctionFactory;
 
@@ -79,5 +80,19 @@ public final class FunctionsIO {
     public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
         var input = new ObjectInputStream(stream);
         return (TabulatedFunction) input.readObject();
+    }
+
+    public static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+        var stream = new XStream();
+        String xml = stream.toXML(function);
+        writer.write(xml);
+        writer.flush();
+    }
+
+    public static ArrayTabulatedFunction deserializeXml(BufferedReader reader) {
+        var stream = new XStream();
+        stream.allowTypes(new Class[] {ArrayTabulatedFunction.class});
+        Object function = stream.fromXML(reader);
+        return (ArrayTabulatedFunction) function;
     }
 }
