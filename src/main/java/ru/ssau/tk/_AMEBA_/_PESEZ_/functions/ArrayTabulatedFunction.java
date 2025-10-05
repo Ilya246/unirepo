@@ -1,5 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
 
 import java.io.Serial;
@@ -12,10 +15,12 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Serial
     private static final long serialVersionUID = 8245354040289733450L;
 
+    @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] xValues, yValues;
     private int count;
 
-    public ArrayTabulatedFunction(double[] xValues, double[] yValues) {
+    @JsonCreator
+    public ArrayTabulatedFunction(@JsonProperty(value = "xValues") double[] xValues, @JsonProperty(value = "yValues") double[] yValues) {
         if (xValues.length < 2) throw new IllegalArgumentException("Length of tabulated function must be at least 2");
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);

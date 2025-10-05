@@ -4,6 +4,8 @@ import java.io.*;
 import java.text.*;
 import java.util.Locale;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.TabulatedFunctionFactory;
@@ -95,4 +97,17 @@ public final class FunctionsIO {
         Object function = stream.fromXML(reader);
         return (ArrayTabulatedFunction) function;
     }
+
+    public static void serializeJson(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+        var object=new ObjectMapper();
+        String jsonString = object.writeValueAsString(function);
+        writer.write(jsonString);
+        writer.flush();
+    }
+
+    public static ArrayTabulatedFunction deserializeJson(BufferedReader reader) throws IOException {
+        var mapper = new ObjectMapper();
+        return mapper.readerFor(ArrayTabulatedFunction.class).readValue(reader);
+    }
+
 }
