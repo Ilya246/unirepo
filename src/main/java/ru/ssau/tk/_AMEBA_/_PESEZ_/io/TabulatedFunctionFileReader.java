@@ -1,8 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.io;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.LinkedListTabulatedFunctionFactory;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
 
 import java.io.*;
 
@@ -18,7 +17,7 @@ public class TabulatedFunctionFileReader {
             TabulatedFunction listFunc = FunctionsIO.readTabulatedFunction(listTableReader, new LinkedListTabulatedFunctionFactory());
 
             System.out.println(arrayFunc.toString());
-            System.out.println(listFunc.toString    ());
+            System.out.println(listFunc.toString());
         } catch (IOException error) {
             error.printStackTrace(System.err);
         }
