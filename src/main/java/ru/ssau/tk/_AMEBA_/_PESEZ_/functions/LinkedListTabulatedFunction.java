@@ -2,10 +2,17 @@ package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
 
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable{
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable, Serializable {
+
+
+    @Serial
+    private static final long serialVersionUID = -1380045487581388807L;
 
     static class Node {
         public Node next;
