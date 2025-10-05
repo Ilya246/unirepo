@@ -9,12 +9,12 @@ public class ArrayTabulatedFunctionJsonSerialization {
 
         double[] xValues = {1.0, 2.0, 3.0, 4.0, 5.0};
         double[] yValues = {1.0, 4.0, 9.0, 16.0, 25.0};
-        var originalFunction = new ArrayTabulatedFunction(xValues, yValues);
+        ArrayTabulatedFunction originalFunction = new ArrayTabulatedFunction(xValues, yValues);
 
         String filename = "output/array_function.json";
 
         // Сериализация в JSON
-        try (var writer = new BufferedWriter(new FileWriter(filename))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             FunctionsIO.serializeJson(writer, originalFunction);
             System.out.println("Функция успешно сериализована в JSON файл: " + filename);
             System.out.println("Исходная функция: " + originalFunction);
@@ -24,7 +24,7 @@ public class ArrayTabulatedFunctionJsonSerialization {
         }
 
         // Десериализация из JSON
-        try (var reader = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             ArrayTabulatedFunction deserializedFunction = FunctionsIO.deserializeJson(reader);
             System.out.println("\nФункция успешно десериализована из JSON файла: " + filename);
             System.out.println("Десериализованная функция: " + deserializedFunction);
