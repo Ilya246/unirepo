@@ -2,8 +2,10 @@ package ru.ssau.tk._AMEBA_._PESEZ_.concurrent;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.Point;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
     private final TabulatedFunction function;
@@ -78,7 +80,23 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     @Override
     public Iterator<Point> iterator() {
         synchronized (function) {
-            return function.iterator();
+            Point[] points = TabulatedFunctionOperationService.asPoints(function);
+            return new Iterator<Point>() {
+                private int currentIndex = 0;
+
+                @Override
+                public boolean hasNext() {
+                    return currentIndex < points.length;
+                }
+
+                @Override
+                public Point next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
+                    return points[currentIndex++];
+                }
+            };
         }
     }
 }
