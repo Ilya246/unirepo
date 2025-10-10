@@ -219,4 +219,38 @@ class FunctionsIOTest {
             }
         });
     }
+
+    @Test
+    void testXmlSerialization() throws IOException {
+        var function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+
+        var _writer = new PipedWriter();
+        var _reader = new PipedReader();
+        _writer.connect(_reader);
+
+        var writer = new BufferedWriter(_writer);
+        var reader = new BufferedReader(_reader);
+
+        FunctionsIO.serializeXml(writer, function);
+        TabulatedFunction after = FunctionsIO.deserializeXml(reader);
+
+        assertEquals(after, function);
+    }
+
+    @Test
+    void testJsonSerialization() throws IOException {
+        var function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+
+        var _writer = new PipedWriter();
+        var _reader = new PipedReader();
+        _writer.connect(_reader);
+
+        var writer = new BufferedWriter(_writer);
+        var reader = new BufferedReader(_reader);
+
+        FunctionsIO.serializeJson(writer, function);
+        TabulatedFunction after = FunctionsIO.deserializeJson(reader);
+
+        assertEquals(after, function);
+    }
 }
