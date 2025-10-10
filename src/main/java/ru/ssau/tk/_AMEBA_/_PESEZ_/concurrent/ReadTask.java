@@ -3,7 +3,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.concurrent;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
 
 public class ReadTask implements Runnable{
-    TabulatedFunction function;
+    private TabulatedFunction function;
 
     public ReadTask(TabulatedFunction tabulatedFunction) {
         this.function = tabulatedFunction;
