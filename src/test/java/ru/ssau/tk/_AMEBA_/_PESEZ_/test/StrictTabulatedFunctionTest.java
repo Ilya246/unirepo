@@ -1,10 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.StrictTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.UnmodifiableTabulatedFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -115,5 +112,17 @@ class StrictTabulatedFunctionTest {
         assertThrows(UnsupportedOperationException.class, () -> strictUnmodifiable.apply(1.5));
     }
 
+    @Test
+    void testIterator() {
+        var arrayFunc = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+        var strictFunc = new StrictTabulatedFunction(arrayFunc);
+
+        int i = 1;
+        for (Point p : strictFunc) {
+            assertEquals(p.getX(), i);
+            assertEquals(p.getY(), i * 10);
+            i++;
+        }
+    }
 
 }
