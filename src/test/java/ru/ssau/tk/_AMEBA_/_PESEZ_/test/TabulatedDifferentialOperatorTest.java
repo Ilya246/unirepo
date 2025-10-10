@@ -1,12 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.LinkedListTabulatedFunctionFactory;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.TabulatedFunctionFactory;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedDifferentialOperator;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -68,6 +64,21 @@ class TabulatedDifferentialOperatorTest {
         assertEquals(4.0, derivative.getY(1), 1e-10);
     }
 
+    @Test
+    void testGetFactory() {
+        var factory = new ArrayTabulatedFunctionFactory();
+        var operator = new TabulatedDifferentialOperator(factory);
+        TabulatedFunctionFactory gotFactory = operator.getFactory();
+        assertSame(factory, gotFactory);
+    }
 
+    @Test
+    void testSetFactory() {
+        var factory = new ArrayTabulatedFunctionFactory();
+        var operator = new TabulatedDifferentialOperator(factory);
+        assertInstanceOf(ArrayTabulatedFunctionFactory.class, operator.getFactory());
 
+        operator.setFactory(new LinkedListTabulatedFunctionFactory());
+        assertInstanceOf(LinkedListTabulatedFunctionFactory.class, operator.getFactory());
+    }
 }

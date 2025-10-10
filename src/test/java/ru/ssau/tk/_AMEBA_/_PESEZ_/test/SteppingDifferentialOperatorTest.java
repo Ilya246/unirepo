@@ -25,6 +25,17 @@ class SteppingDifferentialOperatorTest {
         testDerivatives(op);
     }
 
+    @Test
+    void testExceptions() {
+        var op = new MiddleSteppingDifferentialOperator(0.005);
+        assertDoesNotThrow(() -> op.setStep(0.5));
+        assertThrows(IllegalArgumentException.class, () -> op.setStep(-1));
+        assertThrows(IllegalArgumentException.class, () -> op.setStep(0));
+        assertThrows(IllegalArgumentException.class, () -> op.setStep(Double.NaN));
+        assertThrows(IllegalArgumentException.class, () -> op.setStep(Double.POSITIVE_INFINITY));
+        assertThrows(IllegalArgumentException.class, () -> op.setStep(Double.NEGATIVE_INFINITY));
+    }
+
     void testDerivatives(SteppingDifferentialOperator op) {
         testSqrDerivative(op);
         testIdentityDerivative(op);
