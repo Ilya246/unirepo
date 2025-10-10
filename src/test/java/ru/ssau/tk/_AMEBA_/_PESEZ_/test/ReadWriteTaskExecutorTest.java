@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.ReadTask;
+import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.ReadWriteTaskExecutor;
 import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.WriteTask;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.ConstantFunction;
@@ -10,6 +11,54 @@ import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReadWriteTaskExecutorTest {
+
+    @Test
+    void testMainMethodRunsWithoutExceptions() {
+        // Проверяем что main метод выполняется без исключений
+        assertDoesNotThrow(() -> ReadWriteTaskExecutor.main(new String[]{}));
+    }
+
+    @Test
+    void testThreadStart() throws InterruptedException {
+
+        var constantFunction = new ConstantFunction(-1);
+        var function = new LinkedListTabulatedFunction(constantFunction, 1, 10, 10);
+
+        var readThread = new Thread(new ReadTask(function));
+        var writeThread = new Thread(new WriteTask(function, 0.5));
+
+        readThread.start();
+        writeThread.start();
+
+
+        readThread.join(1000);
+        writeThread.join(1000);
+
+
+        assertEquals(Thread.State.TERMINATED, readThread.getState());
+        assertEquals(Thread.State.TERMINATED, writeThread.getState());
+
+
+        for (int i = 0; i < function.getCount(); i++) {
+            assertEquals(0.5, function.getY(i), 1e-10);
+        }
+    }
+
+    @Test
+    void testMainMethodCompletes() {
+
+        Thread mainThread = new Thread(() -> ReadWriteTaskExecutor.main(new String[]{}));
+        mainThread.start();
+
+
+        assertDoesNotThrow(() -> {
+            mainThread.join(3000); // Ждем 3 секунды
+        });
+
+
+        assertEquals(Thread.State.TERMINATED, mainThread.getState());
+    }
+
     @Test
     void testFunctionCreation() {
         var constantFunction = new ConstantFunction(-1.0);
