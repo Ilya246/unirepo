@@ -1,5 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.operations;
 
+import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.SynchronizedTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.Point;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
@@ -45,5 +46,13 @@ public class TabulatedDifferentialOperator implements DifferentialOperator<Tabul
         yValues[count - 1] = yValues[count - 2];
 
         return factory.create(xValues, yValues);
+    }
+
+    public TabulatedFunction deriveSynchronously(TabulatedFunction function) {
+        SynchronizedTabulatedFunction syncFunc;
+        if (function instanceof SynchronizedTabulatedFunction _syncFunc) syncFunc = _syncFunc;
+        else syncFunc = new SynchronizedTabulatedFunction(function);
+
+        return syncFunc.doSynchronously(this::derive);
     }
 }

@@ -81,4 +81,18 @@ class TabulatedDifferentialOperatorTest {
         operator.setFactory(new LinkedListTabulatedFunctionFactory());
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, operator.getFactory());
     }
+
+    @Test
+    void testDeriveSynchronously() {
+        var operator = new TabulatedDifferentialOperator();
+        var function = new ArrayTabulatedFunction(new double[]{0.0, 1.0, 2.0, 3.0, 4.0}, new double[]{0.0, 1.0, 4.0, 9.0, 16.0});
+
+        var derivative = operator.deriveSynchronously(function);
+
+        assertEquals(1.0, derivative.getY(0), 1e-10);
+        assertEquals(3.0, derivative.getY(1), 1e-10);
+        assertEquals(5.0, derivative.getY(2), 1e-10);
+        assertEquals(7.0, derivative.getY(3), 1e-10);
+        assertEquals(7.0, derivative.getY(4), 1e-10);
+    }
 }
