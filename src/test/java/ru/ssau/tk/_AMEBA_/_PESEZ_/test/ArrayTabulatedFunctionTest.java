@@ -240,6 +240,13 @@ class ArrayTabulatedFunctionTest {
             func.testFloorIndexOfX(0.5);
         });
         assertTrue(exception.getMessage().contains("x is less than left bound"));
+
+        assertEquals(0, func.testFloorIndexOfX(1.5));
+        assertEquals(0, func.testFloorIndexOfX(2.0));
+        assertEquals(1, func.testFloorIndexOfX(2.01));
+        assertEquals(2, func.testFloorIndexOfX(4));
+        assertEquals(4, func.testFloorIndexOfX(4.5));
+        assertEquals(4, func.testFloorIndexOfX(100));
     }
 
 
@@ -278,6 +285,27 @@ class ArrayTabulatedFunctionTest {
         assertEquals(0, func.apply(3));
         assertEquals(-2, func.apply(4));
         assertEquals(-4, func.apply(5));
+    }
+
+    @Test
+    void testGetYExceptions() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(new double[] {0, 1, 2, 5}, new double[] {0, -1, 2, -4});
+        assertThrows(IllegalArgumentException.class, () -> func.getY(-1));
+        assertThrows(IllegalArgumentException.class, () -> func.getY(5));
+    }
+
+    @Test
+    void testSetYExceptions() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(new double[] {0, 1, 2, 5}, new double[] {0, -1, 2, -4});
+        assertThrows(IllegalArgumentException.class, () -> func.setY(-1, 2));
+        assertThrows(IllegalArgumentException.class, () -> func.setY(5, 2));
+    }
+
+    @Test
+    void testRemoveExceptions() {
+        ArrayTabulatedFunction func = new ArrayTabulatedFunction(new double[] {0, 1, 2, 5}, new double[] {0, -1, 2, -4});
+        assertThrows(IllegalArgumentException.class, () -> func.remove(-1));
+        assertThrows(IllegalArgumentException.class, () -> func.remove(5));
     }
 
     @Test

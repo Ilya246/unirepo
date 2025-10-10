@@ -61,7 +61,7 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         if (!(other instanceof TabulatedFunction otherTab)) return false;
 
         int count = otherTab.getCount();
-        if (count != otherTab.getCount()) return false;
+        if (getCount() != otherTab.getCount()) return false;
 
         Point[] ourPoints = TabulatedFunctionOperationService.asPoints(this);
         Point[] otherPoints = TabulatedFunctionOperationService.asPoints(otherTab);

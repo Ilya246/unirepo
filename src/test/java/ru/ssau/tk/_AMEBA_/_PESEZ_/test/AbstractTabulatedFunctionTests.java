@@ -1,7 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,5 +41,35 @@ class AbstractTabulatedFunctionTests {
         var result = function.toString();
 
         assertEquals("ArrayTabulatedFunction size = 3\n[1.0; 10.0]\n[2.0; 20.0]\n[3.0; 30.0]", result);
+    }
+
+    @Test
+    void testEquals() {
+        var function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+
+        assertNotEquals(function, 0);
+        assertEquals(function, function);
+
+        // одна функция, разные типы (равны)
+        var function2 = new LinkedListTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+        assertEquals(function, function2);
+
+        // разное Y
+        var function3 = new LinkedListTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{11.0, 20.0, 30.0});
+        assertNotEquals(function, function3);
+
+        // разное X
+        var function4 = new LinkedListTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{11.0, 20.0, 30.0});
+        assertNotEquals(function, function4);
+
+        // лишняя точка
+        var function5 = new LinkedListTabulatedFunction(new double[]{1.0, 2.0, 3.0, 4.0}, new double[]{11.0, 20.0, 30.0, 40.0});
+        assertNotEquals(function, function5);
+    }
+
+    @Test
+    void testIterator() {
+        MockTabulatedFunction func = new MockTabulatedFunction(0, 0, 3, 5);
+        assertThrows(UnsupportedOperationException.class, func::iterator);
     }
 }

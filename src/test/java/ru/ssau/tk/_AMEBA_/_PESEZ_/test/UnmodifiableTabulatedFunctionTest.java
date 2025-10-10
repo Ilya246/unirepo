@@ -6,10 +6,12 @@ import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UnmodifiableTabulatedFunctionTest {
+    double[] xValues = new double[]{1, 2, 3};
+    double[] yValues = new double[]{10, 20, 30};
 
     @Test
     void testWrapArrayTable() {
-        ArrayTabulatedFunction _func = new ArrayTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
+        ArrayTabulatedFunction _func = new ArrayTabulatedFunction(xValues.clone(), yValues.clone());
         UnmodifiableTabulatedFunction constFunc = new UnmodifiableTabulatedFunction(_func);
 
         realAssert(constFunc);
@@ -19,7 +21,7 @@ class UnmodifiableTabulatedFunctionTest {
 
     @Test
     void testWrapLinkedListTable() {
-        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
+        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(xValues.clone(), yValues.clone());
         UnmodifiableTabulatedFunction constFunc = new UnmodifiableTabulatedFunction(_func);
 
         realAssert(constFunc);
@@ -29,7 +31,7 @@ class UnmodifiableTabulatedFunctionTest {
 
     @Test
     void testWrapStrictTable() {
-        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(new double[]{1, 2, 3}, new double[]{10, 20, 30});
+        LinkedListTabulatedFunction _func = new LinkedListTabulatedFunction(xValues.clone(), yValues.clone());
         StrictTabulatedFunction _strict = new StrictTabulatedFunction(_func);
         UnmodifiableTabulatedFunction wrapFunc = new UnmodifiableTabulatedFunction(_strict);
 
@@ -42,6 +44,12 @@ class UnmodifiableTabulatedFunctionTest {
     }
 
     void integerAssert(TabulatedFunction func) {
+        int i = 1;
+        for (Point p : func) {
+            assertEquals(p.getX(), i);
+            assertEquals(p.getY(), i * 10);
+            i++;
+        }
         assertEquals(10, func.apply(1));
         assertEquals(20, func.apply(2));
         assertEquals(30, func.apply(3));
@@ -50,6 +58,7 @@ class UnmodifiableTabulatedFunctionTest {
         assertEquals(2, func.getX(1));
         assertEquals(20, func.getY(1));
         assertEquals(1, func.indexOfX(2));
+        assertEquals(1, func.indexOfY(20));
         assertEquals(3, func.getCount());
     }
 

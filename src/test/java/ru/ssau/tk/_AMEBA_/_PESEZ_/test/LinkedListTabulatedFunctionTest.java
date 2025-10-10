@@ -39,6 +39,13 @@ class LinkedListTabulatedFunctionTest {
     }
 
     @Test
+    void testConstructorWithSmallCount() {
+        // Меньше 2 точек
+        assertThrows(IllegalArgumentException.class, () ->
+                new LinkedListTabulatedFunction(new UnitFunction(), 1, 10, 1));
+    }
+
+    @Test
     void testConstructorWithUnsortedX() {
         // Неупорядоченные xValues
         assertThrows(ArrayIsNotSortedException.class, () ->
@@ -234,6 +241,16 @@ class LinkedListTabulatedFunctionTest {
         LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(xValues, yValues);
         assertDoesNotThrow(() -> func.apply(-10));
         assertDoesNotThrow(() -> func.apply(10));
+    }
+
+    @Test
+    void testApplyOnEmpty() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(new UnitFunction(), 0, 1, 2);
+        func.remove(0);
+        func.remove(0);
+        assertEquals(0, func.getCount());
+        // head должна быть null
+        assertThrows(NullPointerException.class, () -> func.apply(0));
     }
 
     @Test
