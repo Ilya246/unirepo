@@ -34,7 +34,6 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
                 double ourResult = leftTask.compute();
                 return ourResult + rightTask.join();
             } else {
-                System.out.println(Thread.currentThread().getName() + " executing " + left + " to " + right);
                 return getIntegral();
             }
         }
@@ -51,7 +50,6 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
                 // z(x1) = z0 + (y1 + y0)*(x1 - x0)/2
                 integral += (y1 + y0)*(x1 - x0)/2;
             }
-            System.out.println(Thread.currentThread().getName() + " done in " + (double)(System.nanoTime() - startTime) / 1e9 + " s");
             return integral;
         }
     }
