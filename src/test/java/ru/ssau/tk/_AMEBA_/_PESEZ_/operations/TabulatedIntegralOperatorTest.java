@@ -8,14 +8,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class TabulatedIntegralOperatorTest {
 
     @Test
-    void testIntegrateUnitFunction() {
-        var func = new ArrayTabulatedFunction(new UnitFunction(), 0, 100000000, 100000001);
-        var integrator = new TabulatedIntegralOperator(1000000);
+    void testIntegrateUnitFunction() throws InterruptedException {
+        var func = new ArrayTabulatedFunction(new UnitFunction(), 0, 500000000, 500000001);
+        var integrator = new TabulatedIntegralOperator(20000000);
 
         var time1 = System.nanoTime();
         double result = integrator.integrate(func);
         System.out.println("Time taken: " + (double)(System.nanoTime() - time1) / 1e9);
 
-        assertEquals(100000000, result);
+        assertEquals(500000000, result);
     }
 }

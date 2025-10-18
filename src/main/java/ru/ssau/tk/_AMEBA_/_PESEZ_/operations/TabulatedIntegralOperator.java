@@ -15,21 +15,21 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
 
     private static class IntegrateTask extends RecursiveTask<Double> {
         private final int left, right, partSize;
-        private final Point[] points;
+        private final TabulatedFunction function;
 
-        public IntegrateTask(int left, int right, int partSize, Point[] points) {
+        public IntegrateTask(int left, int right, int partSize, TabulatedFunction function) {
             this.left = left;
             this.right = right;
             this.partSize = partSize;
-            this.points = points;
+            this.function = function;
         }
 
         @Override
         protected Double compute() {
             if (right - left > partSize) {
                 int mid = (left + right) / 2;
-                IntegrateTask leftTask = new IntegrateTask(left, mid, partSize, points);
-                IntegrateTask rightTask = new IntegrateTask(mid, right, partSize, points);
+                IntegrateTask leftTask = new IntegrateTask(left, mid, partSize, function);
+                IntegrateTask rightTask = new IntegrateTask(mid, right, partSize, function);
                 rightTask.fork();
                 double ourResult = leftTask.compute();
                 return ourResult + rightTask.join();
@@ -40,10 +40,10 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
         }
 
         private double getIntegral() {
+            long startTime = System.nanoTime();
             double integral = 0;
             for (int i = left; i < right; i++) {
-                Point pt = points[i], prevPt = points[i - 1];
-                double x0 = prevPt.getX(), y0 = prevPt.getY(), x1 = pt.getX(), y1 = pt.getY();
+                double x0 = function.getX(i - 1), y0 = function.getY(i - 1), x1 = function.getX(i), y1 = function.getY(i);
                 // y = y0 + (y1 - y0) * (x - x0) / (x1 - x0)
                 // y = z'
                 // z = z0 + y0 * (x - x0) + (y1 - y0) * (x - x0)^2 / 2 / (x1 - x0)
@@ -51,19 +51,18 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
                 // z(x1) = z0 + (y1 + y0)*(x1 - x0)/2
                 integral += (y1 + y0)*(x1 - x0)/2;
             }
-            System.out.println(Thread.currentThread().getName() + " done");
+            System.out.println(Thread.currentThread().getName() + " done in " + (double)(System.nanoTime() - startTime) / 1e9 + " s");
             return integral;
         }
     }
 
     @Override
     public Double integrate(TabulatedFunction function) {
-        Point[] points = TabulatedFunctionOperationService.asPoints(function);
-
         ForkJoinPool pool = ForkJoinPool.commonPool();
         // Интеграл в первой точке - 0, поэтому считаем с индекса 1
-        ForkJoinTask<Double> res = pool.submit(new IntegrateTask(1, points.length, partSize, points));
+        ForkJoinTask<Double> res = pool.submit(new IntegrateTask(1, function.getCount(), partSize, function));
         try {
+            res.join();
             return res.get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
