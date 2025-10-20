@@ -254,6 +254,18 @@ class LinkedListTabulatedFunctionTest {
     }
 
     @Test
+    void testInsertOnEmpty() {
+        LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(new UnitFunction(), 0, 1, 2);
+        func.remove(0);
+        func.remove(0);
+        assertEquals(0, func.getCount());
+        func.insert(10, 10);
+        func.insert(11, 20);
+        assertEquals(2, func.getCount());
+        assertEquals(15, func.apply(10.5));
+    }
+
+    @Test
     void testInsertReplaceExistingX() {
         LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(
                 new double[]{0, 1, 2}, new double[]{0, 10, 20});
