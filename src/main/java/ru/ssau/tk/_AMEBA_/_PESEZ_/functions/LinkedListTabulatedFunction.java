@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
+
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable, Serializable {
 
 
@@ -48,31 +50,64 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
+        Log.debug("Создание LinkedListTabulatedFunction из массивов. Количество точек: {}",
+                xValues.length);
         if (xValues.length < 2) {
+            Log.error("Попытка создания функции с менее чем 2 точками: {}", xValues.length);
             throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         }
-        checkLengthIsTheSame(xValues, yValues);
-        checkSorted(xValues);
+        try {
+            checkLengthIsTheSame(xValues, yValues);
+            checkSorted(xValues);
+            Log.trace("Проверки массивов пройдены успешно");
 
-        for (int i = 0; i < xValues.length; i++) {
-            addNode(xValues[i], yValues[i]);
-        }
-    }
+            for (int i = 0; i < xValues.length; i++) {
+                addNode(xValues[i], yValues[i]);
+            }
+
+            Log.info("LinkedListTabulatedFunction успешно создан. Точек: {}", count);
+
+        } catch (Exception e) {
+            Log.error("Ошибка при создании LinkedListTabulatedFunction из массивов", e);
+            throw e;
+        }}
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
+        Log.debug("Создание LinkedListTabulatedFunction из функции. Интервал: [{}, {}], точек: {}",
+                xFrom, xTo, count);
+
         if (count < 2) {
+            Log.error("Недостаточное количество точек: {}", count);
             throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         }
-        if(xFrom>xTo){
-            double temp = xFrom;
-            xFrom=xTo;
-            xTo=temp;
+        try {
+            if (xFrom > xTo) {
+                Log.debug("Границы интервала поменяны местами: {} -> {}", xFrom, xTo);
+                double temp = xFrom;
+                xFrom = xTo;
+                xTo = temp;
+            }
+
+            double step = (xTo - xFrom) / (count - 1);
+            Log.trace("Шаг табуляции: {}", step);
+
+            for (int i = 0; i < count; i++) {
+                double x = xFrom + i * step;
+                double y = source.apply(x);
+                addNode(x, y);
+
+                if (i % 100 == 0 && i > 0) {
+                    Log.debug("Добавлено {}% точек", (i * 100 / count));
+                }
+            }
+
+            Log.info("Функция создана успешно. Диапазон X: [{}, {}]", head.x, head.prev.x);
+
+        } catch (Exception e) {
+            Log.error("Ошибка при создании функции из MathFunction", e);
+            throw e;
         }
-        double step=(xTo-xFrom)/(count-1);
-        for(int i=0; i<count; i++){
-            double x=xFrom+i*step;
-            addNode(x, source.apply(x));
-        }
+
     }
 
     @Override
