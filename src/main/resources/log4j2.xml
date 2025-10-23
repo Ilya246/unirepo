@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <Appenders>
+        <Console name="CONSOLE"/>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility" level="DEBUG"/>
+        <Root level="WARN">
+            <AppenderRef ref="CONSOLE"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

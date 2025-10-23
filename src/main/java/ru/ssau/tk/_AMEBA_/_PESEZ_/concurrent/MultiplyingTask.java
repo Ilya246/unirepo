@@ -2,6 +2,8 @@ package ru.ssau.tk._AMEBA_._PESEZ_.concurrent;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
 
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
+
 public class MultiplyingTask implements Runnable {
     private final TabulatedFunction function;
 
@@ -17,6 +19,6 @@ public class MultiplyingTask implements Runnable {
                 function.setY(i, function.getY(i) * 2);
             }
         }
-        System.out.println("Thread " + Thread.currentThread().getName() + " finished MultiplyingTask");
+        Log.debug("Thread {} finished MultiplyingTask", Thread.currentThread().getName());
     }
 }
