@@ -50,64 +50,34 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
-        Log.debug("Создание LinkedListTabulatedFunction из массивов. Количество точек: {}",
-                xValues.length);
-        if (xValues.length < 2) {
-            Log.error("Попытка создания функции с менее чем 2 точками: {}", xValues.length);
-            throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
+        Log.debug("Создание {} из массивов значений длинами {} и {}",
+                getClass().getSimpleName(), xValues.length, yValues.length);
+
+        if (xValues.length < 2) throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
+        checkLengthIsTheSame(xValues, yValues);
+        checkSorted(xValues);
+
+        for (int i = 0; i < xValues.length; i++) {
+            addNode(xValues[i], yValues[i]);
         }
-        try {
-            checkLengthIsTheSame(xValues, yValues);
-            checkSorted(xValues);
-            Log.trace("Проверки массивов пройдены успешно");
-
-            for (int i = 0; i < xValues.length; i++) {
-                addNode(xValues[i], yValues[i]);
-            }
-
-            Log.info("LinkedListTabulatedFunction успешно создан. Точек: {}", count);
-
-        } catch (Exception e) {
-            Log.error("Ошибка при создании LinkedListTabulatedFunction из массивов", e);
-            throw e;
-        }}
+    }
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
-        Log.debug("Создание LinkedListTabulatedFunction из функции. Интервал: [{}, {}], точек: {}",
-                xFrom, xTo, count);
+        Log.debug("Создание {} из функции {}. Интервал: [{}, {}], точек: {}",
+                getClass().getSimpleName(), source.getClass().getSimpleName(), xFrom, xTo, count);
 
         if (count < 2) {
-            Log.error("Недостаточное количество точек: {}", count);
             throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         }
-        try {
-            if (xFrom > xTo) {
-                Log.debug("Границы интервала поменяны местами: {} -> {}", xFrom, xTo);
-                double temp = xFrom;
-                xFrom = xTo;
-                xTo = temp;
-            }
 
-            double step = (xTo - xFrom) / (count - 1);
-            Log.trace("Шаг табуляции: {}", step);
-
-            for (int i = 0; i < count; i++) {
-                double x = xFrom + i * step;
-                double y = source.apply(x);
-                addNode(x, y);
-
-                if (i % 100 == 0 && i > 0) {
-                    Log.debug("Добавлено {}% точек", (i * 100 / count));
-                }
-            }
-
-            Log.info("Функция создана успешно. Диапазон X: [{}, {}]", head.x, head.prev.x);
-
-        } catch (Exception e) {
-            Log.error("Ошибка при создании функции из MathFunction", e);
-            throw e;
+        double step = Math.abs(xTo - xFrom) / (count - 1);
+        Log.trace("Шаг табуляции: {}", step);
+        double x0 = Math.min(xFrom, xTo);
+        for (int i = 0; i < count; i++) {
+            double x = x0 + step * i;
+            double y = source.apply(x);
+            addNode(x, y);
         }
-
     }
 
     @Override

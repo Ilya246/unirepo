@@ -1,15 +1,11 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.functions;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InterpolationException;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.io.*;
+import java.util.*;
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
     @Serial
@@ -21,31 +17,39 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @JsonCreator
     public ArrayTabulatedFunction(@JsonProperty(value = "xValues") double[] xValues, @JsonProperty(value = "yValues") double[] yValues) {
-        if (xValues.length < 2) throw new IllegalArgumentException("Length of tabulated function must be at least 2");
+        Log.debug("Создание {} из массивов значений длинами {} и {}",
+                getClass().getSimpleName(), xValues.length, yValues.length);
+
+        if (xValues.length < 2) throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         checkLengthIsTheSame(xValues, yValues);
         checkSorted(xValues);
 
         this.count = xValues.length;
-        this.xValues=Arrays.copyOf(xValues, count);
-        this.yValues=Arrays.copyOf(yValues, count);
+        this.xValues = Arrays.copyOf(xValues, count);
+        this.yValues = Arrays.copyOf(yValues, count);
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
-        if (count < 2) {
-            throw new IllegalArgumentException("Length of tabulated function must be at least 2");
-        }
+        Log.debug("Создание {} из функции {}. Интервал: [{}, {}], точек: {}",
+                getClass().getSimpleName(), source.getClass().getSimpleName(), xFrom, xTo, count);
 
+        if (count < 2) {
+            throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
+        }
         xValues = new double[count];
         yValues = new double[count];
         this.count = count;
 
         double step = Math.abs(xTo - xFrom) / (count - 1);
+        Log.trace("Шаг табуляции: {}", step);
         double x0 = Math.min(xFrom, xTo);
         for (int i = 0; i < count; i++) {
             double x = x0 + step * i;
             xValues[i] = x;
             yValues[i] = source.apply(x);
         }
+
+        Log.debug("Created function {} from function {}", this.hashCode(), source);
     }
 
     @Override

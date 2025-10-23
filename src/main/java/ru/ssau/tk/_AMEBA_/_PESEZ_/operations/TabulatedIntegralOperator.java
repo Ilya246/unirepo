@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.operations;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.util.concurrent.*;
 
@@ -28,6 +29,7 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
         protected Double compute() {
             if (right - left > partSize) {
                 int mid = (left + right) / 2;
+                Log.debug("Split integration task [{}, {}) -> [{}, {}), [{}, {})", left, right, left, mid, mid, right);
                 IntegrateTask leftTask = new IntegrateTask(left, mid, partSize, function);
                 IntegrateTask rightTask = new IntegrateTask(mid, right, partSize, function);
                 rightTask.fork();
@@ -39,7 +41,6 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
         }
 
         private double getIntegral() {
-            long startTime = System.nanoTime();
             double integral = 0;
             for (int i = left; i < right; i++) {
                 double x0 = function.getX(i - 1), y0 = function.getY(i - 1), x1 = function.getX(i), y1 = function.getY(i);
@@ -56,14 +57,9 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
 
     @Override
     public Double integrate(TabulatedFunction function) {
+        Log.debug("Computing integral of function {}", function.hashCode());
         ForkJoinPool pool = ForkJoinPool.commonPool();
         // Интеграл в первой точке - 0, поэтому считаем с индекса 1
-        ForkJoinTask<Double> res = pool.submit(new IntegrateTask(1, function.getCount(), partSize, function));
-        try {
-            res.join();
-            return res.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return pool.invoke(new IntegrateTask(1, function.getCount(), partSize, function));
     }
 }
