@@ -48,8 +48,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             xValues[i] = x;
             yValues[i] = source.apply(x);
         }
-
-        Log.debug("Created function {} from function {}", this.hashCode(), source);
     }
 
     @Override
