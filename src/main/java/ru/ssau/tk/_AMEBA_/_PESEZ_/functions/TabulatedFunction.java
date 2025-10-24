@@ -25,4 +25,6 @@ public interface TabulatedFunction extends MathFunction, Iterable<Point> {
     //Метод, возвращающий самый правый x
     double rightBound();
 
+    //Метод, возвращающий краткую информацию об этой функции, позволяет уникально её идентифицировать
+    String simpleInfo();
 }

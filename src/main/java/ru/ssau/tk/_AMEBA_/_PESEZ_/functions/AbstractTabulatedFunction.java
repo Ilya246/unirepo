@@ -71,4 +71,9 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
 
         return true;
     }
+
+    @Override
+    public String simpleInfo() {
+        return String.format("function: {id: %d, points: %d}", hashCode(), getCount());
+    }
 }

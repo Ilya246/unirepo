@@ -1,10 +1,9 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.operations;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.SynchronizedTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.Point;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.TabulatedFunctionFactory;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 public class TabulatedDifferentialOperator implements DifferentialOperator<TabulatedFunction>{
 
@@ -27,6 +26,7 @@ public class TabulatedDifferentialOperator implements DifferentialOperator<Tabul
 
     @Override
     public TabulatedFunction derive(TabulatedFunction function) {
+        Log.debug("Счёт табулированной производной из {}", function.simpleInfo());
         //Получаем точки
         Point[] points = TabulatedFunctionOperationService.asPoints(function);
         int count = points.length;

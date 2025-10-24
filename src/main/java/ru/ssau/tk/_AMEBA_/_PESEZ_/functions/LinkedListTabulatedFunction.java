@@ -50,8 +50,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(double[] xValues, double[] yValues) {
-        Log.debug("Создание {} из массивов значений длинами {} и {}",
-                getClass().getSimpleName(), xValues.length, yValues.length);
+        Log.debug("Создание {} из массивов значений длинами {} и {}, id: {}",
+                getClass().getSimpleName(), xValues.length, yValues.length, hashCode());
 
         if (xValues.length < 2) throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         checkLengthIsTheSame(xValues, yValues);
@@ -63,8 +63,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     public LinkedListTabulatedFunction(MathFunction source, double xFrom, double xTo, int count){
-        Log.debug("Создание {} из функции {}. Интервал: [{}, {}], точек: {}",
-                getClass().getSimpleName(), source.getClass().getSimpleName(), xFrom, xTo, count);
+        Log.debug("Создание {} из функции {}. Интервал: [{}, {}], точек: {}, id: {}",
+                getClass().getSimpleName(), source.getClass().getSimpleName(), xFrom, xTo, count, hashCode());
 
         if (count < 2) {
             throw new IllegalArgumentException("Должно быть хотя бы 2 точки");

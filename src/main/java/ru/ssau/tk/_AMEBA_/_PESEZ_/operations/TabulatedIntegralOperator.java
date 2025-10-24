@@ -4,6 +4,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
+import java.io.Serial;
 import java.util.concurrent.*;
 
 // Оператор, интегрирующий табулированную функцию по области задания
@@ -15,6 +16,8 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
     }
 
     private static class IntegrateTask extends RecursiveTask<Double> {
+        @Serial
+        private static final long serialVersionUID = -1623237770652048111L;
         private final int left, right, partSize;
         private final TabulatedFunction function;
 
@@ -29,7 +32,7 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
         protected Double compute() {
             if (right - left > partSize) {
                 int mid = (left + right) / 2;
-                Log.debug("Split integration task [{}, {}) -> [{}, {}), [{}, {})", left, right, left, mid, mid, right);
+                Log.trace("Split integration task [{}, {}) -> [{}, {}), [{}, {})", left, right, left, mid, mid, right);
                 IntegrateTask leftTask = new IntegrateTask(left, mid, partSize, function);
                 IntegrateTask rightTask = new IntegrateTask(mid, right, partSize, function);
                 rightTask.fork();
@@ -57,7 +60,7 @@ public class TabulatedIntegralOperator implements IntegralOperator<TabulatedFunc
 
     @Override
     public Double integrate(TabulatedFunction function) {
-        Log.debug("Computing integral of function {}", function.hashCode());
+        Log.debug("Счёт интеграла из {}", function.simpleInfo());
         ForkJoinPool pool = ForkJoinPool.commonPool();
         // Интеграл в первой точке - 0, поэтому считаем с индекса 1
         return pool.invoke(new IntegrateTask(1, function.getCount(), partSize, function));

@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.concurrent;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.util.*;
 
@@ -22,6 +23,6 @@ public class MultiplyingTaskExecutor {
             t.join();
         }
 
-        System.out.println("Function is now: " + func);
+        Log.info("Function is now: {}", func);
     }
 }

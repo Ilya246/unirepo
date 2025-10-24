@@ -100,6 +100,13 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
         }
     }
 
+    @Override
+    public String simpleInfo() {
+        synchronized (function) {
+            return function.simpleInfo();
+        }
+    }
+
     public interface Operation<T> {
         T apply(SynchronizedTabulatedFunction func);
     }

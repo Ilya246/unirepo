@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.TabulatedFunctionFactory;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 public final class FunctionsIO {
     private FunctionsIO() {
@@ -14,6 +15,7 @@ public final class FunctionsIO {
     }
 
     public static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction function) {
+        Log.debug("Serializing tabulated function {} into string", function.simpleInfo());
         var print = new PrintWriter(writer);
         print.println(function.getCount());
         for (Point point : function) {
@@ -23,6 +25,7 @@ public final class FunctionsIO {
     }
 
     public static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction function) throws IOException {
+        Log.debug("Serializing tabulated function {} into data", function.simpleInfo());
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
 
         dataOutputStream.writeInt(function.getCount());
@@ -52,7 +55,9 @@ public final class FunctionsIO {
             throw new IOException(error);
         }
 
-        return factory.create(xValues, yValues);
+        TabulatedFunction func = factory.create(xValues, yValues);
+        Log.debug("Read tabulated function {} from string", func.simpleInfo());
+        return func;
     }
 
     public static TabulatedFunction readTabulatedFunction(BufferedInputStream inputStream, TabulatedFunctionFactory factory) throws IOException{
@@ -67,10 +72,13 @@ public final class FunctionsIO {
             yValues[i] = dataInputStream.readDouble();
         }
 
-        return factory.create(xValues, yValues);
+        TabulatedFunction func = factory.create(xValues, yValues);
+        Log.debug("Read tabulated function {} from data", func.simpleInfo());
+        return func;
     }
 
     public static void serialize(BufferedOutputStream stream, TabulatedFunction function) throws IOException {
+        Log.debug("Serializing tabulated function {}", function.simpleInfo());
         var output = new ObjectOutputStream(stream);
         output.writeObject(function);
         output.flush();
@@ -78,7 +86,9 @@ public final class FunctionsIO {
 
     public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
         var input = new ObjectInputStream(stream);
-        return (TabulatedFunction) input.readObject();
+        var func = (TabulatedFunction) input.readObject();
+        Log.debug("Deserialized tabulated function {}", func.simpleInfo());
+        return func;
     }
 
     public static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {

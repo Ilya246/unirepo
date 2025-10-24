@@ -58,4 +58,9 @@ public class UnmodifiableTabulatedFunction implements TabulatedFunction {
     public double apply(double x) {
         return function.apply(x);
     }
+
+    @Override
+    public String simpleInfo() {
+        return function.simpleInfo();
+    }
 }

@@ -8,6 +8,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.LinkedListTabulatedFunctionF
 import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedDifferentialOperator;
 
 import java.io.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 public class TabulatedFunctionFileInputStream {
     public static void main(String[] args) {
@@ -16,29 +17,23 @@ public class TabulatedFunctionFileInputStream {
             var bufferedInputStream = new BufferedInputStream(_binaryStream);
             var arrayFactory = new ArrayTabulatedFunctionFactory();
             TabulatedFunction fileFunction = FunctionsIO.readTabulatedFunction(bufferedInputStream, arrayFactory);
-            System.out.println("Функция из файла:");
-            System.out.println(fileFunction.toString());
+            Log.info("Функция из файла: {}", fileFunction);
 
         }
         catch (IOException error) {
-            error.printStackTrace(System.err);
+            Log.error("Ошибка:", error);
         }
-        System.out.println("Введите размер и значения функции");
+        Log.info("Введите размер и значения функции");
         try {
-            var inputStreamReader = new InputStreamReader(System.in);
-            var bufferedReader = new BufferedReader(inputStreamReader);
-
             var linkedListFactory = new LinkedListTabulatedFunctionFactory();
             TabulatedFunction consoleFunction = FunctionsIO.readTabulatedFunction(new BufferedInputStream(System.in), linkedListFactory);
 
             var differentialOperator = new TabulatedDifferentialOperator();
             TabulatedFunction derivative = differentialOperator.derive(consoleFunction);
 
-            System.out.println("Производная введенной функции:");
-            System.out.println(derivative.toString());
-
+            Log.info("Производная введенной функции: {}", derivative);
         } catch (IOException e) {
-            e.printStackTrace(System.err);
+            Log.error("Ошибка:", e);
         }
     }
 }

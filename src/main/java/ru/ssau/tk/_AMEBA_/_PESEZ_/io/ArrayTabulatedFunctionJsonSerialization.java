@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.io;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.io.*;
 
@@ -16,23 +17,22 @@ public class ArrayTabulatedFunctionJsonSerialization {
         // Сериализация в JSON
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
             FunctionsIO.serializeJson(writer, originalFunction);
-            System.out.println("Функция успешно сериализована в JSON файл: " + filename);
-            System.out.println("Исходная функция: " + originalFunction);
+            Log.info("Функция успешно сериализована в JSON файл: {}", filename);
+            Log.info("Исходная функция: {}", originalFunction);
         } catch (IOException e) {
-            System.err.println("Ошибка при сериализации:");
-            e.printStackTrace(System.err);
+            Log.error("Ошибка при десериализации:", e);
         }
 
         // Десериализация из JSON
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             ArrayTabulatedFunction deserializedFunction = FunctionsIO.deserializeJson(reader);
-            System.out.println("\nФункция успешно десериализована из JSON файла: " + filename);
-            System.out.println("Десериализованная функция: " + deserializedFunction);
+            Log.info("Функция успешно десериализована из JSON файла: {}", filename);
+            Log.info("Десериализованная функция: {}", deserializedFunction);
 
             // Проверка корректности десериализации
-            System.out.println("\nПроверка корректности десериализации:");
-            System.out.println("Количество точек совпадает: " +
-                    (originalFunction.getCount() == deserializedFunction.getCount()));
+            Log.debug("Проверка корректности десериализации:\n" +
+                      "Количество точек совпадает: {}",
+                      (originalFunction.getCount() == deserializedFunction.getCount()));
 
             boolean allPointsMatch = true;
             for (int i = 0; i < originalFunction.getCount(); i++) {
@@ -43,11 +43,10 @@ public class ArrayTabulatedFunctionJsonSerialization {
                     break;
                 }
             }
-            System.out.println("Все точки совпадают: " + allPointsMatch);
+            Log.debug("Все точки совпадают: {}", allPointsMatch);
 
         } catch (IOException e) {
-            System.err.println("Ошибка при десериализации:");
-            e.printStackTrace(System.err);
+            Log.error("Ошибка при десериализации:", e);
         }
     }
 }

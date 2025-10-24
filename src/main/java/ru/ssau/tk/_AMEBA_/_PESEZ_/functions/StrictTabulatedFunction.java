@@ -62,4 +62,9 @@ public class StrictTabulatedFunction implements TabulatedFunction{
         }
         throw new UnsupportedOperationException("Cannot interpolate or extrapolate in strict mode. X value not found: " + x);
     }
+
+    @Override
+    public String simpleInfo() {
+        return function.simpleInfo();
+    }
 }

@@ -17,8 +17,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @JsonCreator
     public ArrayTabulatedFunction(@JsonProperty(value = "xValues") double[] xValues, @JsonProperty(value = "yValues") double[] yValues) {
-        Log.debug("Создание {} из массивов значений длинами {} и {}",
-                getClass().getSimpleName(), xValues.length, yValues.length);
+        Log.debug("Создание {} из массивов значений длинами {} и {}, id: {}",
+                getClass().getSimpleName(), xValues.length, yValues.length, hashCode());
 
         if (xValues.length < 2) throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
         checkLengthIsTheSame(xValues, yValues);
@@ -30,8 +30,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     public ArrayTabulatedFunction(MathFunction source, double xFrom, double xTo, int count) {
-        Log.debug("Создание {} из функции {}. Интервал: [{}, {}], точек: {}",
-                getClass().getSimpleName(), source.getClass().getSimpleName(), xFrom, xTo, count);
+        Log.debug("Создание {} из функции {}. Интервал: [{}, {}], точек: {}, id: {}",
+                getClass().getSimpleName(), source.getClass().getSimpleName(), xFrom, xTo, count, hashCode());
 
         if (count < 2) {
             throw new IllegalArgumentException("Должно быть хотя бы 2 точки");
@@ -56,7 +56,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         //  0    0    1    2    3    5
         // ---x1---x2---x3---x4---x5---
         if (x < xValues[0]) {
-            throw new IllegalArgumentException("x is less than left bound");
+            throw new IllegalArgumentException("x меньше левой границы");
         }
 
         for (int i = 1; i < count; i++) {
