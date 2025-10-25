@@ -1,1 +1,1 @@
-DELETE FROM Points WHERE funcId = ? and xValue=?;
+DELETE FROM Points WHERE funcId = ? and xValue=? ;
