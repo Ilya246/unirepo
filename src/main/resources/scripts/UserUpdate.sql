@@ -1,3 +1,3 @@
-UPDATE User
-SET userName = ?, password = ?
-WHERE userId = ?;
+UPDATE users
+SET user_name = ?, password = ?
+WHERE user_id = ?;

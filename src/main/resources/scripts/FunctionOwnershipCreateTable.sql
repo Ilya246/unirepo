@@ -1,6 +1,6 @@
-CREATE TABLE FunctionOwnership (
-    userId INT FOREIGN KEY REFERENCES User(userId),
-    funcId INT FOREIGN KEY REFERENCES Function(funcId),
-    createdDate DATETIME,
-    funcName VARCHAR(100),
+CREATE TABLE function_ownership (
+    user_id INT FOREIGN KEY REFERENCES user(user_id),
+    func_id INT FOREIGN KEY REFERENCES function(func_id),
+    created_date DATETIME,
+    func_name VARCHAR(100),
 );

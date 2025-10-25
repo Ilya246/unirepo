@@ -1,1 +1,1 @@
-SELECT * FROM FunctionOwnership;
+SELECT * FROM function_ownership;

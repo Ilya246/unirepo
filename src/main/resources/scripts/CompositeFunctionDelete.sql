@@ -1,1 +1,1 @@
-DELETE FROM CompositeFunction WHERE funcId = ?;
+DELETE FROM composite_function WHERE func_id = ?;

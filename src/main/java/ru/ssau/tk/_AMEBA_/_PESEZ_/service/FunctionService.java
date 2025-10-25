@@ -63,7 +63,7 @@ public class FunctionService {
     public static MathFunction getFunction(int funcId) throws SQLException {
         try (ResultSet results = DatabaseConnection.executeQuery(FUNCTION_SELECT, funcId)) {
             results.first();
-            int typeId = results.getInt("typeId");
+            int typeId = results.getInt("type_id");
             switch (typeId) {
                 case (MathFunctionID): {
                     return null;
@@ -88,8 +88,8 @@ public class FunctionService {
                 case (CompositeID): {
                     try (ResultSet functions = DatabaseConnection.executeQuery(COMPOSITE_SELECT, funcId)) {
                         functions.first();
-                        int inner = functions.getInt("innerFuncId");
-                        int outer = functions.getInt("outerFuncId");
+                        int inner = functions.getInt("inner_func_id");
+                        int outer = functions.getInt("outer_func_id");
                         if (inner == funcId || outer == funcId) {
                             throw new RuntimeException("Попытка сделать композитную функцию из самой себя");
                         }
@@ -105,8 +105,8 @@ public class FunctionService {
     public static void updateComposite(int funcId, Integer newInner, Integer newOuter) throws SQLException {
         try (ResultSet row = DatabaseConnection.executeQuery(COMPOSITE_SELECT, funcId)) {
             row.first();
-            int inner = row.getInt("innerFuncId");
-            int outer = row.getInt("outerFuncId");
+            int inner = row.getInt("inner_func_id");
+            int outer = row.getInt("outer_func_id");
             if (newInner != null) inner = newInner;
             if (newOuter != null) outer = newOuter;
             DatabaseConnection.executeUpdate(COMPOSITE_UPDATE, funcId, inner, outer);
@@ -134,7 +134,7 @@ public class FunctionService {
     }
 
     private static int getNextFunctionId() throws SQLException {
-        try (ResultSet rs = DatabaseConnection.executeQuery("SELECT MAX(funcId) FROM Function")) {
+        try (ResultSet rs = DatabaseConnection.executeQuery("SELECT MAX(func_id) FROM function")) {
             return rs.next() ? rs.getInt(1) + 1 : 1;
         }
     }

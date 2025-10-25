@@ -1,5 +1,5 @@
-CREATE TABLE Function (
-    funcId INT PRIMARY KEY,
-    typeId INT CHECK (typeId>=1 AND typeId<=3),
+CREATE TABLE function (
+    func_id INT PRIMARY KEY,
+    type_id INT CHECK (type_id>=1 AND type_id<=3),
     expression VARCHAR(200)
 );

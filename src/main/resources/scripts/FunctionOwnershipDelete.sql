@@ -1,1 +1,1 @@
-DELETE FROM FunctionOwnership WHERE userId = ? and funcId = ?;
+DELETE FROM function_ownership WHERE user_id = ? and func_id = ?;

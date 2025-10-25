@@ -1,5 +1,5 @@
-CREATE TABLE CompositeFunction (
-    funcId INT FOREIGN KEY REFERENCES Function(funcId),
-    innerFuncId INT FOREIGN KEY REFERENCES Function(funcId),
-    outerFuncId INT FOREIGN KEY REFERENCES Function(funcId),
+CREATE TABLE composite_function (
+    func_id INT FOREIGN KEY REFERENCES function(func_id),
+    inner_func_id INT FOREIGN KEY REFERENCES function(func_id),
+    outer_func_id INT FOREIGN KEY REFERENCES function(func_id),
 );

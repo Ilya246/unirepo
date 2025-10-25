@@ -1,1 +1,1 @@
-DELETE FROM Function WHERE funcId = ?;
+DELETE FROM function WHERE func_id = ?;
