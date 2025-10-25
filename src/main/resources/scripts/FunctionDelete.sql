@@ -1,0 +1,1 @@
+DELETE FROM Function WHERE funcId = ?;

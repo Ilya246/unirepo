@@ -1,0 +1,1 @@
+DELETE FROM FunctionOwnership WHERE userId = ? and funcId = ?;
