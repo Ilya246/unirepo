@@ -1,3 +1,3 @@
 UPDATE CompositeFunction
-SET innerFuncId = ?, outerFuncId
+SET innerFuncId = ?, outerFuncId = ?
 WHERE funcId = ?;

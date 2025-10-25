@@ -1,3 +1,3 @@
 UPDATE FunctionOwnership
 SET funcId = ?
-WHERE userId = ?;
+WHERE userId = ? and funcId = ?;
