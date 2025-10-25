@@ -1,1 +1,1 @@
-SELECT * FROM Points;
+SELECT xValue, yValue FROM Points WHERE funcId = ?;

@@ -1,1 +1,1 @@
-SELECT * FROM Function;
+SELECT typeId, expression FROM Function WHERE funcId = ?;

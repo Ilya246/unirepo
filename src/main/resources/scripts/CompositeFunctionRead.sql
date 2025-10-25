@@ -1,1 +1,1 @@
-SELECT * FROM CompositeFunction;
+SELECT innerFuncId, outerFundIc FROM CompositeFunction WHERE funcId = ?;
