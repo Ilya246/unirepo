@@ -1,3 +1,3 @@
 UPDATE Points
-SET xValue = ?, yValue = ?
-WHERE funcId = ?;
+SET yValue = ?
+WHERE xValue = ?;
