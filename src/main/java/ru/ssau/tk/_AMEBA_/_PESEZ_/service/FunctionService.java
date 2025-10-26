@@ -8,6 +8,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class FunctionService {
     private static final String FUNCTION_ENSURE_TABLE = readCommand("FunctionCreateTable");
@@ -80,7 +82,7 @@ public class FunctionService {
             outer.first();
             String replaceWith = "(" + inner.getString("expression") + ")";
             String expression = outer.getString("expression").replaceAll("x", replaceWith);
-            Log.info("Writing composite function from IDs {}({}) with expression: `{}` as ID {}", outer, innerId, expression, funcId);
+            Log.info("Writing composite function from IDs {}({}) with expression: `{}` as ID {}", outerId, innerId, expression, funcId);
             database.executeUpdate(FUNCTION_INSERT, funcId, CompositeID, expression);
             database.executeUpdate(COMPOSITE_INSERT, funcId, innerId, outerId);
             return funcId;
@@ -105,15 +107,21 @@ public class FunctionService {
                     try (ResultSet points = database.executeQuery(POINTS_SELECT, funcId)) {
                         points.last();
                         int count = points.getRow();
-                        var xValues = new double[count];
-                        var yValues = new double[count];
+                        var newPoints = new Point[count];
                         points.first();
                         for (int i = 0; i < count; i++) {
                             double x = points.getDouble(1);
                             double y = points.getDouble(2);
-                            xValues[i] = x;
-                            yValues[i] = y;
+                            newPoints[i] = new Point(x, y);
                             points.relative(1);
+                        }
+                        Arrays.sort(newPoints, Comparator.comparingDouble(Point::getX));
+                        var xValues = new double[count];
+                        var yValues = new double[count];
+                        for (int i = 0; i < count; i++) {
+                            Point p = newPoints[i];
+                            xValues[i] = p.getX();
+                            yValues[i] = p.getY();
                         }
                         return new ArrayTabulatedFunction(xValues, yValues);
                     }
@@ -142,12 +150,12 @@ public class FunctionService {
             int outer = row.getInt("outer_func_id");
             if (newInner != null) inner = newInner;
             if (newOuter != null) outer = newOuter;
-            database.executeUpdate(COMPOSITE_UPDATE, funcId, inner, outer);
+            database.executeUpdate(COMPOSITE_UPDATE, inner, outer, funcId);
         }
     }
 
     public static void updatePoint(int funcId, double xValue, double newY, DatabaseConnection database) throws SQLException {
-        database.executeUpdate(POINTS_UPDATE, funcId, xValue, newY);
+        database.executeUpdate(POINTS_UPDATE, newY, xValue, funcId);
     }
 
     public static void deletePoint(int funcId, double xValue, DatabaseConnection database) throws SQLException {
