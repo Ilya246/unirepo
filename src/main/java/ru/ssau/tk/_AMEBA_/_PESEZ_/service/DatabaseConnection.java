@@ -1,5 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -13,13 +15,16 @@ public class DatabaseConnection {
     }
 
     public DatabaseConnection(String URL) {
-        PROPERTIES.setProperty("user", "postgres");
-        PROPERTIES.setProperty("password", "postgres");
+        String user = "postgres"; // placeholder
+        String password = "postgres"; // placeholder
+        PROPERTIES.setProperty("user", user);
+        PROPERTIES.setProperty("password", password);
+        Log.info("Connecting to database {} as {}:{}", URL, user, password);
         JDBC_URL = URL;
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Не найден PostgreSQL JDBC Driver", e);
+            throw new RuntimeException("PostgreSQL JDBC Driver not found", e);
         }
     }
 
@@ -34,6 +39,7 @@ public class DatabaseConnection {
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
             }
+            Log.trace("Executing database update: {}", stmt);
             stmt.executeUpdate();
         }
     }
@@ -44,6 +50,7 @@ public class DatabaseConnection {
         for (int i = 0; i < params.length; i++) {
             stmt.setObject(i + 1, params[i]);
         }
+        Log.trace("Executing database query: {}", stmt);
         return stmt.executeQuery();
     }
 }
