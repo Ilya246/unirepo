@@ -41,54 +41,58 @@ public class FunctionService {
         }
     }
 
-    static {
+    public static void ensureTables(DatabaseConnection database) {
         try {
-            ensureFunctionTable();
-            ensurePointsTable();
-            ensureCompositeTable();
+            ensureFunctionTable(database);
+            ensurePointsTable(database);
+            ensureCompositeTable(database);
         } catch (SQLException e) {
             Log.error("Error when trying to ensure SQL tables:", e);
         }
     }
 
-    public static int createMathFunction(String expression) throws SQLException {
+    public static int createMathFunction(String expression, DatabaseConnection database) throws SQLException {
         // Читаем функцию, чтобы убедиться, что она правильная
         parseFunction(expression);
-        int funcId = getNextFunctionId();
-        DatabaseConnection.executeUpdate(FUNCTION_INSERT, funcId, MathFunctionID, expression);
+        int funcId = getNextFunctionId(database);
+        Log.info("Writing math function {} into database as ID {}", expression, funcId);
+        database.executeUpdate(FUNCTION_INSERT, funcId, MathFunctionID, expression);
         return funcId;
     }
 
-    public static int createTabulated(String expression, double from, double to, int pointCount) throws SQLException {
+    public static int createTabulated(String expression, double from, double to, int pointCount, DatabaseConnection database) throws SQLException {
         MathFunction func = parseFunction(expression);
-        int funcId = getNextFunctionId();
-        DatabaseConnection.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, expression);
+        int funcId = getNextFunctionId(database);
+        Log.info("Writing tabulated function {} into database as ID {}", expression, funcId);
+        database.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, expression);
         TabulatedFunction tabFunc = new ArrayTabulatedFunction(func, from, to, pointCount);
         for (Point p : tabFunc) {
-            DatabaseConnection.executeUpdate(POINTS_INSERT, funcId, p.getX(), p.getY());
+            database.executeUpdate(POINTS_INSERT, funcId, p.getX(), p.getY());
         }
         return funcId;
     }
 
-    public static int createComposite(int innerId, int outerId) throws SQLException {
-        int funcId = getNextFunctionId();
-        try (ResultSet inner = DatabaseConnection.executeQuery(FUNCTION_SELECT, innerId);
-         ResultSet outer = DatabaseConnection.executeQuery(FUNCTION_SELECT, outerId)) {
+    public static int createComposite(int innerId, int outerId, DatabaseConnection database) throws SQLException {
+        int funcId = getNextFunctionId(database);
+        try (ResultSet inner = database.executeQuery(FUNCTION_SELECT, innerId);
+         ResultSet outer = database.executeQuery(FUNCTION_SELECT, outerId)) {
             inner.first();
             outer.first();
-            String expression = outer.getString("expression") + "(" + inner.getString("expression") + ")";
-            DatabaseConnection.executeUpdate(FUNCTION_INSERT, funcId, CompositeID, expression);
-            DatabaseConnection.executeUpdate(COMPOSITE_INSERT, funcId, innerId, outerId);
+            String replaceWith = "(" + inner.getString("expression") + ")";
+            String expression = outer.getString("expression").replaceAll("x", replaceWith);
+            Log.info("Writing composite function from IDs {}({}) with expression: `{}` as ID {}", outer, innerId, expression, funcId);
+            database.executeUpdate(FUNCTION_INSERT, funcId, CompositeID, expression);
+            database.executeUpdate(COMPOSITE_INSERT, funcId, innerId, outerId);
             return funcId;
         }
     }
 
-    public static MathFunction getFunction(int funcId) throws SQLException {
-        return getFunction(funcId, false);
+    public static MathFunction getFunction(int funcId, DatabaseConnection database) throws SQLException {
+        return getFunction(funcId, false, database);
     }
 
-    public static MathFunction getFunction(int funcId, boolean asMath) throws SQLException {
-        try (ResultSet results = DatabaseConnection.executeQuery(FUNCTION_SELECT, funcId)) {
+    public static MathFunction getFunction(int funcId, boolean asMath, DatabaseConnection database) throws SQLException {
+        try (ResultSet results = database.executeQuery(FUNCTION_SELECT, funcId)) {
             results.first();
             String expr = results.getString("expression");
             if (asMath) return parseFunction(expr);
@@ -98,15 +102,15 @@ public class FunctionService {
                     return parseFunction(expr);
                 }
                 case (TabulatedID): {
-                    try (ResultSet points = DatabaseConnection.executeQuery(POINTS_SELECT, funcId)) {
+                    try (ResultSet points = database.executeQuery(POINTS_SELECT, funcId)) {
                         points.last();
                         int count = points.getRow();
                         var xValues = new double[count];
                         var yValues = new double[count];
                         points.first();
                         for (int i = 0; i < count; i++) {
-                            double x = points.getDouble(0);
-                            double y = points.getDouble(1);
+                            double x = points.getDouble(1);
+                            double y = points.getDouble(2);
                             xValues[i] = x;
                             yValues[i] = y;
                             points.relative(1);
@@ -115,14 +119,14 @@ public class FunctionService {
                     }
                 }
                 case (CompositeID): {
-                    try (ResultSet functions = DatabaseConnection.executeQuery(COMPOSITE_SELECT, funcId)) {
+                    try (ResultSet functions = database.executeQuery(COMPOSITE_SELECT, funcId)) {
                         functions.first();
                         int inner = functions.getInt("inner_func_id");
                         int outer = functions.getInt("outer_func_id");
                         if (inner == funcId || outer == funcId) {
-                            throw new RuntimeException("Попытка сделать композитную функцию из самой себя");
+                            throw new RuntimeException("Attempt to make self-referential composite function");
                         }
-                        return new CompositeFunction(getFunction(inner), getFunction(outer));
+                        return new CompositeFunction(getFunction(inner, database), getFunction(outer, database));
                     }
                 }
             }
@@ -131,29 +135,29 @@ public class FunctionService {
     }
 
     // Обновляет композитную функцию, аргументы могут быть null чтобы не обновлять этот параметр
-    public static void updateComposite(int funcId, Integer newInner, Integer newOuter) throws SQLException {
-        try (ResultSet row = DatabaseConnection.executeQuery(COMPOSITE_SELECT, funcId)) {
+    public static void updateComposite(int funcId, Integer newInner, Integer newOuter, DatabaseConnection database) throws SQLException {
+        try (ResultSet row = database.executeQuery(COMPOSITE_SELECT, funcId)) {
             row.first();
             int inner = row.getInt("inner_func_id");
             int outer = row.getInt("outer_func_id");
             if (newInner != null) inner = newInner;
             if (newOuter != null) outer = newOuter;
-            DatabaseConnection.executeUpdate(COMPOSITE_UPDATE, funcId, inner, outer);
+            database.executeUpdate(COMPOSITE_UPDATE, funcId, inner, outer);
         }
     }
 
-    public static void updatePoint(int funcId, double xValue, double newY) throws SQLException {
-        DatabaseConnection.executeUpdate(POINTS_UPDATE, funcId, xValue, newY);
+    public static void updatePoint(int funcId, double xValue, double newY, DatabaseConnection database) throws SQLException {
+        database.executeUpdate(POINTS_UPDATE, funcId, xValue, newY);
     }
 
-    public static void deletePoint(int funcId, double xValue) throws SQLException {
-        DatabaseConnection.executeUpdate(POINTS_DELETE_ONE, funcId, xValue);
+    public static void deletePoint(int funcId, double xValue, DatabaseConnection database) throws SQLException {
+        database.executeUpdate(POINTS_DELETE_ONE, funcId, xValue);
     }
 
-    public static void deleteFunction(int funcId) throws SQLException {
-        DatabaseConnection.executeUpdate(FUNCTION_DELETE, funcId);
-        DatabaseConnection.executeUpdate(POINTS_DELETE, funcId);
-        DatabaseConnection.executeUpdate(COMPOSITE_DELETE, funcId);
+    public static void deleteFunction(int funcId, DatabaseConnection database) throws SQLException {
+        database.executeUpdate(POINTS_DELETE, funcId);
+        database.executeUpdate(COMPOSITE_DELETE, funcId);
+        database.executeUpdate(FUNCTION_DELETE, funcId);
     }
 
     private static int getFunctionTypeId(MathFunction function) {
@@ -162,22 +166,22 @@ public class FunctionService {
         else return MathFunctionID;
     }
 
-    private static int getNextFunctionId() throws SQLException {
-        try (ResultSet rs = DatabaseConnection.executeQuery("SELECT MAX(func_id) FROM function")) {
+    private static int getNextFunctionId(DatabaseConnection database) throws SQLException {
+        try (ResultSet rs = database.executeQuery("SELECT MAX(func_id) FROM function")) {
             return rs.first() ? rs.getInt(1) + 1 : 1;
         }
     }
 
-    private static void ensureFunctionTable() throws SQLException {
-        DatabaseConnection.executeUpdate(FUNCTION_ENSURE_TABLE);
+    private static void ensureFunctionTable(DatabaseConnection database) throws SQLException {
+        database.executeUpdate(FUNCTION_ENSURE_TABLE);
     }
 
-    private static void ensureCompositeTable() throws SQLException {
-        DatabaseConnection.executeUpdate(COMPOSITE_ENSURE_TABLE);
+    private static void ensureCompositeTable(DatabaseConnection database) throws SQLException {
+        database.executeUpdate(COMPOSITE_ENSURE_TABLE);
     }
 
-    private static void ensurePointsTable() throws SQLException {
-        DatabaseConnection.executeUpdate(POINTS_ENSURE_TABLE);
+    private static void ensurePointsTable(DatabaseConnection database) throws SQLException {
+        database.executeUpdate(POINTS_ENSURE_TABLE);
     }
 
     public static MathFunction parseFunction(String expression) {

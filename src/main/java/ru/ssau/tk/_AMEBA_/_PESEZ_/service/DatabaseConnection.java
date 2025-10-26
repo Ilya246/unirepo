@@ -4,13 +4,18 @@ import java.sql.*;
 import java.util.Properties;
 
 public class DatabaseConnection {
-    private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/function_db";
-    private static final Properties PROPERTIES = new Properties();
-    private static Connection connection = null;
+    private final String JDBC_URL;
+    private final Properties PROPERTIES = new Properties();
+    private Connection connection = null;
 
-    static {
+    public DatabaseConnection() {
+        this("jdbc:postgresql://localhost:5432/function_db");
+    }
+
+    public DatabaseConnection(String URL) {
         PROPERTIES.setProperty("user", "postgres");
         PROPERTIES.setProperty("password", "postgres");
+        JDBC_URL = URL;
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
@@ -18,12 +23,12 @@ public class DatabaseConnection {
         }
     }
 
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         if (connection == null) connection = DriverManager.getConnection(JDBC_URL, PROPERTIES);
         return connection;
     }
 
-    public static void executeUpdate(String sql, Object... params) throws SQLException {
+    public void executeUpdate(String sql, Object... params) throws SQLException {
         Connection conn = getConnection();
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (int i = 0; i < params.length; i++) {
@@ -33,7 +38,7 @@ public class DatabaseConnection {
         }
     }
 
-    public static ResultSet executeQuery(String sql, Object... params) throws SQLException {
+    public ResultSet executeQuery(String sql, Object... params) throws SQLException {
         Connection conn = getConnection();
         PreparedStatement stmt = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         for (int i = 0; i < params.length; i++) {
