@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     user_id INT PRIMARY KEY,
     type_id INT CHECK (type_id>=1 AND type_id<=2),
     user_name VARCHAR(100),

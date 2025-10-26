@@ -1,22 +1,27 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
+import net.objecthunter.exp4j.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.sql.*;
 
 public class FunctionService {
+    private static final String FUNCTION_ENSURE_TABLE = readCommand("FunctionCreateTable");
     private static final String FUNCTION_INSERT = readCommand("FunctionCreate");
     private static final String FUNCTION_DELETE = readCommand("FunctionDelete");
     private static final String FUNCTION_SELECT = readCommand("FunctionRead");
 
+    private static final String COMPOSITE_ENSURE_TABLE = readCommand("CompositeFunctionCreateTable");
     private static final String COMPOSITE_INSERT = readCommand("CompositeFunctionCreate");
     private static final String COMPOSITE_UPDATE = readCommand("CompositeFunctionUpdate");
     private static final String COMPOSITE_DELETE = readCommand("CompositeFunctionDelete");
     private static final String COMPOSITE_SELECT = readCommand("CompositeFunctionRead");
 
+    private static final String POINTS_ENSURE_TABLE = readCommand("PointsCreateTable");
     private static final String POINTS_INSERT = readCommand("PointsCreate");
     private static final String POINTS_UPDATE = readCommand("PointsUpdate");
     private static final String POINTS_DELETE = readCommand("PointsDeleteMany");
@@ -28,16 +33,34 @@ public class FunctionService {
     private static final int CompositeID = 3;
 
     private static String readCommand(String filename) {
-        try {
-            return Files.readString(Paths.get(filename));
-        } catch (IOException e) {
+        try (InputStream instream = FunctionService.class.getClassLoader().getResourceAsStream("scripts/" + filename + ".sql")) {
+            return new String(instream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException | NullPointerException e) {
             Log.error("Failed to read SQL command:", e);
             return null;
         }
     }
 
+    static {
+        try {
+            ensureFunctionTable();
+            ensurePointsTable();
+            ensureCompositeTable();
+        } catch (SQLException e) {
+            Log.error("Error when trying to ensure SQL tables:", e);
+        }
+    }
+
+    public static int createMathFunction(String expression) throws SQLException {
+        // Читаем функцию, чтобы убедиться, что она правильная
+        parseFunction(expression);
+        int funcId = getNextFunctionId();
+        DatabaseConnection.executeUpdate(FUNCTION_INSERT, funcId, MathFunctionID, expression);
+        return funcId;
+    }
+
     public static int createTabulated(String expression, double from, double to, int pointCount) throws SQLException {
-        MathFunction func = new IdentityFunction(); // placeholder
+        MathFunction func = parseFunction(expression);
         int funcId = getNextFunctionId();
         DatabaseConnection.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, expression);
         TabulatedFunction tabFunc = new ArrayTabulatedFunction(func, from, to, pointCount);
@@ -61,12 +84,18 @@ public class FunctionService {
     }
 
     public static MathFunction getFunction(int funcId) throws SQLException {
+        return getFunction(funcId, false);
+    }
+
+    public static MathFunction getFunction(int funcId, boolean asMath) throws SQLException {
         try (ResultSet results = DatabaseConnection.executeQuery(FUNCTION_SELECT, funcId)) {
             results.first();
+            String expr = results.getString("expression");
+            if (asMath) return parseFunction(expr);
             int typeId = results.getInt("type_id");
             switch (typeId) {
                 case (MathFunctionID): {
-                    return null;
+                    return parseFunction(expr);
                 }
                 case (TabulatedID): {
                     try (ResultSet points = DatabaseConnection.executeQuery(POINTS_SELECT, funcId)) {
@@ -135,7 +164,24 @@ public class FunctionService {
 
     private static int getNextFunctionId() throws SQLException {
         try (ResultSet rs = DatabaseConnection.executeQuery("SELECT MAX(func_id) FROM function")) {
-            return rs.next() ? rs.getInt(1) + 1 : 1;
+            return rs.first() ? rs.getInt(1) + 1 : 1;
         }
+    }
+
+    private static void ensureFunctionTable() throws SQLException {
+        DatabaseConnection.executeUpdate(FUNCTION_ENSURE_TABLE);
+    }
+
+    private static void ensureCompositeTable() throws SQLException {
+        DatabaseConnection.executeUpdate(COMPOSITE_ENSURE_TABLE);
+    }
+
+    private static void ensurePointsTable() throws SQLException {
+        DatabaseConnection.executeUpdate(POINTS_ENSURE_TABLE);
+    }
+
+    public static MathFunction parseFunction(String expression) {
+        Expression expr = new ExpressionBuilder(expression).variable("x").build();
+        return (double x) -> expr.setVariable("x", x).evaluate();
     }
 }

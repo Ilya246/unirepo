@@ -1,4 +1,4 @@
-CREATE TABLE function_ownership (
+CREATE TABLE IF NOT EXISTS function_ownership (
     user_id INT FOREIGN KEY REFERENCES user(user_id),
     func_id INT FOREIGN KEY REFERENCES function(func_id),
     created_date DATETIME,
