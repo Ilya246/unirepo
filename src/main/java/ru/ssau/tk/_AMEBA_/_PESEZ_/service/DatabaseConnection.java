@@ -53,4 +53,8 @@ public class DatabaseConnection {
         Log.trace("Executing database query: {}", stmt);
         return stmt.executeQuery();
     }
+
+    public String getURL() {
+        return JDBC_URL;
+    }
 }
