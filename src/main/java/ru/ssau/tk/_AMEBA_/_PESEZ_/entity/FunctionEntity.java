@@ -59,6 +59,7 @@ public class FunctionEntity {
         this.typeId = typeId;
     }
 
+
     public String getExpression() { return expression; }
     public void setExpression(String expression) { this.expression = expression; }
 

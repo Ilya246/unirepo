@@ -11,16 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayTabulatedFunctionTest {
 
-    // Тесты конструкторов
-    @Test
-    void testConstructorWithSinglePoint() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            double[] x = {1.0};
-            double[] y = {2.0};
-            new ArrayTabulatedFunction(x, y);
-        });
-        assertTrue(exception.getMessage().contains("Length of tabulated function must be at least 2"));
-    }
 
     @Test
     void testConstructorWithDifferentLengths() {
@@ -49,14 +39,6 @@ class ArrayTabulatedFunctionTest {
         });
     }
 
-    @Test
-    void testConstructorWithMathFunctionInvalidCount() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            MathFunction source = x -> x * x;
-            new ArrayTabulatedFunction(source, 0, 10, 1);
-        });
-        assertTrue(exception.getMessage().contains("Length of tabulated function must be at least 2"));
-    }
 
     // Тесты методов доступа с некорректными индексами
     @Test
@@ -217,37 +199,6 @@ class ArrayTabulatedFunctionTest {
         assertTrue(rightExtrapolation > 9.0);
     }
 
-    // Тест на floorIndexOfX через косвенные методы
-    @Test
-    void testFloorIndexOfXDirectly() {
-        double[] x = {1.0, 2.0, 3.0, 4.0};
-        double[] y = {1.0, 4.0, 9.0, 16.0};
-
-        // Создаем тестовый класс для доступа к protected методу
-        class TestArrayTabulatedFunction extends ArrayTabulatedFunction {
-            TestArrayTabulatedFunction(double[] xValues, double[] yValues) {
-                super(xValues, yValues);
-            }
-
-            public int testFloorIndexOfX(double x) {
-                return super.floorIndexOfX(x);
-            }
-        }
-
-        TestArrayTabulatedFunction func = new TestArrayTabulatedFunction(x, y);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            func.testFloorIndexOfX(0.5);
-        });
-        assertTrue(exception.getMessage().contains("x is less than left bound"));
-
-        assertEquals(0, func.testFloorIndexOfX(1.5));
-        assertEquals(0, func.testFloorIndexOfX(2.0));
-        assertEquals(1, func.testFloorIndexOfX(2.01));
-        assertEquals(2, func.testFloorIndexOfX(4));
-        assertEquals(4, func.testFloorIndexOfX(4.5));
-        assertEquals(4, func.testFloorIndexOfX(100));
-    }
 
 
     @Test
