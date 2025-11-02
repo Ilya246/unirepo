@@ -8,13 +8,12 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FunctionService {
+public class FunctionRepository {
     private static final String FUNCTION_ENSURE_TABLE = readCommand("FunctionCreateTable");
     private static final String FUNCTION_INSERT = readCommand("FunctionCreate");
     private static final String FUNCTION_DELETE = readCommand("FunctionDelete");
@@ -41,8 +40,10 @@ public class FunctionService {
 
     private static final String PureTabulatedExpression = "<TABULATED>";
 
+    private ThreadLocal<DatabaseConnection> databaseLocal;
+
     private static String readCommand(String filename) {
-        try (InputStream instream = FunctionService.class.getClassLoader().getResourceAsStream("scripts/" + filename + ".sql")) {
+        try (InputStream instream = FunctionRepository.class.getClassLoader().getResourceAsStream("scripts/" + filename + ".sql")) {
             return new String(instream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException | NullPointerException e) {
             Log.error("Failed to read SQL command:", e);
@@ -50,24 +51,31 @@ public class FunctionService {
         }
     }
 
-    public static void ensureTables(ThreadLocal<DatabaseConnection> databaseLocal) {
+    public FunctionRepository(String url) {
+        this.databaseLocal = ThreadLocal.withInitial(() -> new DatabaseConnection(url));;
+    }
+
+    public FunctionRepository(DatabaseConnection connection) {
+        this.databaseLocal = ThreadLocal.withInitial(() -> connection);
+    }
+
+    public void ensureTables() {
         try {
-            ensureFunctionTable(databaseLocal);
-            ensurePointsTable(databaseLocal);
-            ensureCompositeTable(databaseLocal);
+            ensureFunctionTable();
+            ensurePointsTable();
+            ensureCompositeTable();
         } catch (SQLException e) {
             Log.error("Error when trying to ensure SQL tables:", e);
         }
     }
 
-    public static CompletableFuture<Integer> createMathFunction(
-            String expression, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Integer> createMathFunction(String expression) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 // Читаем функцию, чтобы убедиться, что она правильная
                 parseFunction(expression);
-                int funcId = getNextFunctionId(databaseLocal);
+                int funcId = getNextFunctionId();
                 Log.info("Writing math function {} into database as ID {}", expression, funcId);
                 database.executeUpdate(FUNCTION_INSERT, funcId, MathFunctionID, expression);
                 return funcId;
@@ -77,13 +85,12 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<Integer> createTabulated(
-            String expression, double from, double to, int pointCount, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Integer> createTabulated(String expression, double from, double to, int pointCount) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 MathFunction func = parseFunction(expression);
-                int funcId = getNextFunctionId(databaseLocal);
+                int funcId = getNextFunctionId();
                 Log.info("Writing tabulated function {} into database as ID {}", expression, funcId);
                 database.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, expression);
                 TabulatedFunction tabFunc = new ArrayTabulatedFunction(func, from, to, pointCount);
@@ -106,12 +113,11 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<Integer> createPureTabulated(
-            double[] xValues, double[] yValues, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Integer> createPureTabulated(double[] xValues, double[] yValues) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int funcId = getNextFunctionId(databaseLocal);
+                int funcId = getNextFunctionId();
                 Log.info("Writing pure tabulated function into database as ID {}", funcId);
                 database.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, "<TABULATED>");
 
@@ -132,12 +138,11 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<Integer> createComposite(
-            int innerId, int outerId, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Integer> createComposite(int innerId, int outerId) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int funcId = getNextFunctionId(databaseLocal);
+                int funcId = getNextFunctionId();
                 try (ResultSet inner = database.executeQuery(FUNCTION_SELECT, innerId);
                  ResultSet outer = database.executeQuery(FUNCTION_SELECT, outerId)) {
                     inner.first();
@@ -155,13 +160,11 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<MathFunction> getFunction(
-            int funcId, ThreadLocal<DatabaseConnection> databaseLocal) {
-        return getFunction(funcId, false, databaseLocal);
+    public CompletableFuture<MathFunction> getFunction(int funcId) {
+        return getFunction(funcId, false);
     }
 
-    public static CompletableFuture<MathFunction> getFunction(
-            int funcId, boolean asMath, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<MathFunction> getFunction(int funcId, boolean asMath) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -208,7 +211,9 @@ public class FunctionService {
                                 if (inner == funcId || outer == funcId) {
                                     throw new RuntimeException("Attempt to make self-referential composite function");
                                 }
-                                return new CompositeFunction(getFunction(inner, databaseLocal).get(), getFunction(outer, databaseLocal).get());
+                                CompletableFuture<MathFunction> innerFunc = getFunction(inner);
+                                CompletableFuture<MathFunction> outerFunc = getFunction(outer);
+                                return new CompositeFunction(innerFunc.get(), outerFunc.get());
                             }
                         }
                     }
@@ -221,8 +226,7 @@ public class FunctionService {
     }
 
     // Обновляет композитную функцию, аргументы могут быть null чтобы не обновлять этот параметр
-    public static CompletableFuture<Void> updateComposite(
-            int funcId, Integer newInner, Integer newOuter, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Void> updateComposite(int funcId, Integer newInner, Integer newOuter) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -241,7 +245,7 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<Void> updatePoint(int funcId, double xValue, double newY, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Void> updatePoint(int funcId, double xValue, double newY) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -253,7 +257,7 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<Void> deletePoint(int funcId, double xValue, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Void> deletePoint(int funcId, double xValue) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -265,7 +269,7 @@ public class FunctionService {
         });
     }
 
-    public static CompletableFuture<Void> deleteFunction(int funcId, ThreadLocal<DatabaseConnection> databaseLocal) {
+    public CompletableFuture<Void> deleteFunction(int funcId) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -279,7 +283,7 @@ public class FunctionService {
         });
     }
 
-    private static int getNextFunctionId(ThreadLocal<DatabaseConnection> databaseLocal) throws SQLException {
+    private int getNextFunctionId() throws SQLException {
         DatabaseConnection database = databaseLocal.get();
         AtomicInteger nextFunctionID = NextFunctionIDs.computeIfAbsent(database.getURL(), k -> new AtomicInteger(-1));
 
@@ -293,17 +297,17 @@ public class FunctionService {
         }
     }
 
-    private static void ensureFunctionTable(ThreadLocal<DatabaseConnection> databaseLocal) throws SQLException {
+    private void ensureFunctionTable() throws SQLException {
         DatabaseConnection database = databaseLocal.get();
         database.executeUpdate(FUNCTION_ENSURE_TABLE);
     }
 
-    private static void ensureCompositeTable(ThreadLocal<DatabaseConnection> databaseLocal) throws SQLException {
+    private void ensureCompositeTable() throws SQLException {
         DatabaseConnection database = databaseLocal.get();
         database.executeUpdate(COMPOSITE_ENSURE_TABLE);
     }
 
-    private static void ensurePointsTable(ThreadLocal<DatabaseConnection> databaseLocal) throws SQLException {
+    private void ensurePointsTable() throws SQLException {
         DatabaseConnection database = databaseLocal.get();
         database.executeUpdate(POINTS_ENSURE_TABLE);
     }

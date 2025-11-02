@@ -9,43 +9,45 @@ import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FunctionServiceTest {
-    static ThreadLocal<DatabaseConnection> database;
+class FunctionRepositoryTest {
+    static String databaseUrl = "jdbc:postgresql://localhost:5432/function_db_test";
+    static FunctionRepository repository;
 
     @BeforeAll
     static void setup() {
-        database = ThreadLocal.withInitial(() -> new DatabaseConnection("jdbc:postgresql://localhost:5432/function_db_test"));
-        FunctionService.ensureTables(database);
+        repository = new FunctionRepository(databaseUrl);
+        repository.ensureTables();
     }
 
     // Финальная очистка
     @AfterAll
     static void cleanup() throws SQLException {
-        database.get().executeUpdate("DELETE FROM points");
-        database.get().executeUpdate("DELETE FROM composite_function");
-        database.get().executeUpdate("DELETE FROM function");
+        var database = new DatabaseConnection(databaseUrl);
+        database.executeUpdate("DELETE FROM points");
+        database.executeUpdate("DELETE FROM composite_function");
+        database.executeUpdate("DELETE FROM function");
     }
 
     @Test
     void testMathFunction() throws InterruptedException, ExecutionException {
         String expr = "2x+3";
         // Пишем в базу данных
-        int id = FunctionService.createMathFunction(expr, database).get();
+        int id = repository.createMathFunction(expr).get();
 
-        MathFunction function = FunctionService.getFunction(id, database).get();
+        MathFunction function = repository.getFunction(id).get();
         assertEquals(5, function.apply(1));
         assertEquals(1, function.apply(-1));
 
-        FunctionService.deleteFunction(id, database);
+        repository.deleteFunction(id);
     }
 
     @Test
     void testTabulatedFunction() throws InterruptedException, ExecutionException {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = FunctionService.createTabulated(expr, -10, 10, 100, database).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).get();
 
-        MathFunction function = FunctionService.getFunction(id, database).get();
+        MathFunction function = repository.getFunction(id).get();
         assertInstanceOf(TabulatedFunction.class, function);
         assertEquals(0, function.apply(0), 0.05);
         assertEquals(3.38, function.apply(1.71), 0.05);
@@ -57,11 +59,11 @@ class FunctionServiceTest {
         String exprInner = "sin(x)";
         String exprOuter = "2*asin(x)";
         // Пишем в базу данных
-        CompletableFuture<Integer> idInner = FunctionService.createMathFunction(exprInner, database);
-        CompletableFuture<Integer> idOuter = FunctionService.createMathFunction(exprOuter, database);
-        CompletableFuture<Integer> idComposite = FunctionService.createComposite(idInner.get(), idOuter.get(), database);
+        CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
+        CompletableFuture<Integer> idOuter = repository.createMathFunction(exprOuter);
+        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.get(), idOuter.get());
 
-        MathFunction function = FunctionService.getFunction(idComposite.get(), database).get();
+        MathFunction function = repository.getFunction(idComposite.get()).get();
         assertInstanceOf(CompositeFunction.class, function);
         assertEquals(0, function.apply(0), 0.05);
         assertEquals(0.2, function.apply(0.1), 0.05);
@@ -75,11 +77,11 @@ class FunctionServiceTest {
         String exprInner = "sin(x)";
         String exprOuter = "x^2";
         // Пишем в базу данных
-        CompletableFuture<Integer> idInner = FunctionService.createMathFunction(exprInner, database);
-        CompletableFuture<Integer> idOuter = FunctionService.createTabulated(exprOuter, -1, 1, 100, database);
-        CompletableFuture<Integer> idComposite = FunctionService.createComposite(idInner.get(), idOuter.get(), database);
+        CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
+        CompletableFuture<Integer> idOuter = repository.createTabulated(exprOuter, -1, 1, 100);
+        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.get(), idOuter.get());
 
-        MathFunction function = FunctionService.getFunction(idComposite.get(), database).get();
+        MathFunction function = repository.getFunction(idComposite.get()).get();
         assertInstanceOf(CompositeFunction.class, function);
         assertEquals(0, function.apply(0), 0.05);
         assertEquals(0.25, function.apply(Math.PI / 6), 0.05);
@@ -95,20 +97,20 @@ class FunctionServiceTest {
         String exprOuter = "0.5x-0.5";
         String exprOuterNew = "0.5x-2.5";
         // Пишем в базу данных
-        CompletableFuture<Integer> idInner = FunctionService.createMathFunction(exprInner, database);
-        CompletableFuture<Integer> idOuter = FunctionService.createMathFunction(exprOuter, database);
-        CompletableFuture<Integer> idOuterNew = FunctionService.createMathFunction(exprOuterNew, database);
-        CompletableFuture<Integer> idComposite = FunctionService.createComposite(idInner.get(), idOuter.get(), database);
+        CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
+        CompletableFuture<Integer> idOuter = repository.createMathFunction(exprOuter);
+        CompletableFuture<Integer> idOuterNew = repository.createMathFunction(exprOuterNew);
+        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.get(), idOuter.get());
 
-        MathFunction function = FunctionService.getFunction(idComposite.get(), database).get();
+        MathFunction function = repository.getFunction(idComposite.get()).get();
         assertEquals(3, function.apply(0), 0.05);
         assertEquals(5, function.apply(2), 0.05);
         assertEquals(17.2, function.apply(14.2), 0.05);
         assertEquals(-2.2, function.apply(-5.2), 0.05);
         assertEquals(-7, function.apply(-10), 0.05);
 
-        FunctionService.updateComposite(idComposite.get(), null, idOuterNew.get(), database);
-        function = FunctionService.getFunction(idComposite.get(), database).get();
+        repository.updateComposite(idComposite.get(), null, idOuterNew.get()).get();
+        function = repository.getFunction(idComposite.get()).get();
         assertEquals(1, function.apply(0), 0.05);
         assertEquals(3, function.apply(2), 0.05);
         assertEquals(15.2, function.apply(14.2), 0.05);
@@ -121,15 +123,15 @@ class FunctionServiceTest {
     void testUpdatePoint() throws InterruptedException, ExecutionException {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = FunctionService.createTabulated(expr, -10, 10, 100, database).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).get();
 
-        MathFunction function = FunctionService.getFunction(id, database).get();
+        MathFunction function = repository.getFunction(id).get();
         var tabulated = (TabulatedFunction)function;
         double ptX = tabulated.getX(50);
         double ptY = tabulated.apply(ptX);
 
-        FunctionService.updatePoint(id, ptX, 10, database);
-        function = FunctionService.getFunction(id, database).get();
+        repository.updatePoint(id, ptX, 10).get();
+        function = repository.getFunction(id).get();
         assertEquals(10, function.apply(ptX));
         assertNotEquals(ptY, function.apply(ptX));
     }
@@ -138,23 +140,23 @@ class FunctionServiceTest {
     void testDeletePoint() throws InterruptedException, ExecutionException {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = FunctionService.createTabulated(expr, -10, 10, 100, database).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).get();
 
-        MathFunction function = FunctionService.getFunction(id, database).get();
+        MathFunction function = repository.getFunction(id).get();
         var tabulated = (TabulatedFunction)function;
         assertEquals(100, tabulated.getCount());
         double ptX = tabulated.getX(50);
 
-        FunctionService.deletePoint(id, ptX, database);
-        function = FunctionService.getFunction(id, database).get();
+        repository.deletePoint(id, ptX).get();
+        function = repository.getFunction(id).get();
         tabulated = (TabulatedFunction)function;
         assertEquals(99, tabulated.getCount());
     }
 
     @Test
     void testWriteGetMany() throws InterruptedException, ExecutionException {
-        int count = 10000;
-        int pointCount = 5;
+        int count = 5000;
+        int pointCount = 50;
         var functions = new CompletableFuture[count];
         for (int i = 0; i < count; i++) {
             // генерируем случайные табулированные функции
@@ -166,7 +168,7 @@ class FunctionServiceTest {
                 xValues[j] = curX;
                 yValues[j] = Math.random() * 10 - 5;
             }
-            functions[i] = FunctionService.createPureTabulated(xValues, yValues, database);
+            functions[i] = repository.createPureTabulated(xValues, yValues);
         }
         //noinspection rawtypes
         for (CompletableFuture f : functions) {
