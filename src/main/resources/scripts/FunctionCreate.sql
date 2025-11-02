@@ -1,2 +1,2 @@
-INSERT INTO function (func_id, type_id, expression)
-VALUES (?, ?, ?);
+INSERT INTO function (type_id, expression)
+VALUES (?, ?);

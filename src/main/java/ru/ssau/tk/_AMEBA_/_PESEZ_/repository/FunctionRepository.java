@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.service;
+package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import net.objecthunter.exp4j.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
@@ -7,13 +7,11 @@ import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class FunctionRepository {
+public class FunctionRepository extends Repository {
     private static final String FUNCTION_ENSURE_TABLE = readCommand("FunctionCreateTable");
     private static final String FUNCTION_INSERT = readCommand("FunctionCreate");
     private static final String FUNCTION_DELETE = readCommand("FunctionDelete");
@@ -36,27 +34,14 @@ public class FunctionRepository {
     private static final int TabulatedID = 2;
     private static final int CompositeID = 3;
 
-    private static Map<String, AtomicInteger> NextFunctionIDs = new ConcurrentHashMap<>();
-
     private static final String PureTabulatedExpression = "<TABULATED>";
 
-    private ThreadLocal<DatabaseConnection> databaseLocal;
-
-    private static String readCommand(String filename) {
-        try (InputStream instream = FunctionRepository.class.getClassLoader().getResourceAsStream("scripts/" + filename + ".sql")) {
-            return new String(instream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException | NullPointerException e) {
-            Log.error("Failed to read SQL command:", e);
-            return null;
-        }
-    }
-
     public FunctionRepository(String url) {
-        this.databaseLocal = ThreadLocal.withInitial(() -> new DatabaseConnection(url));;
+        super(url);
     }
 
     public FunctionRepository(DatabaseConnection connection) {
-        this.databaseLocal = ThreadLocal.withInitial(() -> connection);
+        super(connection);
     }
 
     public void ensureTables() {
@@ -75,9 +60,8 @@ public class FunctionRepository {
                 DatabaseConnection database = databaseLocal.get();
                 // Читаем функцию, чтобы убедиться, что она правильная
                 parseFunction(expression);
-                int funcId = getNextFunctionId();
-                Log.info("Writing math function {} into database as ID {}", expression, funcId);
-                database.executeUpdate(FUNCTION_INSERT, funcId, MathFunctionID, expression);
+                int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, MathFunctionID, expression);
+                Log.info("Wrote math function {} into database with ID {}", expression, funcId);
                 return funcId;
             } catch (SQLException e) {
                 throw new CompletionException(e);
@@ -90,9 +74,8 @@ public class FunctionRepository {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 MathFunction func = parseFunction(expression);
-                int funcId = getNextFunctionId();
-                Log.info("Writing tabulated function {} into database as ID {}", expression, funcId);
-                database.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, expression);
+                int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, TabulatedID, expression);
+                Log.info("Wrote tabulated function {} into database with ID {}", expression, funcId);
                 TabulatedFunction tabFunc = new ArrayTabulatedFunction(func, from, to, pointCount);
                 Point[] points = TabulatedFunctionOperationService.asPoints(tabFunc);
 
@@ -117,9 +100,8 @@ public class FunctionRepository {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int funcId = getNextFunctionId();
-                Log.info("Writing pure tabulated function into database as ID {}", funcId);
-                database.executeUpdate(FUNCTION_INSERT, funcId, TabulatedID, "<TABULATED>");
+                int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, TabulatedID, "<TABULATED>");
+                Log.info("Wrote pure tabulated function into database with ID {}", funcId);
 
                 // Строим запрос для помещения всех точек в таблицу сразу
                 try (PreparedStatement stmt = database.getConnection().prepareStatement(POINTS_INSERT)) {
@@ -142,16 +124,15 @@ public class FunctionRepository {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int funcId = getNextFunctionId();
                 try (ResultSet inner = database.executeQuery(FUNCTION_SELECT, innerId);
                  ResultSet outer = database.executeQuery(FUNCTION_SELECT, outerId)) {
                     inner.first();
                     outer.first();
                     String replaceWith = "(" + inner.getString("expression") + ")";
                     String expression = outer.getString("expression").replaceAll("x", replaceWith);
-                    Log.info("Writing composite function from IDs {}({}) with expression: `{}` as ID {}", outerId, innerId, expression, funcId);
-                    database.executeUpdate(FUNCTION_INSERT, funcId, CompositeID, expression);
+                    int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, CompositeID, expression);
                     database.executeUpdate(COMPOSITE_INSERT, funcId, innerId, outerId);
+                    Log.info("Wrote composite function from IDs {}({}) with expression: `{}` and ID {}", outerId, innerId, expression, funcId);
                     return funcId;
                 }
             } catch (SQLException e) {
@@ -281,20 +262,6 @@ public class FunctionRepository {
                 throw new CompletionException(e);
             }
         });
-    }
-
-    private int getNextFunctionId() throws SQLException {
-        DatabaseConnection database = databaseLocal.get();
-        AtomicInteger nextFunctionID = NextFunctionIDs.computeIfAbsent(database.getURL(), k -> new AtomicInteger(-1));
-
-        synchronized (nextFunctionID) {
-            if (nextFunctionID.get() == -1) {
-                try (ResultSet rs = database.executeQuery("SELECT MAX(func_id) FROM function")) {
-                    nextFunctionID.set(rs.first() ? rs.getInt(1) + 1 : 1);
-                }
-            }
-            return nextFunctionID.getAndIncrement();
-        }
     }
 
     private void ensureFunctionTable() throws SQLException {

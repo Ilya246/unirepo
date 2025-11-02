@@ -2,7 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.service.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
 
 import java.sql.SQLException;
 import java.util.concurrent.*;
@@ -23,9 +23,9 @@ class FunctionRepositoryTest {
     @AfterAll
     static void cleanup() throws SQLException {
         var database = new DatabaseConnection(databaseUrl);
-        database.executeUpdate("DELETE FROM points");
-        database.executeUpdate("DELETE FROM composite_function");
-        database.executeUpdate("DELETE FROM function");
+        database.executeUpdate("DROP TABLE points");
+        database.executeUpdate("DROP TABLE composite_function");
+        database.executeUpdate("DROP TABLE function");
     }
 
     @Test
@@ -38,7 +38,7 @@ class FunctionRepositoryTest {
         assertEquals(5, function.apply(1));
         assertEquals(1, function.apply(-1));
 
-        repository.deleteFunction(id);
+        repository.deleteFunction(id).get();
     }
 
     @Test

@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.service;
+package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
@@ -41,6 +41,26 @@ public class DatabaseConnection {
             }
             Log.trace("Executing database update: {}", stmt);
             stmt.executeUpdate();
+        }
+    }
+
+    // Для вставок одного нового объекта с ID
+    public int executeUpdateAndGetId(String sql, Object... params) throws SQLException {
+        Connection conn = getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
+            Log.trace("Executing database update and getting ID: {}", stmt);
+            int affected = stmt.executeUpdate();
+            if (affected == 1) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+            throw new SQLException("Failed to get ID on database update");
         }
     }
 
