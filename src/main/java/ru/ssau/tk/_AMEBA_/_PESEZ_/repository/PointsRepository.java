@@ -95,6 +95,12 @@ public class PointsRepository {
         }
     }
 
+    public List<PointsEntity> findAll() {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM PointsEntity", PointsEntity.class).list();
+        }
+    }
+
 
 
 }
