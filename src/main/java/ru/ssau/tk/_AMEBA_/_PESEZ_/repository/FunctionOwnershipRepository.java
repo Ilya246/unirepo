@@ -95,4 +95,36 @@ public class FunctionOwnershipRepository {
             transaction.commit();
         }
     }
+    public List<FunctionOwnershipEntity> findByUserId(int userId) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(
+                            "FROM FunctionOwnershipEntity WHERE id.userId = :userId",
+                            FunctionOwnershipEntity.class)
+                    .setParameter("userId", userId)
+                    .list();
+        }
+    }
+    public Optional<UserEntity> findOwnerByFunctionId(int functionId) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery(
+                            "SELECT u FROM FunctionOwnershipEntity fo " +
+                                    "JOIN UserEntity u ON u.userId = fo.id.userId " +
+                                    "WHERE fo.id.funcId = :functionId",
+                            UserEntity.class)
+                    .setParameter("functionId", functionId)
+                    .uniqueResultOptional();
+        }
+    }
+    public List<FunctionEntity> findUserFunctionsOrderByDate(int userId, boolean descending) {
+        try (Session session = sessionFactory.openSession()) {
+            String order = descending ? "DESC" : "ASC";
+            return session.createQuery(
+                            "SELECT fo.function FROM FunctionOwnershipEntity fo " +
+                                    "WHERE fo.id.userId = :userId " +
+                                    "ORDER BY fo.createdDate " + order,
+                            FunctionEntity.class)
+                    .setParameter("userId", userId)
+                    .list();
+        }
+    }
 }

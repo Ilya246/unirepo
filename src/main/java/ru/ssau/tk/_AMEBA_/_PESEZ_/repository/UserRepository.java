@@ -63,4 +63,12 @@ public class UserRepository {
                     .list();
         }
     }
+    public List<UserEntity> findAllOrderByCreatedDate(boolean descending) {
+        try (Session session = sessionFactory.openSession()) {
+            String order = descending ? "DESC" : "ASC";
+            return session.createQuery(
+                            "FROM UserEntity ORDER BY createdDate " + order, UserEntity.class)
+                    .list();
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
@@ -13,15 +12,28 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserRepositoryTest extends BaseRepositoryTest{
+class UserRepositoryTest extends BaseRepositoryTest {
     private SessionFactory factory;
     private UserRepository repository;
 
-    @Test
-
-    void testSaveAndFindById() {
+    @BeforeEach
+    void setUp() {
         factory = TestHibernateSessionFactoryUtil.getSessionFactory();
         repository = new UserRepository(factory);
+        clearDatabase();
+    }
+
+    private void clearDatabase() {
+        try (var session = factory.openSession()) {
+            var transaction = session.beginTransaction();
+            session.createNativeQuery("DELETE FROM function_ownership").executeUpdate();
+            session.createNativeQuery("DELETE FROM users").executeUpdate();
+            transaction.commit();
+        }
+    }
+
+    @Test
+    void testSaveAndFindById() {
         UserEntity user = new UserEntity(1, 1, "Polina", "12345", new Date());
         repository.save(user);
 
@@ -32,12 +44,8 @@ class UserRepositoryTest extends BaseRepositoryTest{
         assertEquals(1, found.getTypeId());
     }
 
-
     @Test
-
     void testFindAll() {
-        factory = TestHibernateSessionFactoryUtil.getSessionFactory();
-        repository = new UserRepository(factory);
         UserEntity u1 = new UserEntity(1, 1, "Pola", "pass1");
         UserEntity u2 = new UserEntity(2, 2, "Ameba", "pass2");
         repository.save(u1);
@@ -50,12 +58,8 @@ class UserRepositoryTest extends BaseRepositoryTest{
         assertTrue(users.stream().anyMatch(u -> u.getUserName().equals("Ameba")));
     }
 
-
     @Test
-
     void testUpdateUser() {
-        factory = TestHibernateSessionFactoryUtil.getSessionFactory();
-        repository = new UserRepository(factory);
         UserEntity user = new UserEntity(1, 2, "OldName", "oldpass");
         repository.save(user);
 
@@ -72,12 +76,8 @@ class UserRepositoryTest extends BaseRepositoryTest{
         assertEquals("NewName", fromDb.getUserName());
     }
 
-
     @Test
-
     void testDeleteById() {
-        factory = TestHibernateSessionFactoryUtil.getSessionFactory();
-        repository = new UserRepository(factory);
         UserEntity user = new UserEntity(1, 1, "DeleteMe", "secret");
         repository.save(user);
 
@@ -89,9 +89,6 @@ class UserRepositoryTest extends BaseRepositoryTest{
 
     @Test
     void testFindByType() {
-        factory = TestHibernateSessionFactoryUtil.getSessionFactory();
-        repository = new UserRepository(factory);
-
         UserEntity user1 = new UserEntity(1, 1, "Alice", "pass1");
         UserEntity user2 = new UserEntity(2, 1, "Bob", "pass2");
         UserEntity user3 = new UserEntity(3, 2, "Charlie", "pass3");
@@ -110,6 +107,183 @@ class UserRepositoryTest extends BaseRepositoryTest{
         List<UserEntity> type300Users = repository.findByType(300);
         assertTrue(type300Users.isEmpty(), "Не должно быть пользователей с typeId = 300");
     }
+
+    @Test
+    void testFindAllOrderByCreatedDateAscending() {
+        // Создаем пользователей с разными датами
+        Date oldestDate = new Date(System.currentTimeMillis() - 30000); // 30 секунд назад
+        Date middleDate = new Date(System.currentTimeMillis() - 20000); // 20 секунд назад
+        Date newestDate = new Date(System.currentTimeMillis() - 10000); // 10 секунд назад
+
+        UserEntity user1 = new UserEntity(1, 1, "OldestUser", "pass1", oldestDate);
+        UserEntity user2 = new UserEntity(2, 1, "MiddleUser", "pass2", middleDate);
+        UserEntity user3 = new UserEntity(3, 1, "NewestUser", "pass3", newestDate);
+
+        repository.save(user1);
+        repository.save(user2);
+        repository.save(user3);
+
+        // Тестируем сортировку по возрастанию (старые сначала)
+        List<UserEntity> ascendingUsers = repository.findAllOrderByCreatedDate(false);
+
+        assertEquals(3, ascendingUsers.size(), "Должно быть 3 пользователя");
+        assertEquals("OldestUser", ascendingUsers.get(0).getUserName(), "Первый должен быть самый старый");
+        assertEquals("MiddleUser", ascendingUsers.get(1).getUserName(), "Второй - средний");
+        assertEquals("NewestUser", ascendingUsers.get(2).getUserName(), "Последний - самый новый");
+    }
+
+    @Test
+    void testFindAllOrderByCreatedDateDescending() {
+        // Создаем пользователей с разными датами
+        Date oldestDate = new Date(System.currentTimeMillis() - 30000);
+        Date middleDate = new Date(System.currentTimeMillis() - 20000);
+        Date newestDate = new Date(System.currentTimeMillis() - 10000);
+
+        UserEntity user1 = new UserEntity(1, 1, "OldestUser", "pass1", oldestDate);
+        UserEntity user2 = new UserEntity(2, 1, "MiddleUser", "pass2", middleDate);
+        UserEntity user3 = new UserEntity(3, 1, "NewestUser", "pass3", newestDate);
+
+        repository.save(user1);
+        repository.save(user2);
+        repository.save(user3);
+
+        // Тестируем сортировку по убыванию (новые сначала)
+        List<UserEntity> descendingUsers = repository.findAllOrderByCreatedDate(true);
+
+        assertEquals(3, descendingUsers.size(), "Должно быть 3 пользователя");
+        assertEquals("NewestUser", descendingUsers.get(0).getUserName(), "Первый должен быть самый новый");
+        assertEquals("MiddleUser", descendingUsers.get(1).getUserName(), "Второй - средний");
+        assertEquals("OldestUser", descendingUsers.get(2).getUserName(), "Последний - самый старый");
+    }
+
+    @Test
+    void testFindAllOrderByCreatedDateWithSameDates() {
+        // Создаем пользователей с одинаковыми датами
+        Date sameDate = new Date();
+        UserEntity user1 = new UserEntity(1, 1, "User1", "pass1", sameDate);
+        UserEntity user2 = new UserEntity(2, 1, "User2", "pass2", sameDate);
+        UserEntity user3 = new UserEntity(3, 1, "User3", "pass3", sameDate);
+
+        repository.save(user1);
+        repository.save(user2);
+        repository.save(user3);
+
+        // При одинаковых датах порядок может быть любым, но список должен содержать всех пользователей
+        List<UserEntity> users = repository.findAllOrderByCreatedDate(false);
+        assertEquals(3, users.size(), "Должно быть 3 пользователя независимо от порядка");
+        assertTrue(users.stream().anyMatch(u -> u.getUserName().equals("User1")));
+        assertTrue(users.stream().anyMatch(u -> u.getUserName().equals("User2")));
+        assertTrue(users.stream().anyMatch(u -> u.getUserName().equals("User3")));
+    }
+
+    @Test
+    void testFindAllOrderByCreatedDateEmptyDatabase() {
+        // Тестируем на пустой базе данных
+        List<UserEntity> users = repository.findAllOrderByCreatedDate(true);
+        assertTrue(users.isEmpty(), "Для пустой базы должен вернуться пустой список");
+    }
+
+    @Test
+    void testUpdateNonExistentUser() {
+        // Пытаемся обновить несуществующего пользователя
+        UserEntity nonExistentUser = new UserEntity(999, 1, "NonExistent", "pass");
+
+        // merge для несуществующего пользователя создаст новую запись
+        UserEntity result = repository.update(nonExistentUser);
+
+        assertNotNull(result, "Merge несуществующего пользователя должен создать новую запись");
+        assertEquals("NonExistent", result.getUserName());
+
+        // Проверяем, что пользователь действительно создан
+        UserEntity fromDb = repository.findById(999);
+        assertNotNull(fromDb, "Пользователь должен быть создан через merge");
+    }
+
+    @Test
+    void testDeleteNonExistentUser() {
+        // Удаление несуществующего пользователя не должно вызывать исключений
+        assertDoesNotThrow(() -> repository.deleteById(999),
+                "Удаление несуществующего пользователя не должно вызывать исключений");
+    }
+
+    @Test
+    void testFindByIdNonExistent() {
+        // Поиск несуществующего пользователя
+        UserEntity user = repository.findById(999);
+        assertNull(user, "Для несуществующего ID должен вернуться null");
     }
 
 
+    @Test
+    void testSaveUserWithEmptyStrings() {
+        // Тестируем сохранение пользователя с пустыми строками
+        UserEntity user = new UserEntity(1, 1, "", "", new Date());
+        repository.save(user);
+
+        UserEntity found = repository.findById(1);
+        assertNotNull(found);
+        assertEquals("", found.getUserName());
+        assertEquals("", found.getPassword());
+    }
+
+    @Test
+    void testMultipleUpdates() {
+        // Тестируем множественные обновления одного пользователя
+        UserEntity user = new UserEntity(1, 1, "InitialName", "InitialPass", new Date());
+        repository.save(user);
+
+        // Первое обновление
+        user.setUserName("FirstUpdate");
+        user.setPassword("FirstPass");
+        UserEntity firstUpdate = repository.update(user);
+        assertEquals("FirstUpdate", firstUpdate.getUserName());
+
+        // Второе обновление
+        user.setUserName("SecondUpdate");
+        user.setPassword("SecondPass");
+        UserEntity secondUpdate = repository.update(user);
+        assertEquals("SecondUpdate", secondUpdate.getUserName());
+
+        // Проверяем финальное состояние в базе
+        UserEntity finalUser = repository.findById(1);
+        assertEquals("SecondUpdate", finalUser.getUserName());
+        assertEquals("SecondPass", finalUser.getPassword());
+    }
+
+    @Test
+    void testUserTypeBoundaryValues() {
+        // Тестируем граничные значения для typeId
+        UserEntity minTypeUser = new UserEntity(1, 1, "MinTypeUser", "pass");
+        UserEntity maxTypeUser = new UserEntity(2, 2, "MaxTypeUser", "pass");
+
+        repository.save(minTypeUser);
+        repository.save(maxTypeUser);
+
+        // Проверяем, что пользователи сохранились и находятся по typeId
+        List<UserEntity> minTypeUsers = repository.findByType(1);
+        assertEquals(1, minTypeUsers.size());
+        assertEquals("MinTypeUser", minTypeUsers.get(0).getUserName());
+
+        List<UserEntity> maxTypeUsers = repository.findByType(2);
+        assertEquals(1, maxTypeUsers.size());
+        assertEquals("MaxTypeUser", maxTypeUsers.get(0).getUserName());
+
+       }
+
+    @Test
+    void testFindAllWithLargeDataset() {
+        // Тестируем с большим количеством пользователей
+        int userCount = 50;
+        for (int i = 1; i <= userCount; i++) {
+            UserEntity user = new UserEntity(i, 1, "User" + i, "pass" + i, new Date());
+            repository.save(user);
+        }
+
+        List<UserEntity> allUsers = repository.findAll();
+        assertEquals(userCount, allUsers.size(), "Должно быть найдено " + userCount + " пользователей");
+
+        // Проверяем сортировку с большим набором данных
+        List<UserEntity> sortedUsers = repository.findAllOrderByCreatedDate(false);
+        assertEquals(userCount, sortedUsers.size(), "Сортировка должна работать с большими наборами данных");
+    }
+}
