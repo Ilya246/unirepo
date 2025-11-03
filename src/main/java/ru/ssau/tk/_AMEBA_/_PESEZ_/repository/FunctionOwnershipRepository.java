@@ -60,6 +60,26 @@ public class FunctionOwnershipRepository {
             transaction.commit();
         }
     }
+
+    public void deleteByFuncId(int functionId) {
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+
+            // Для составного ключа нужно найти сущность по компонентам ключа
+            Query<FunctionOwnershipEntity> query = session.createQuery(
+                    "FROM FunctionOwnershipEntity WHERE id.funcId = :funcId",
+                    FunctionOwnershipEntity.class);
+            query.setParameter("funcId", functionId);
+
+            FunctionOwnershipEntity ownership = query.uniqueResult();
+            if (ownership != null) {
+                session.remove(ownership);
+            }
+
+            transaction.commit();
+        }
+    }
+
     public void updateById(int userId, int functionId, String newFuncName) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
