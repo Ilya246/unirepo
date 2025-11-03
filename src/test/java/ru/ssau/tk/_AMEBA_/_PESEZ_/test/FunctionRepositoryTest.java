@@ -156,28 +156,39 @@ class FunctionRepositoryTest {
 
     @Test
     void testWriteGetMany() throws InterruptedException, ExecutionException {
-        int count = 5000;
-        int pointCount = 50;
-        var functions = new CompletableFuture[count];
-        long startTime = System.currentTimeMillis();
-        for (int i = 0; i < count; i++) {
-            // генерируем случайные табулированные функции
-            double curX = -Math.random() * pointCount / 4;
-            var xValues = new double[pointCount];
-            var yValues = new double[pointCount];
-            for (int j = 0; j < pointCount; j++) {
-                curX += Math.max(Math.random(), 0.001);
-                xValues[j] = curX;
-                yValues[j] = Math.random() * 10 - 5;
+        int startCount = 1000;
+        int countDelta = 1000;
+        int testAmount = 10;
+        var writeTimes = new float[testAmount];
+        for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
+            int pointCount = 50;
+            var functions = new CompletableFuture[count];
+            long startTime = System.currentTimeMillis();
+            for (int i = 0; i < count; i++) {
+                // генерируем случайные табулированные функции
+                double curX = -Math.random() * pointCount / 4;
+                var xValues = new double[pointCount];
+                var yValues = new double[pointCount];
+                for (int j = 0; j < pointCount; j++) {
+                    curX += Math.max(Math.random(), 0.001);
+                    xValues[j] = curX;
+                    yValues[j] = Math.random() * 10 - 5;
+                }
+                functions[i] = repository.createPureTabulated(xValues, yValues);
             }
-            functions[i] = repository.createPureTabulated(xValues, yValues);
+            //noinspection rawtypes
+            for (CompletableFuture f : functions) {
+                f.get();
+            }
+            float tookMillis = System.currentTimeMillis() - startTime;
+            float tookSeconds = tookMillis / 1000f;
+            writeTimes[it] = tookSeconds;
+            Log.info("Write of {} tabulated functions took: {}, {}/s", count, tookSeconds, count / tookSeconds);
         }
-        //noinspection rawtypes
-        for (CompletableFuture f : functions) {
-            f.get();
+        for (int i = 0; i < testAmount; i++) {
+            float time = writeTimes[i];
+            int amount = startCount + countDelta * i;
+            Log.info("Write {}: took {}s for {} ({}/s)", i + 1, time, amount, amount / time);
         }
-        float tookMillis = System.currentTimeMillis() - startTime;
-        float tookSeconds = tookMillis / 1000f;
-        Log.info("Write took: {}, {}/s", tookSeconds, count/tookSeconds);
     }
 }
