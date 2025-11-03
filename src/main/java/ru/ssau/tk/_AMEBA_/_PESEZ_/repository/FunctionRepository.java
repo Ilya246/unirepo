@@ -326,7 +326,28 @@ public class FunctionRepository {
         }
     }
 
+    public void saveAll(List<FunctionEntity> functions) {
+        var session = sessionFactory.openSession();
+        var transaction = session.beginTransaction();
 
+        try {
+            for (int i = 0; i < functions.size(); i++) {
+                session.persist(functions.get(i));
+                if (i % 50 == 0) {
+                    session.flush();
+                    session.clear();
+                }
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RuntimeException("Error saving points batch", e);
+        } finally {
+            session.close();
+        }
+    }
 
 
 }

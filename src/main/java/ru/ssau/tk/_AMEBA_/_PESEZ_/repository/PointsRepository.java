@@ -1,6 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -11,6 +13,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.utility.HibernateSessionFactoryUtil;
 
 import java.util.List;
 import java.util.Optional;
+
+
 
 public class PointsRepository {
 
@@ -100,6 +104,31 @@ public class PointsRepository {
             return session.createQuery("FROM PointsEntity", PointsEntity.class).list();
         }
     }
+
+    public void saveAll(List<PointsEntity> points) {
+        var session = sessionFactory.openSession();
+        var transaction = session.beginTransaction();
+
+        try {
+            for (int i = 0; i < points.size(); i++) {
+                session.persist(points.get(i));
+                if (i % 50 == 0) {
+                    session.flush();
+                    session.clear();
+                }
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RuntimeException("Error saving points batch", e);
+        } finally {
+            session.close();
+        }
+    }
+
+
 
 
 
