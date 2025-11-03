@@ -1,5 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionOwnershipDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
 import java.sql.*;
@@ -23,6 +25,8 @@ public class UserRepository extends Repository {
 
     private static final int NormalUserID = 1;
     private static final int AdminUserID = 2;
+
+    public enum UserType {Normal, Admin}
 
     public UserRepository(String url) {
         super(url);
@@ -98,30 +102,18 @@ public class UserRepository extends Repository {
         });
     }
 
-    public enum UserType {Normal, Admin}
-
-    public static class User {
-        public int userId;
-        public UserType userType;
-        public String username;
-        public String password;
-        public Timestamp createdDate;
-
-        public User(int userId, int typeId, String username, String password, Timestamp createdDate) {
-            this.userId = userId;
-            this.userType = typeId == 1 ? UserType.Normal : UserType.Admin;
-            this.username = username;
-            this.password = password;
-            this.createdDate = createdDate;
-        }
-    }
-
-    public CompletableFuture<User> getUser(int userId) {
+    public CompletableFuture<UserDTO> getUser(int userId) {
         return CompletableFuture.supplyAsync(() -> {
             try (ResultSet rs = databaseLocal.get().executeQuery(USER_SELECT, userId)) {
                 rs.next();
-                return new User(rs.getInt("user_id"),
-                        rs.getInt("type_id"),
+                int typeId = rs.getInt("type_id");
+                UserType type = switch(typeId) {
+                    case NormalUserID -> UserType.Normal;
+                    case AdminUserID -> UserType.Admin;
+                    default -> throw new RuntimeException("Unexpected value: " + typeId);
+                };
+                return new UserDTO(rs.getInt("user_id"),
+                        type,
                         rs.getString("user_name"),
                         rs.getString("password"),
                         rs.getTimestamp("created_date"));
@@ -170,24 +162,12 @@ public class UserRepository extends Repository {
         });
     }
 
-    public static class FunctionOwnership {
-        public int funcId;
-        public Timestamp createdDate;
-        public String funcName;
-
-        public FunctionOwnership(int funcId, Timestamp createdDate, String funcName) {
-            this.funcId = funcId;
-            this.createdDate = createdDate;
-            this.funcName = funcName;
-        }
-    }
-
-    public CompletableFuture<ArrayList<FunctionOwnership>> getFunctionOwnerships(int userId) {
+    public CompletableFuture<ArrayList<FunctionOwnershipDTO>> getFunctionOwnerships(int userId) {
         return CompletableFuture.supplyAsync(() -> {
-            ArrayList<FunctionOwnership> result = new ArrayList<>();
+            ArrayList<FunctionOwnershipDTO> result = new ArrayList<>();
             try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT, userId)) {
                 while (rs.next()) {
-                    result.add(new FunctionOwnership(rs.getInt("func_id"),
+                    result.add(new FunctionOwnershipDTO(rs.getInt("func_id"),
                             rs.getTimestamp("created_date"),
                             rs.getString("func_name")));
                 }

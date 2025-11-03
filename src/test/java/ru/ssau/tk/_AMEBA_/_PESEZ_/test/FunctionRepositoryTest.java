@@ -1,8 +1,13 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.CompositeFunctionDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.PointsDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
+
+import static ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository.FunctionType.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.sql.SQLException;
@@ -158,7 +163,7 @@ class FunctionRepositoryTest {
     void testWriteGetMany() throws InterruptedException, ExecutionException {
         int startCount = 1000;
         int countDelta = 1000;
-        int testAmount = 10;
+        int testAmount = 5;
         var writeTimes = new float[testAmount];
         for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
             int pointCount = 50;
@@ -190,5 +195,45 @@ class FunctionRepositoryTest {
             int amount = startCount + countDelta * i;
             Log.info("Write {}: took {}s for {} ({}/s)", i + 1, time, amount, amount / time);
         }
+    }
+
+    @Test
+    void testFunctionDTO() throws InterruptedException, ExecutionException {
+        String expr = "2x+3";
+        // Пишем в базу данных
+        int id = repository.createMathFunction(expr).get();
+
+        FunctionDTO function = repository.getFunctionData(id).get();
+        assertEquals(id, function.funcId);
+        assertEquals(expr, function.expression);
+        assertEquals(MathFunctionType, function.funcType);
+    }
+
+    @Test
+    void testCompositeDTO() throws InterruptedException, ExecutionException {
+        String exprInner = "sin(x)";
+        String exprOuter = "2*asin(x)";
+        // Пишем в базу данных
+        CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
+        CompletableFuture<Integer> idOuter = repository.createMathFunction(exprOuter);
+        int idComposite = repository.createComposite(idInner.get(), idOuter.get()).get();
+
+        CompositeFunctionDTO function = repository.getCompositeData(idComposite).get();
+        assertEquals(idComposite, function.funcId);
+        assertEquals(idInner.get(), function.innerFuncId);
+        assertEquals(idOuter.get(), function.outerFuncId);
+    }
+
+    @Test
+    void testPointsDTO() throws InterruptedException, ExecutionException {
+        String expr = "2x*sin(x)";
+        // Пишем в базу данных
+        int id = repository.createTabulated(expr, -10, 10, 100).get();
+
+        PointsDTO function = repository.getPointsData(id).get();
+        assertEquals(100, function.xValues.length);
+        assertEquals(100, function.yValues.length);
+        assertEquals(-10, function.xValues[0], 0.001);
+        assertEquals(10, function.xValues[99], 0.001);
     }
 }

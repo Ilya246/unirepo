@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import net.objecthunter.exp4j.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
 
@@ -33,8 +34,9 @@ public class FunctionRepository extends Repository {
     private static final int MathFunctionID = 1;
     private static final int TabulatedID = 2;
     private static final int CompositeID = 3;
+    private static final int PureTabulatedID = 4;
 
-    private static final String PureTabulatedExpression = "<TABULATED>";
+    public enum FunctionType {MathFunctionType, TabulatedFunctionType, PureTabulatedType, CompositeType}
 
     public FunctionRepository(String url) {
         super(url);
@@ -100,7 +102,7 @@ public class FunctionRepository extends Repository {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, TabulatedID, "<TABULATED>");
+                int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, PureTabulatedID, "<TABULATED>");
                 Log.info("Wrote pure tabulated function into database with ID {}", funcId);
 
                 // Строим запрос для помещения всех точек в таблицу сразу
@@ -141,6 +143,79 @@ public class FunctionRepository extends Repository {
         });
     }
 
+    public CompletableFuture<FunctionDTO> getFunctionData(int funcId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                DatabaseConnection database = databaseLocal.get();
+                try (ResultSet results = database.executeQuery(FUNCTION_SELECT, funcId)) {
+                    results.first();
+                    int typeId =results.getInt("type_id");
+                    FunctionType type = switch (typeId) {
+                        case MathFunctionID -> FunctionType.MathFunctionType;
+                        case TabulatedID -> FunctionType.TabulatedFunctionType;
+                        case CompositeID -> FunctionType.CompositeType;
+                        case PureTabulatedID -> FunctionType.PureTabulatedType;
+                        default -> throw new RuntimeException("Unexpected value: " + typeId);
+                    };
+                    return new FunctionDTO(funcId,
+                            type,
+                            results.getString("expression")
+                    );
+                }
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    public CompletableFuture<CompositeFunctionDTO> getCompositeData(int funcId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                DatabaseConnection database = databaseLocal.get();
+                try (ResultSet results = database.executeQuery(COMPOSITE_SELECT, funcId)) {
+                    results.first();
+                    return new CompositeFunctionDTO(funcId,
+                            results.getInt("inner_func_id"),
+                            results.getInt("outer_func_id")
+                    );
+                }
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    public CompletableFuture<PointsDTO> getPointsData(int funcId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                DatabaseConnection database = databaseLocal.get();
+                try (ResultSet points = database.executeQuery(POINTS_SELECT, funcId)) {
+                    points.last();
+                    int count = points.getRow();
+                    var newPoints = new Point[count];
+                    points.first();
+                    for (int i = 0; i < count; i++) {
+                        double x = points.getDouble(1);
+                        double y = points.getDouble(2);
+                        newPoints[i] = new Point(x, y);
+                        points.relative(1);
+                    }
+                    Arrays.sort(newPoints, Comparator.comparingDouble(Point::getX));
+                    var xValues = new double[count];
+                    var yValues = new double[count];
+                    for (int i = 0; i < count; i++) {
+                        Point p = newPoints[i];
+                        xValues[i] = p.getX();
+                        yValues[i] = p.getY();
+                    }
+                    return new PointsDTO(funcId, xValues, yValues, false);
+                }
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
     public CompletableFuture<MathFunction> getFunction(int funcId) {
         return getFunction(funcId, false);
     }
@@ -148,59 +223,30 @@ public class FunctionRepository extends Repository {
     public CompletableFuture<MathFunction> getFunction(int funcId, boolean asMath) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                DatabaseConnection database = databaseLocal.get();
-                try (ResultSet results = database.executeQuery(FUNCTION_SELECT, funcId)) {
-                    results.first();
-                    String expr = results.getString("expression");
-                    int typeId = results.getInt("type_id");
-                    if (asMath) {
-                        if (expr.equals(PureTabulatedExpression)) throw new RuntimeException("Can't return pure tabulated functions as a pure math function.");
-                        return parseFunction(expr);
+                FunctionDTO func = getFunctionData(funcId).get();
+                if (asMath) {
+                    if (func.funcType == FunctionType.PureTabulatedType)
+                        throw new RuntimeException("Can't return pure tabulated functions as a pure math function.");
+                    return parseFunction(func.expression);
+                }
+                switch (func.funcType) {
+                    case MathFunctionType: {
+                        return parseFunction(func.expression);
                     }
-                    switch (typeId) {
-                        case (MathFunctionID): {
-                            return parseFunction(expr);
-                        }
-                        case (TabulatedID): {
-                            try (ResultSet points = database.executeQuery(POINTS_SELECT, funcId)) {
-                                points.last();
-                                int count = points.getRow();
-                                var newPoints = new Point[count];
-                                points.first();
-                                for (int i = 0; i < count; i++) {
-                                    double x = points.getDouble(1);
-                                    double y = points.getDouble(2);
-                                    newPoints[i] = new Point(x, y);
-                                    points.relative(1);
-                                }
-                                Arrays.sort(newPoints, Comparator.comparingDouble(Point::getX));
-                                var xValues = new double[count];
-                                var yValues = new double[count];
-                                for (int i = 0; i < count; i++) {
-                                    Point p = newPoints[i];
-                                    xValues[i] = p.getX();
-                                    yValues[i] = p.getY();
-                                }
-                                return new ArrayTabulatedFunction(xValues, yValues);
-                            }
-                        }
-                        case (CompositeID): {
-                            try (ResultSet functions = database.executeQuery(COMPOSITE_SELECT, funcId)) {
-                                functions.first();
-                                int inner = functions.getInt("inner_func_id");
-                                int outer = functions.getInt("outer_func_id");
-                                if (inner == funcId || outer == funcId) {
-                                    throw new RuntimeException("Attempt to make self-referential composite function");
-                                }
-                                CompletableFuture<MathFunction> innerFunc = getFunction(inner);
-                                CompletableFuture<MathFunction> outerFunc = getFunction(outer);
-                                return new CompositeFunction(innerFunc.get(), outerFunc.get());
-                            }
-                        }
+                    case PureTabulatedType:
+                    case TabulatedFunctionType: {
+                        PointsDTO pts = getPointsData(funcId).get();
+                        return new ArrayTabulatedFunction(pts.xValues, pts.yValues);
+                    }
+                    case CompositeType: {
+                        CompositeFunctionDTO composite = getCompositeData(funcId).get();
+                        CompletableFuture<MathFunction> innerFunc = getFunction(composite.innerFuncId);
+                        CompletableFuture<MathFunction> outerFunc = getFunction(composite.outerFuncId);
+                        return new CompositeFunction(innerFunc.get(), outerFunc.get());
                     }
                 }
                 return null;
-            } catch (SQLException | InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 throw new CompletionException(e);
             }
         });
