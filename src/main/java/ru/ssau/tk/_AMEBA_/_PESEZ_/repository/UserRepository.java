@@ -98,16 +98,18 @@ public class UserRepository extends Repository {
         });
     }
 
+    public enum UserType {Normal, Admin}
+
     public static class User {
         public int userId;
-        public int typeId;
+        public UserType userType;
         public String username;
         public String password;
         public Timestamp createdDate;
 
         public User(int userId, int typeId, String username, String password, Timestamp createdDate) {
             this.userId = userId;
-            this.typeId = typeId;
+            this.userType = typeId == 1 ? UserType.Normal : UserType.Admin;
             this.username = username;
             this.password = password;
             this.createdDate = createdDate;

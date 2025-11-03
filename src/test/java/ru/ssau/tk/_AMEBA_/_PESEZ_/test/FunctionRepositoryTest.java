@@ -3,6 +3,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 import org.junit.jupiter.api.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.sql.SQLException;
 import java.util.concurrent.*;
@@ -158,6 +159,7 @@ class FunctionRepositoryTest {
         int count = 5000;
         int pointCount = 50;
         var functions = new CompletableFuture[count];
+        long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             // генерируем случайные табулированные функции
             double curX = -Math.random() * pointCount / 4;
@@ -174,5 +176,8 @@ class FunctionRepositoryTest {
         for (CompletableFuture f : functions) {
             f.get();
         }
+        float tookMillis = System.currentTimeMillis() - startTime;
+        float tookSeconds = tookMillis / 1000f;
+        Log.info("Write took: {}, {}/s", tookSeconds, count/tookSeconds);
     }
 }
