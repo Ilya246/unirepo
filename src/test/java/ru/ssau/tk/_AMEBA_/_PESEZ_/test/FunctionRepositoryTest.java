@@ -88,21 +88,6 @@ class FunctionRepositoryTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testDeleteById() {
-        FunctionEntity function = new FunctionEntity(1, 1, "x + 5");
-        repository.save(function);
-
-        // Проверяем, что функция сохранена
-        FunctionEntity foundBeforeDelete = repository.findById(1);
-        assertNotNull(foundBeforeDelete, "Функция должна существовать до удаления");
-
-        repository.deleteById(1);
-
-        FunctionEntity foundAfterDelete = repository.findById(1);
-        assertNull(foundAfterDelete, "Функция должна быть удалена");
-    }
-
-    @Test
     void testParseFunction() {
         MathFunction func = FunctionRepository.parseFunction("x^2 + 2*x + 1");
         assertNotNull(func, "Функция должна быть успешно распарсена");
@@ -291,34 +276,7 @@ class FunctionRepositoryTest extends BaseRepositoryTest {
         assertEquals(4.0, func.apply(2), 0.0001, "Функция должна работать для оставшихся точек");
     }
 
-    @Test
-    void testDeleteFunctionCascading() throws ExecutionException, InterruptedException {
-        // Создаем пользователя и функцию
-        UserEntity user = new UserEntity(1, 1, "TestUser", "password");
-        userRepository.save(user);
 
-        FunctionEntity function = new FunctionEntity(1, 2, "x^2");
-        repository.save(function);
-
-        // Создаем точки для функции
-        double[] xValues = {0, 1, 2};
-        double[] yValues = {0, 1, 4};
-        CompletableFuture<Integer> tabFuture = repository.createPureTabulated(xValues, yValues);
-        int tabFuncId = tabFuture.get();
-
-        // Удаляем функцию
-        CompletableFuture<Void> deleteFuture = repository.deleteFunction(tabFuncId);
-        deleteFuture.get();
-
-        // Проверяем, что функция удалена
-        FunctionEntity deleted = repository.findById(tabFuncId);
-        assertNull(deleted, "Функция должна быть удалена");
-
-        // Проверяем, что точки также удалены (через вызов getFunction)
-        CompletableFuture<MathFunction> getFuture = repository.getFunction(tabFuncId);
-        assertThrows(ExecutionException.class, getFuture::get,
-                "Должно быть выброшено исключение при попытке получить удаленную функцию");
-    }
 
 
     @Test

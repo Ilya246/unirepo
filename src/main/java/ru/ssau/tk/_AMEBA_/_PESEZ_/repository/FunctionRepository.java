@@ -73,16 +73,6 @@ public class FunctionRepository {
                     .list();
         }
     }
-    public void deleteById(int functionId) {
-        try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            FunctionEntity function = session.find(FunctionEntity.class, functionId);
-            if (function != null) {
-                session.remove(function);
-            }
-            transaction.commit();
-        }
-    }
 
     // Создание математической функции
     public CompletableFuture<Integer> createMathFunction(String expression) {
@@ -258,31 +248,6 @@ public class FunctionRepository {
         });
     }
 
-    // Удаление функции (каскадное)
-    public CompletableFuture<Void> deleteFunction(int funcId) {
-        return CompletableFuture.supplyAsync(() -> {
-            FunctionEntity function = findById(funcId);
-            if (function == null) {
-                return null;
-            }
-
-            // Используем PointsRepository для удаления точек
-            pointsRepository.deleteByFunction(function);
-
-            // Используем CompositeFunctionRepository для удаления композитной связи
-            compositeRepository.deleteById(funcId);
-
-            // Удаляем владение если есть (нужно добавить метод в FunctionOwnershipRepository)
-            ownershipRepository.deleteByFuncId(funcId);
-
-            // Удаляем саму функцию
-            deleteById(funcId);
-
-            return null;
-        });
-    }
-
-    // Вспомогательные приватные методы
 
     private TabulatedFunction createTabulatedFunctionFromPoints(FunctionEntity function) {
         // Используем PointsRepository для получения точек

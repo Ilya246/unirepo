@@ -89,16 +89,6 @@ public class FunctionService {
         }
     }
 
-    public void deleteFunc(int funcId) {
-        Log.info("Удаление функции с ID: {}", funcId);
-        try {
-            functionRepository.deleteById(funcId);
-            Log.debug("Функция с ID {} успешно удалена", funcId);
-        } catch (Exception e) {
-            Log.error("Ошибка при удалении функции {}: {}", funcId, e.getMessage(), e);
-            throw e;
-        }
-    }
 
     public List<FunctionEntity> getUserFunctionsSortedByDate(int userId, boolean descending) {
         String order = descending ? "убыванию" : "возрастанию";
@@ -199,18 +189,6 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<Void> deleteFunction(int funcId) {
-
-        return functionRepository.deleteFunction(funcId)
-                .whenComplete((result, throwable) -> {
-                    if (throwable != null) {
-                        Log.error("Ошибка при асинхронном удалении функции {}: {}",
-                                funcId, throwable.getMessage(), throwable);
-                    } else {
-                        Log.debug("Функция {} успешно удалена (асинхронно)", funcId);
-                    }
-                });
-    }
 
     public void saveAllFunctions(List<FunctionEntity> functions) {
         try {

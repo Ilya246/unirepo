@@ -109,36 +109,7 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
         assertTrue(foundAfterUpdate.isPresent());
     }
 
-    @Test
-    void testDeleteById() {
 
-        FunctionEntity inner = new FunctionEntity(1, 1, "x");
-        FunctionEntity outer = new FunctionEntity(2, 1, "x^2");
-        FunctionEntity composite = new FunctionEntity(3, 3, "(x)^2");
-
-        functionRepository.save(inner);
-        functionRepository.save(outer);
-        functionRepository.save(composite);
-
-        CompositeFunctionEntity comp = new CompositeFunctionEntity(composite, inner, outer);
-        compositeFunctionRepository.save(comp);
-
-        Optional<CompositeFunctionEntity> foundBefore = compositeFunctionRepository.findById(3);
-        assertTrue(foundBefore.isPresent(), "Композитная функция должна существовать до удаления");
-
-        compositeFunctionRepository.deleteById(3);
-
-        Optional<CompositeFunctionEntity> foundAfter = compositeFunctionRepository.findById(3);
-        assertFalse(foundAfter.isPresent(), "Композитная функция должна быть удалена");
-
-        FunctionEntity innerAfter = functionRepository.findById(1);
-        FunctionEntity outerAfter = functionRepository.findById(2);
-        FunctionEntity compositeAfter = functionRepository.findById(3);
-
-        assertNotNull(innerAfter, "Внутренняя функция не должна быть удалена");
-        assertNotNull(outerAfter, "Внешняя функция не должна быть удалена");
-        assertNotNull(compositeAfter, "Композитная базовая функция не должна быть удалена");
-    }
     @Test
     void testCompositeFunctionWithPoints() {
 

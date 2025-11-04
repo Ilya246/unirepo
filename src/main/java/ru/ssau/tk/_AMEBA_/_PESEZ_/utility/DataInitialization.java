@@ -14,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
+
 public class DataInitialization {
 
     private final SessionFactory factory;
@@ -108,37 +110,27 @@ public class DataInitialization {
     public void clearAllData() {
         System.out.println("🧹 Очистка базы данных...");
         long startTime = System.currentTimeMillis();
-        try {
-            // Очищаем в правильном порядке из-за foreign key constraints
-            ownershipRepository.findAll().forEach(ownership -> {
-                ownershipRepository.deleteById(
-                        ownership.getId().getUserId(),
-                        ownership.getId().getFuncId()
-                );
-            });
+        try (var session = factory.openSession()) {
+            var transaction = session.beginTransaction();
 
-            pointsRepository.findAll().forEach(point -> {
-                pointsRepository.deleteById(point.getFunction().getFuncId(), point.get_xValue());
-            });
+            try {
+                // Удаляем в правильном порядке из-за foreign key constraints
+                session.createQuery("DELETE FROM PointsEntity").executeUpdate();
+                session.createQuery("DELETE FROM CompositeFunctionEntity").executeUpdate();
+                session.createQuery("DELETE FROM FunctionOwnershipEntity").executeUpdate();
+                session.createQuery("DELETE FROM FunctionEntity").executeUpdate();
+                session.createQuery("DELETE FROM UserEntity").executeUpdate();
 
-            compositeFunctionRepository.findAll().forEach(composite -> {
-                compositeFunctionRepository.deleteById(composite.getCompositeFunction().getFuncId());
-            });
-
-            functionRepository.findAll().forEach(function -> {
-                functionRepository.deleteById(function.getFuncId());
-            });
-
-            userRepository.findAll().forEach(user -> {
-                userRepository.deleteById(user.getUserId());
-            });
-            long endTime = System.currentTimeMillis();
-            System.out.println("База данных очищена!");
-            System.out.println("Время очистки: " + formatTime(endTime - startTime));
-
-        } catch (Exception e) {
-            System.err.println("Ошибка при очистке базы данных: " + e.getMessage());
-            e.printStackTrace();
+                transaction.commit();
+                long endTime = System.currentTimeMillis();
+                System.out.println("База данных очищена!");
+                System.out.println("Время очистки: " + formatTime(endTime - startTime));
+            } catch (Exception e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                Log.warn("Warning during database cleanup: " + e.getMessage());
+            }
         }
     }
 
@@ -189,7 +181,7 @@ public class DataInitialization {
         long totalStartTime = System.currentTimeMillis();
 
         initializer.clearAllData();
-        initializer.initializeTabulatedFunctionsOnly();
+        //initializer.initializeTabulatedFunctionsOnly();
 
         long totalEndTime = System.currentTimeMillis();
         long totalProcessTime = totalEndTime - totalStartTime;

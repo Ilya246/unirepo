@@ -45,16 +45,6 @@ public class CompositeFunctionRepository {
             return merged;
         }
     }
-    public void deleteById(int compositeFunctionId) {
-        try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            CompositeFunctionEntity composite = session.find(CompositeFunctionEntity.class, compositeFunctionId);
-            if (composite != null) {
-                session.remove(composite);
-            }
-            transaction.commit();
-        }
-    }
 
 
 

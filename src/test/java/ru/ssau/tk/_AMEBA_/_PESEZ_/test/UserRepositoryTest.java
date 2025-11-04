@@ -4,7 +4,9 @@ import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
@@ -305,10 +307,9 @@ class UserRepositoryTest extends BaseRepositoryTest {
 
         UserRepository userRepository = new UserRepository(factory);
         FunctionRepository functionRepository = new FunctionRepository(factory);
-        //clearDatabase1();
+        FunctionOwnershipRepository ownershipRepository = new FunctionOwnershipRepository(factory);
+
         for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
-
-
             CompletableFuture<Void>[] userFutures = new CompletableFuture[count];
             List<UserEntity> users = Collections.synchronizedList(new ArrayList<>());
 
@@ -330,10 +331,9 @@ class UserRepositoryTest extends BaseRepositoryTest {
                 });
             }
 
-            // Ждем завершения создания всех пользователей
             CompletableFuture.allOf(userFutures).get();
 
-            // Асинхронное создание функций
+            // Асинхронное создание функций и связей владения
             int funcTotal = count * functionsCount;
             CompletableFuture<Void>[] functionFutures = new CompletableFuture[funcTotal];
 
@@ -344,64 +344,41 @@ class UserRepositoryTest extends BaseRepositoryTest {
                 for (int j = 0; j < functionsCount; j++) {
                     final int functionIndex = i * functionsCount + j;
                     functionFutures[functionIndex] = CompletableFuture.runAsync(() -> {
+                        // Создаем функцию
                         FunctionEntity function = new FunctionEntity();
                         function.setFuncId(idGenerator.getAndIncrement());
-                        function.setTypeId(1); // MATH_FUNCTION_ID
+                        function.setTypeId(1);
                         function.setExpression(expr);
-                        // function.setUser(user); // если есть связь
-
                         functionRepository.save(function);
+
+                        // Создаем связь владения через конструктор
+                        FunctionOwnershipEntity ownership = new FunctionOwnershipEntity(
+                                user,
+                                function,
+                                new Date(),
+                                "Func_" + user.getUserId() + "_" + function.getFuncId()
+                        );
+                        ownershipRepository.save(ownership);
                     });
                 }
             }
 
-            // Ждем завершения создания всех функций
             CompletableFuture.allOf(functionFutures).get();
 
             float tookMillis = System.currentTimeMillis() - startTime;
             float tookSeconds = tookMillis / 1000f;
 
             Log.warn("Write of {} users + {} functions took: {}s ({}+{}/s)",
-                    count, funcTotal, tookSeconds, count / tookSeconds, funcTotal / tookSeconds);
-            // Проверяем сохранение
-            try (var session = factory.openSession()) {
-                Long userCount = session.createQuery("SELECT COUNT(u) FROM UserEntity u", Long.class)
-                        .uniqueResult();
-                Long funcCount = session.createQuery("SELECT COUNT(f) FROM FunctionEntity f", Long.class)
-                        .uniqueResult();
-
-
-
-            }
+                    count, funcTotal, tookSeconds,
+                    count / tookSeconds, funcTotal / tookSeconds);
         }
 
-        // Тестируем сортировку
         List<UserEntity> allUsers = userRepository.findAll();
         long sortStartTime = System.nanoTime();
 
         List<UserEntity> sortedUsers = userRepository.findAllOrderByCreatedDate(true);
 
         float sortTime = (System.nanoTime() - sortStartTime) * 1e-9f;
-        Log.warn("Took {}s to sort {} users", sortTime, allUsers.size());
+        Log.warn("Took {}s to sort {} users by date", sortTime, allUsers.size());
     }
-    private void clearDatabase1() {
-        try (var session = factory.openSession()) {
-            var transaction = session.beginTransaction();
-
-            try {
-                // Удаляем в правильном порядке из-за foreign key constraints
-                session.createQuery("DELETE FROM PointsEntity").executeUpdate();
-                session.createQuery("DELETE FROM CompositeFunctionEntity").executeUpdate();
-                session.createQuery("DELETE FROM FunctionOwnershipEntity").executeUpdate();
-                session.createQuery("DELETE FROM FunctionEntity").executeUpdate();
-                session.createQuery("DELETE FROM UserEntity").executeUpdate();
-
-                transaction.commit();
-            } catch (Exception e) {
-                if (transaction != null) {
-                    transaction.rollback();
-                }
-                Log.warn("Warning during database cleanup: " + e.getMessage());
-            }
-        }
-}}
+}

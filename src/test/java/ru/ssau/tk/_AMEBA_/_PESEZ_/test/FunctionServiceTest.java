@@ -148,21 +148,6 @@ class FunctionServiceTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testDeleteFunc() {
-        FunctionEntity function = new FunctionEntity(1, 1, "to delete");
-        functionService.saveFunc(function);
-
-        // Проверяем, что функция существует
-        assertNotNull(functionService.getFunctionById(1));
-
-        // Удаляем функцию
-        functionService.deleteFunc(1);
-
-        // Проверяем, что функция удалена
-        assertNull(functionService.getFunctionById(1));
-    }
-
-    @Test
     void testGetUserFunctionsSortedByDate() {
         // Создаем пользователя и функции
         UserEntity user = new UserEntity(1, 1, "TestUser", "pass", new Date());
@@ -305,21 +290,6 @@ class FunctionServiceTest extends BaseRepositoryTest {
         assertEquals(4.0, result, 0.0001, "Функция должна работать для оставшихся точек");
     }
 
-    @Test
-    void testDeleteFunction() throws ExecutionException, InterruptedException {
-        FunctionEntity function = new FunctionEntity(1, 1, "to delete");
-        functionService.saveFunc(function);
-
-        // Проверяем, что функция существует
-        assertNotNull(functionService.getFunctionById(1));
-
-        // Удаляем функцию через асинхронный метод
-        CompletableFuture<Void> deleteFuture = functionService.deleteFunction(1);
-        deleteFuture.get();
-
-        // Проверяем, что функция удалена
-        assertNull(functionService.getFunctionById(1));
-    }
 
     @Test
     void testSaveAllFunctions() {
