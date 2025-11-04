@@ -68,12 +68,11 @@ public class UserRepository extends Repository {
     }
 
     public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(USER_UPDATE, newUserName, newPassword, userId);
                 Log.info("Updated user ID {}", userId);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -81,12 +80,11 @@ public class UserRepository extends Repository {
     }
 
     public CompletableFuture<Void> deleteUser(int userId) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(USER_DELETE, userId);
                 Log.info("Deleted user ID {}", userId);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -110,12 +108,11 @@ public class UserRepository extends Repository {
     }
 
     public CompletableFuture<Void> addFunctionOwnership(int userId, int funcId, String funcName) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(FUNCTION_OWNERSHIP_INSERT, userId, funcId, funcName);
                 Log.info("Added ownership for user {} to function {}", userId, funcId);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -123,12 +120,11 @@ public class UserRepository extends Repository {
     }
 
     public CompletableFuture<Void> updateFunctionOwnership(int userId, int oldFuncId, int newFuncId) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(FUNCTION_OWNERSHIP_UPDATE, newFuncId, userId, oldFuncId);
                 Log.info("Updated ownership for user {} from {} to {}", userId, oldFuncId, newFuncId);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -136,12 +132,11 @@ public class UserRepository extends Repository {
     }
 
     public CompletableFuture<Void> removeFunctionOwnership(int userId, int funcId) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(FUNCTION_OWNERSHIP_DELETE, userId, funcId);
                 Log.info("Removed ownership for user {} to function {}", userId, funcId);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }

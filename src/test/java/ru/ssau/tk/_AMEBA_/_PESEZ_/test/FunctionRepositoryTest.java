@@ -35,25 +35,25 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testMathFunction() throws InterruptedException, ExecutionException {
+    void testMathFunction() {
         String expr = "2x+3";
         // Пишем в базу данных
-        int id = repository.createMathFunction(expr).get();
+        int id = repository.createMathFunction(expr).join();
 
-        MathFunction function = repository.getFunction(id).get();
+        MathFunction function = repository.getFunction(id).join();
         assertEquals(5, function.apply(1));
         assertEquals(1, function.apply(-1));
 
-        repository.deleteFunction(id).get();
+        repository.deleteFunction(id).join();
     }
 
     @Test
-    void testTabulatedFunction() throws InterruptedException, ExecutionException {
+    void testTabulatedFunction() {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = repository.createTabulated(expr, -10, 10, 100).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).join();
 
-        MathFunction function = repository.getFunction(id).get();
+        MathFunction function = repository.getFunction(id).join();
         assertInstanceOf(TabulatedFunction.class, function);
         assertEquals(0, function.apply(0), 0.05);
         assertEquals(3.38, function.apply(1.71), 0.05);
@@ -61,15 +61,15 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testCompositeFunction() throws InterruptedException, ExecutionException {
+    void testCompositeFunction() {
         String exprInner = "sin(x)";
         String exprOuter = "2*asin(x)";
         // Пишем в базу данных
         CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
         CompletableFuture<Integer> idOuter = repository.createMathFunction(exprOuter);
-        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.get(), idOuter.get());
+        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.join(), idOuter.join());
 
-        MathFunction function = repository.getFunction(idComposite.get()).get();
+        MathFunction function = repository.getFunction(idComposite.join()).join();
         assertInstanceOf(CompositeFunction.class, function);
         assertEquals(0, function.apply(0), 0.05);
         assertEquals(0.2, function.apply(0.1), 0.05);
@@ -79,15 +79,15 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testMathTabulatedCompositeFunction() throws InterruptedException, ExecutionException {
+    void testMathTabulatedCompositeFunction() {
         String exprInner = "sin(x)";
         String exprOuter = "x^2";
         // Пишем в базу данных
         CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
         CompletableFuture<Integer> idOuter = repository.createTabulated(exprOuter, -1, 1, 100);
-        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.get(), idOuter.get());
+        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.join(), idOuter.join());
 
-        MathFunction function = repository.getFunction(idComposite.get()).get();
+        MathFunction function = repository.getFunction(idComposite.join()).join();
         assertInstanceOf(CompositeFunction.class, function);
         assertEquals(0, function.apply(0), 0.05);
         assertEquals(0.25, function.apply(Math.PI / 6), 0.05);
@@ -98,7 +98,7 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testUpdateComposite() throws InterruptedException, ExecutionException {
+    void testUpdateComposite() {
         String exprInner = "2x+7";
         String exprOuter = "0.5x-0.5";
         String exprOuterNew = "0.5x-2.5";
@@ -106,17 +106,17 @@ class FunctionRepositoryTest {
         CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
         CompletableFuture<Integer> idOuter = repository.createMathFunction(exprOuter);
         CompletableFuture<Integer> idOuterNew = repository.createMathFunction(exprOuterNew);
-        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.get(), idOuter.get());
+        CompletableFuture<Integer> idComposite = repository.createComposite(idInner.join(), idOuter.join());
 
-        MathFunction function = repository.getFunction(idComposite.get()).get();
+        MathFunction function = repository.getFunction(idComposite.join()).join();
         assertEquals(3, function.apply(0), 0.05);
         assertEquals(5, function.apply(2), 0.05);
         assertEquals(17.2, function.apply(14.2), 0.05);
         assertEquals(-2.2, function.apply(-5.2), 0.05);
         assertEquals(-7, function.apply(-10), 0.05);
 
-        repository.updateComposite(idComposite.get(), null, idOuterNew.get()).get();
-        function = repository.getFunction(idComposite.get()).get();
+        repository.updateComposite(idComposite.join(), null, idOuterNew.join()).join();
+        function = repository.getFunction(idComposite.join()).join();
         assertEquals(1, function.apply(0), 0.05);
         assertEquals(3, function.apply(2), 0.05);
         assertEquals(15.2, function.apply(14.2), 0.05);
@@ -126,52 +126,52 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testUpdatePoint() throws InterruptedException, ExecutionException {
+    void testUpdatePoint() {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = repository.createTabulated(expr, -10, 10, 100).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).join();
 
-        MathFunction function = repository.getFunction(id).get();
+        MathFunction function = repository.getFunction(id).join();
         var tabulated = (TabulatedFunction)function;
         double ptX = tabulated.getX(50);
         double ptY = tabulated.apply(ptX);
 
-        repository.updatePoint(id, ptX, 10).get();
-        function = repository.getFunction(id).get();
+        repository.updatePoint(id, ptX, 10).join();
+        function = repository.getFunction(id).join();
         assertEquals(10, function.apply(ptX));
         assertNotEquals(ptY, function.apply(ptX));
     }
 
     @Test
-    void testNewPoint() throws InterruptedException, ExecutionException {
+    void testNewPoint() {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = repository.createTabulated(expr, -10, 10, 100).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).join();
 
-        repository.createPoint(id, 15, 137).get();
-        MathFunction function = repository.getFunction(id).get();
+        repository.createPoint(id, 15, 137).join();
+        MathFunction function = repository.getFunction(id).join();
         assertEquals(137, function.apply(15));
     }
 
     @Test
-    void testDeletePoint() throws InterruptedException, ExecutionException {
+    void testDeletePoint() {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = repository.createTabulated(expr, -10, 10, 100).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).join();
 
-        MathFunction function = repository.getFunction(id).get();
+        MathFunction function = repository.getFunction(id).join();
         var tabulated = (TabulatedFunction)function;
         assertEquals(100, tabulated.getCount());
         double ptX = tabulated.getX(50);
 
-        repository.deletePoint(id, ptX).get();
-        function = repository.getFunction(id).get();
+        repository.deletePoint(id, ptX).join();
+        function = repository.getFunction(id).join();
         tabulated = (TabulatedFunction)function;
         assertEquals(99, tabulated.getCount());
     }
 
     @Test
-    void testWriteGetMany() throws InterruptedException, ExecutionException {
+    void testWriteGetMany() {
         int startCount = 1000;
         int countDelta = 1000;
         int testAmount = 5;
@@ -192,10 +192,7 @@ class FunctionRepositoryTest {
                 }
                 functions[i] = repository.createPureTabulated(xValues, yValues);
             }
-            //noinspection rawtypes
-            for (CompletableFuture f : functions) {
-                f.get();
-            }
+            CompletableFuture.allOf(functions).join();
             float tookMillis = System.currentTimeMillis() - startTime;
             float tookSeconds = tookMillis / 1000f;
             writeTimes[it] = tookSeconds;
@@ -209,39 +206,39 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testFunctionDTO() throws InterruptedException, ExecutionException {
+    void testFunctionDTO() {
         String expr = "2x+3";
         // Пишем в базу данных
-        int id = repository.createMathFunction(expr).get();
+        int id = repository.createMathFunction(expr).join();
 
-        FunctionDTO function = repository.getFunctionData(id).get();
+        FunctionDTO function = repository.getFunctionData(id).join();
         assertEquals(id, function.funcId);
         assertEquals(expr, function.expression);
         assertEquals(MathFunctionID, function.funcType);
     }
 
     @Test
-    void testCompositeDTO() throws InterruptedException, ExecutionException {
+    void testCompositeDTO() {
         String exprInner = "sin(x)";
         String exprOuter = "2*asin(x)";
         // Пишем в базу данных
         CompletableFuture<Integer> idInner = repository.createMathFunction(exprInner);
         CompletableFuture<Integer> idOuter = repository.createMathFunction(exprOuter);
-        int idComposite = repository.createComposite(idInner.get(), idOuter.get()).get();
+        int idComposite = repository.createComposite(idInner.join(), idOuter.join()).join();
 
-        CompositeFunctionDTO function = repository.getCompositeData(idComposite).get();
+        CompositeFunctionDTO function = repository.getCompositeData(idComposite).join();
         assertEquals(idComposite, function.funcId);
-        assertEquals(idInner.get(), function.innerFuncId);
-        assertEquals(idOuter.get(), function.outerFuncId);
+        assertEquals(idInner.join(), function.innerFuncId);
+        assertEquals(idOuter.join(), function.outerFuncId);
     }
 
     @Test
-    void testPointsDTO() throws InterruptedException, ExecutionException {
+    void testPointsDTO() {
         String expr = "2x*sin(x)";
         // Пишем в базу данных
-        int id = repository.createTabulated(expr, -10, 10, 100).get();
+        int id = repository.createTabulated(expr, -10, 10, 100).join();
 
-        PointsDTO function = repository.getPointsData(id).get();
+        PointsDTO function = repository.getPointsData(id).join();
         assertEquals(100, function.xValues.length);
         assertEquals(100, function.yValues.length);
         assertEquals(-10, function.xValues[0], 0.001);

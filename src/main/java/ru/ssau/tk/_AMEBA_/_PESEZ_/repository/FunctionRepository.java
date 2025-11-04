@@ -92,7 +92,7 @@ public class FunctionRepository extends Repository {
                     stmt.executeBatch();
                 }
                 return funcId;
-            } catch (SQLException  e) {
+            } catch (SQLException e) {
                 throw new CompletionException(e);
             }
         });
@@ -123,12 +123,11 @@ public class FunctionRepository extends Repository {
     }
 
     public CompletableFuture<Void> createPoint(int funcId, double xValue, double yValue) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(POINTS_INSERT, funcId, xValue, yValue);
                 Log.info("Wrote single point into database for function ID {}: ({}, {})", funcId, xValue, yValue);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -245,39 +244,35 @@ public class FunctionRepository extends Repository {
 
     public CompletableFuture<MathFunction> getFunction(int funcId, boolean asMath) {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                FunctionDTO func = getFunctionData(funcId).get();
-                if (asMath) {
-                    if (func.funcType == PureTabulatedID)
-                        throw new RuntimeException("Can't return pure tabulated functions as a pure math function.");
+            FunctionDTO func = getFunctionData(funcId).join();
+            if (asMath) {
+                if (func.funcType == PureTabulatedID)
+                    throw new RuntimeException("Can't return pure tabulated functions as a pure math function.");
+                return parseFunction(func.expression);
+            }
+            switch (func.funcType) {
+                case MathFunctionID: {
                     return parseFunction(func.expression);
                 }
-                switch (func.funcType) {
-                    case MathFunctionID: {
-                        return parseFunction(func.expression);
-                    }
-                    case PureTabulatedID:
-                    case TabulatedID: {
-                        PointsDTO pts = getPointsData(funcId).get();
-                        return new ArrayTabulatedFunction(pts.xValues, pts.yValues);
-                    }
-                    case CompositeID: {
-                        CompositeFunctionDTO composite = getCompositeData(funcId).get();
-                        CompletableFuture<MathFunction> innerFunc = getFunction(composite.innerFuncId);
-                        CompletableFuture<MathFunction> outerFunc = getFunction(composite.outerFuncId);
-                        return new CompositeFunction(innerFunc.get(), outerFunc.get());
-                    }
+                case PureTabulatedID:
+                case TabulatedID: {
+                    PointsDTO pts = getPointsData(funcId).join();
+                    return new ArrayTabulatedFunction(pts.xValues, pts.yValues);
                 }
-                return null;
-            } catch (InterruptedException | ExecutionException e) {
-                throw new CompletionException(e);
+                case CompositeID: {
+                    CompositeFunctionDTO composite = getCompositeData(funcId).join();
+                    CompletableFuture<MathFunction> innerFunc = getFunction(composite.innerFuncId);
+                    CompletableFuture<MathFunction> outerFunc = getFunction(composite.outerFuncId);
+                    return new CompositeFunction(innerFunc.join(), outerFunc.join());
+                }
             }
+            return null;
         });
     }
 
     // Обновляет композитную функцию, аргументы могут быть null чтобы не обновлять этот параметр
     public CompletableFuture<Void> updateComposite(int funcId, Integer newInner, Integer newOuter) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 try (ResultSet row = database.executeQuery(COMPOSITE_SELECT, funcId)) {
@@ -287,7 +282,6 @@ public class FunctionRepository extends Repository {
                     if (newInner != null) inner = newInner;
                     if (newOuter != null) outer = newOuter;
                     database.executeUpdate(COMPOSITE_UPDATE, inner, outer, funcId);
-                    return null;
                 }
             } catch (SQLException e) {
                 throw new CompletionException(e);
@@ -296,11 +290,10 @@ public class FunctionRepository extends Repository {
     }
 
     public CompletableFuture<Void> updatePoint(int funcId, double xValue, double newY) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(POINTS_UPDATE, newY, xValue, funcId);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -308,11 +301,10 @@ public class FunctionRepository extends Repository {
     }
 
     public CompletableFuture<Void> deletePoint(int funcId, double xValue) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 database.executeUpdate(POINTS_DELETE_ONE, funcId, xValue);
-                return null;
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }
@@ -320,10 +312,10 @@ public class FunctionRepository extends Repository {
     }
 
     public CompletableFuture<Void> deleteFunction(int funcId) {
-        return CompletableFuture.supplyAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                CompositeFunctionDTO[] comps = getCompositesContaining(funcId).get();
+                CompositeFunctionDTO[] comps = getCompositesContaining(funcId).join();
                 if (comps.length > 0)
                     throw new IsInCompositeException("Function is present in at least one other composite function",
                             Arrays.stream(comps).mapToInt(c -> c.funcId).toArray());
@@ -331,8 +323,7 @@ public class FunctionRepository extends Repository {
                 database.executeUpdate(POINTS_DELETE, funcId);
                 database.executeUpdate(COMPOSITE_DELETE, funcId);
                 database.executeUpdate(FUNCTION_DELETE, funcId);
-                return null;
-            } catch (SQLException | InterruptedException | ExecutionException e) {
+            } catch (SQLException e) {
                 throw new CompletionException(e);
             }
         });
