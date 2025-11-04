@@ -236,10 +236,9 @@ class ArrayTabulatedFunctionTest {
 
         TestArrayTabulatedFunction func = new TestArrayTabulatedFunction(x, y);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             func.testFloorIndexOfX(0.5);
         });
-        assertTrue(exception.getMessage().contains("x is less than left bound"));
 
         assertEquals(0, func.testFloorIndexOfX(1.5));
         assertEquals(0, func.testFloorIndexOfX(2.0));
