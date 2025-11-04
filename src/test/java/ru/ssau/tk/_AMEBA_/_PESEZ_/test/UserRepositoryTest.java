@@ -6,10 +6,11 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 class UserRepositoryTest {
     static String databaseUrl = "jdbc:postgresql://localhost:5432/function_db_test";
@@ -47,7 +48,7 @@ class UserRepositoryTest {
 
         repository.deleteUser(id).get();
 
-        assertThrows(ExecutionException.class, () -> repository.getUser(id).get());
+        assertNull(repository.getUser(id).get());
     }
 
     @Test
@@ -56,7 +57,7 @@ class UserRepositoryTest {
         UserDTO user = repository.getUser(id).get();
         assertEquals("AdminUser", user.username);
         assertEquals("adminPass", user.password);
-        assertEquals(UserRepository.UserType.Admin, user.userType);
+        assertEquals(AdminUserID, user.userType);
 
         repository.deleteUser(id).get();
     }
@@ -71,6 +72,18 @@ class UserRepositoryTest {
         assertEquals("NewPass", user.password);
 
         repository.deleteUser(id).get();
+    }
+
+    @Test
+    void testGetUsers() throws InterruptedException, ExecutionException {
+        repository.createNormalUser("User1", "Pass1").get();
+        repository.createNormalUser("User2", "Pass2").get();
+        repository.createNormalUser("User3", "Pass3").get();
+
+        UserDTO[] all = repository.getAllUsers().get();
+        assertTrue(Arrays.stream(all).anyMatch(a -> a.username.equals("User1") && a.password.equals("Pass1")));
+        assertTrue(Arrays.stream(all).anyMatch(a -> a.username.equals("User2") && a.password.equals("Pass2")));
+        assertTrue(Arrays.stream(all).anyMatch(a -> a.username.equals("User3") && a.password.equals("Pass3")));
     }
 
     @Test
@@ -104,16 +117,16 @@ class UserRepositoryTest {
         repository.addFunctionOwnership(userId, funcId1, "1").get();
         repository.addFunctionOwnership(userId, funcId2, "2").get();
         repository.addFunctionOwnership(userId, funcId3, "3").get();
-        ArrayList<FunctionOwnershipDTO> ownerships = repository.getFunctionOwnerships(userId).get();
-        assertEquals(3, ownerships.size());
-        assertEquals("1", ownerships.get(0).funcName);
-        assertEquals("2", ownerships.get(1).funcName);
-        assertEquals("3", ownerships.get(2).funcName);
+        FunctionOwnershipDTO[] ownerships = repository.getFunctionOwnerships(userId).get();
+        assertEquals(3, ownerships.length);
+        assertEquals("1", ownerships[0].funcName);
+        assertEquals("2", ownerships[1].funcName);
+        assertEquals("3", ownerships[2].funcName);
 
         repository.removeFunctionOwnership(userId, funcId2).get();
         ownerships = repository.getFunctionOwnerships(userId).get();
-        assertEquals(2, ownerships.size());
-        assertEquals("1", ownerships.get(0).funcName);
-        assertEquals("3", ownerships.get(1).funcName);
+        assertEquals(2, ownerships.length);
+        assertEquals("1", ownerships[0].funcName);
+        assertEquals("3", ownerships[1].funcName);
     }
 }

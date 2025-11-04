@@ -31,12 +31,10 @@ public class FunctionRepository extends Repository {
     private static final String POINTS_DELETE_ONE = readCommand("PointsDeleteOne");
     private static final String POINTS_SELECT = readCommand("PointsRead");
 
-    private static final int MathFunctionID = 1;
-    private static final int TabulatedID = 2;
-    private static final int CompositeID = 3;
-    private static final int PureTabulatedID = 4;
-
-    public enum FunctionType {MathFunctionType, TabulatedFunctionType, PureTabulatedType, CompositeType}
+    public static final int MathFunctionID = 1;
+    public static final int TabulatedID = 1 << 1;
+    public static final int CompositeID = 1 << 2;
+    public static final int PureTabulatedID = 1 << 3;
 
     public FunctionRepository(String url) {
         super(url);
@@ -163,16 +161,8 @@ public class FunctionRepository extends Repository {
                 try (ResultSet results = database.executeQuery(FUNCTION_SELECT, funcId)) {
                     if (!results.first())
                         return null;
-                    int typeId =results.getInt("type_id");
-                    FunctionType type = switch (typeId) {
-                        case MathFunctionID -> FunctionType.MathFunctionType;
-                        case TabulatedID -> FunctionType.TabulatedFunctionType;
-                        case CompositeID -> FunctionType.CompositeType;
-                        case PureTabulatedID -> FunctionType.PureTabulatedType;
-                        default -> throw new RuntimeException("Unexpected value: " + typeId);
-                    };
                     return new FunctionDTO(funcId,
-                            type,
+                            results.getInt("type_id"),
                             results.getString("expression")
                     );
                 }
@@ -205,8 +195,7 @@ public class FunctionRepository extends Repository {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 try (ResultSet points = database.executeQuery(POINTS_SELECT, funcId)) {
-                    if (!points.last())
-                        return null;
+                    points.last();
                     int count = points.getRow();
                     points.first();
                     var xValues = new double[count];
@@ -214,7 +203,7 @@ public class FunctionRepository extends Repository {
                     for (int i = 0; i < count; i++) {
                         xValues[i] = points.getDouble(1);
                         yValues[i] = points.getDouble(2);
-                        points.relative(1);
+                        points.next();
                     }
                     return new PointsDTO(funcId, xValues, yValues, false);
                 }
@@ -233,20 +222,20 @@ public class FunctionRepository extends Repository {
             try {
                 FunctionDTO func = getFunctionData(funcId).get();
                 if (asMath) {
-                    if (func.funcType == FunctionType.PureTabulatedType)
+                    if (func.funcType == PureTabulatedID)
                         throw new RuntimeException("Can't return pure tabulated functions as a pure math function.");
                     return parseFunction(func.expression);
                 }
                 switch (func.funcType) {
-                    case MathFunctionType: {
+                    case MathFunctionID: {
                         return parseFunction(func.expression);
                     }
-                    case PureTabulatedType:
-                    case TabulatedFunctionType: {
+                    case PureTabulatedID:
+                    case TabulatedID: {
                         PointsDTO pts = getPointsData(funcId).get();
                         return new ArrayTabulatedFunction(pts.xValues, pts.yValues);
                     }
-                    case CompositeType: {
+                    case CompositeID: {
                         CompositeFunctionDTO composite = getCompositeData(funcId).get();
                         CompletableFuture<MathFunction> innerFunc = getFunction(composite.innerFuncId);
                         CompletableFuture<MathFunction> outerFunc = getFunction(composite.outerFuncId);

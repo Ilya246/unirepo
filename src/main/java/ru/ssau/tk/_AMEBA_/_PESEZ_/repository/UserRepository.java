@@ -5,7 +5,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.concurrent.*;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
@@ -15,6 +14,7 @@ public class UserRepository extends Repository {
     private static final String USER_INSERT = readCommand("UserCreate");
     private static final String USER_DELETE = readCommand("UserDelete");
     private static final String USER_SELECT = readCommand("UserRead");
+    private static final String USER_SELECT_ALL = readCommand("UserReadAll");
     private static final String USER_UPDATE = readCommand("UserUpdate");
 
     private static final String FUNCTION_OWNERSHIP_ENSURE_TABLE = readCommand("FunctionOwnershipCreateTable");
@@ -24,10 +24,8 @@ public class UserRepository extends Repository {
     private static final String FUNCTION_OWNERSHIP_SELECT = readCommand("FunctionOwnershipRead");
     private static final String FUNCTION_OWNERSHIP_SELECT_MANY = readCommand("FunctionOwnershipReadMany");
 
-    private static final int NormalUserID = 1;
-    private static final int AdminUserID = 2;
-
-    public enum UserType {Normal, Admin}
+    public static final int NormalUserID = 1;
+    public static final int AdminUserID = 1 << 1;
 
     public UserRepository(String url) {
         super(url);
@@ -108,14 +106,8 @@ public class UserRepository extends Repository {
             try (ResultSet rs = databaseLocal.get().executeQuery(USER_SELECT, userId)) {
                 if (!rs.first())
                     return null;
-                int typeId = rs.getInt("type_id");
-                UserType type = switch(typeId) {
-                    case NormalUserID -> UserType.Normal;
-                    case AdminUserID -> UserType.Admin;
-                    default -> throw new RuntimeException("Unexpected value: " + typeId);
-                };
                 return new UserDTO(rs.getInt("user_id"),
-                        type,
+                        rs.getInt("type_id"),
                         rs.getString("user_name"),
                         rs.getString("password"),
                         rs.getTimestamp("created_date"));
@@ -166,7 +158,6 @@ public class UserRepository extends Repository {
 
     public CompletableFuture<FunctionOwnershipDTO> getFunctionOwnership(int userId, int funcId) {
         return CompletableFuture.supplyAsync(() -> {
-            ArrayList<FunctionOwnershipDTO> result = new ArrayList<>();
             try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT, userId, funcId)) {
                 if (!rs.first())
                     return null;
@@ -179,14 +170,40 @@ public class UserRepository extends Repository {
         });
     }
 
-    public CompletableFuture<ArrayList<FunctionOwnershipDTO>> getFunctionOwnerships(int userId) {
+    public CompletableFuture<FunctionOwnershipDTO[]> getFunctionOwnerships(int userId) {
         return CompletableFuture.supplyAsync(() -> {
-            ArrayList<FunctionOwnershipDTO> result = new ArrayList<>();
             try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT_MANY, userId)) {
-                while (rs.next()) {
-                    result.add(new FunctionOwnershipDTO(rs.getInt("func_id"),
+                rs.last();
+                int count = rs.getRow();
+                var result = new FunctionOwnershipDTO[count];
+                rs.first();
+                for (int i = 0; i < count; i++) {
+                    result[i] = new FunctionOwnershipDTO(rs.getInt("func_id"),
                             rs.getTimestamp("created_date"),
-                            rs.getString("func_name")));
+                            rs.getString("func_name"));
+                    rs.next();
+                }
+                return result;
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    public CompletableFuture<UserDTO[]> getAllUsers() {
+        return CompletableFuture.supplyAsync(() -> {
+            try (ResultSet rs = databaseLocal.get().executeQuery(USER_SELECT_ALL)) {
+                rs.last();
+                int count = rs.getRow();
+                var result = new UserDTO[count];
+                rs.first();
+                for (int i = 0; i < count; i++) {
+                    result[i] = new UserDTO(rs.getInt("user_id"),
+                            rs.getInt("type_id"),
+                            rs.getString("user_name"),
+                            rs.getString("password"),
+                            rs.getTimestamp("created_date"));
+                    rs.next();
                 }
                 return result;
             } catch (SQLException e) {

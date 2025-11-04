@@ -7,7 +7,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.PointsDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
 
-import static ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository.FunctionType.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.sql.SQLException;
@@ -217,7 +217,7 @@ class FunctionRepositoryTest {
         FunctionDTO function = repository.getFunctionData(id).get();
         assertEquals(id, function.funcId);
         assertEquals(expr, function.expression);
-        assertEquals(MathFunctionType, function.funcType);
+        assertEquals(MathFunctionID, function.funcType);
     }
 
     @Test
