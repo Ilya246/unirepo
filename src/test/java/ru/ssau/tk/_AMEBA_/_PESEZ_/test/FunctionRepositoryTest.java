@@ -143,6 +143,17 @@ class FunctionRepositoryTest {
     }
 
     @Test
+    void testNewPoint() throws InterruptedException, ExecutionException {
+        String expr = "2x*sin(x)";
+        // Пишем в базу данных
+        int id = repository.createTabulated(expr, -10, 10, 100).get();
+
+        repository.createPoint(id, 15, 137).get();
+        MathFunction function = repository.getFunction(id).get();
+        assertEquals(137, function.apply(15));
+    }
+
+    @Test
     void testDeletePoint() throws InterruptedException, ExecutionException {
         String expr = "2x*sin(x)";
         // Пишем в базу данных

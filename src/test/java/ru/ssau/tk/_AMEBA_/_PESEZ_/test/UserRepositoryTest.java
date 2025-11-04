@@ -80,20 +80,18 @@ class UserRepositoryTest {
 
         String funcName = "Quadratic";
         repository.addFunctionOwnership(userId, funcId, funcName).get();
-        ArrayList<FunctionOwnershipDTO> ownerships = repository.getFunctionOwnerships(userId).get();
-        assertEquals(1, ownerships.size());
-        assertEquals(funcId, ownerships.get(0).funcId);
-        assertEquals(funcName, ownerships.get(0).funcName);
+        FunctionOwnershipDTO ownership = repository.getFunctionOwnership(userId, funcId).get();
+        assertEquals(funcId, ownership.funcId);
+        assertEquals(funcName, ownership.funcName);
 
         int newFuncId = functionRepo.createMathFunction("x^3").get();
         repository.updateFunctionOwnership(userId, funcId, newFuncId).get();
-        ownerships = repository.getFunctionOwnerships(userId).get();
-        assertEquals(1, ownerships.size());
-        assertEquals(newFuncId, ownerships.get(0).funcId);
+        ownership = repository.getFunctionOwnership(userId, newFuncId).get();
+        assertEquals(newFuncId, ownership.funcId);
 
         repository.removeFunctionOwnership(userId, newFuncId).get();
-        ownerships = repository.getFunctionOwnerships(userId).get();
-        assertTrue(ownerships.isEmpty());
+        ownership = repository.getFunctionOwnership(userId, newFuncId).get();
+        assertNull(ownership);
     }
 
     @Test

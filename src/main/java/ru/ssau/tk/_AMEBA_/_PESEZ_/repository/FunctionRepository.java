@@ -122,14 +122,27 @@ public class FunctionRepository extends Repository {
         });
     }
 
+    public CompletableFuture<Void> createPoint(int funcId, double xValue, double yValue) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                DatabaseConnection database = databaseLocal.get();
+                database.executeUpdate(POINTS_INSERT, funcId, xValue, yValue);
+                Log.info("Wrote single point into database for function ID {}: ({}, {})", funcId, xValue, yValue);
+                return null;
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
     public CompletableFuture<Integer> createComposite(int innerId, int outerId) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 try (ResultSet inner = database.executeQuery(FUNCTION_SELECT, innerId);
                  ResultSet outer = database.executeQuery(FUNCTION_SELECT, outerId)) {
-                    inner.first();
-                    outer.first();
+                    if (!inner.first() || !outer.first())
+                        return null;
                     String replaceWith = "(" + inner.getString("expression") + ")";
                     String expression = outer.getString("expression").replaceAll("x", replaceWith);
                     int funcId = database.executeUpdateAndGetId(FUNCTION_INSERT, CompositeID, expression);
@@ -148,7 +161,8 @@ public class FunctionRepository extends Repository {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 try (ResultSet results = database.executeQuery(FUNCTION_SELECT, funcId)) {
-                    results.first();
+                    if (!results.first())
+                        return null;
                     int typeId =results.getInt("type_id");
                     FunctionType type = switch (typeId) {
                         case MathFunctionID -> FunctionType.MathFunctionType;
@@ -173,7 +187,8 @@ public class FunctionRepository extends Repository {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 try (ResultSet results = database.executeQuery(COMPOSITE_SELECT, funcId)) {
-                    results.first();
+                    if (!results.first())
+                        return null;
                     return new CompositeFunctionDTO(funcId,
                             results.getInt("inner_func_id"),
                             results.getInt("outer_func_id")
@@ -190,23 +205,16 @@ public class FunctionRepository extends Repository {
             try {
                 DatabaseConnection database = databaseLocal.get();
                 try (ResultSet points = database.executeQuery(POINTS_SELECT, funcId)) {
-                    points.last();
+                    if (!points.last())
+                        return null;
                     int count = points.getRow();
-                    var newPoints = new Point[count];
                     points.first();
-                    for (int i = 0; i < count; i++) {
-                        double x = points.getDouble(1);
-                        double y = points.getDouble(2);
-                        newPoints[i] = new Point(x, y);
-                        points.relative(1);
-                    }
-                    Arrays.sort(newPoints, Comparator.comparingDouble(Point::getX));
                     var xValues = new double[count];
                     var yValues = new double[count];
                     for (int i = 0; i < count; i++) {
-                        Point p = newPoints[i];
-                        xValues[i] = p.getX();
-                        yValues[i] = p.getY();
+                        xValues[i] = points.getDouble(1);
+                        yValues[i] = points.getDouble(2);
+                        points.relative(1);
                     }
                     return new PointsDTO(funcId, xValues, yValues, false);
                 }

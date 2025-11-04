@@ -22,6 +22,7 @@ public class UserRepository extends Repository {
     private static final String FUNCTION_OWNERSHIP_UPDATE = readCommand("FunctionOwnershipUpdate");
     private static final String FUNCTION_OWNERSHIP_DELETE = readCommand("FunctionOwnershipDelete");
     private static final String FUNCTION_OWNERSHIP_SELECT = readCommand("FunctionOwnershipRead");
+    private static final String FUNCTION_OWNERSHIP_SELECT_MANY = readCommand("FunctionOwnershipReadMany");
 
     private static final int NormalUserID = 1;
     private static final int AdminUserID = 2;
@@ -105,7 +106,8 @@ public class UserRepository extends Repository {
     public CompletableFuture<UserDTO> getUser(int userId) {
         return CompletableFuture.supplyAsync(() -> {
             try (ResultSet rs = databaseLocal.get().executeQuery(USER_SELECT, userId)) {
-                rs.next();
+                if (!rs.first())
+                    return null;
                 int typeId = rs.getInt("type_id");
                 UserType type = switch(typeId) {
                     case NormalUserID -> UserType.Normal;
@@ -162,10 +164,25 @@ public class UserRepository extends Repository {
         });
     }
 
+    public CompletableFuture<FunctionOwnershipDTO> getFunctionOwnership(int userId, int funcId) {
+        return CompletableFuture.supplyAsync(() -> {
+            ArrayList<FunctionOwnershipDTO> result = new ArrayList<>();
+            try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT, userId, funcId)) {
+                if (!rs.first())
+                    return null;
+                return new FunctionOwnershipDTO(rs.getInt("func_id"),
+                        rs.getTimestamp("created_date"),
+                        rs.getString("func_name"));
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
     public CompletableFuture<ArrayList<FunctionOwnershipDTO>> getFunctionOwnerships(int userId) {
         return CompletableFuture.supplyAsync(() -> {
             ArrayList<FunctionOwnershipDTO> result = new ArrayList<>();
-            try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT, userId)) {
+            try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT_MANY, userId)) {
                 while (rs.next()) {
                     result.add(new FunctionOwnershipDTO(rs.getInt("func_id"),
                             rs.getTimestamp("created_date"),
