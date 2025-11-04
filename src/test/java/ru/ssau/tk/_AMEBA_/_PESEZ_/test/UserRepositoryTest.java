@@ -3,18 +3,28 @@ package ru.ssau.tk._AMEBA_._PESEZ_.test;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 
 class UserRepositoryTest extends BaseRepositoryTest {
     private SessionFactory factory;
     private UserRepository repository;
+    private final AtomicInteger idGenerator = new AtomicInteger(1000);
+
 
     @BeforeEach
     void setUp() {
@@ -286,4 +296,112 @@ class UserRepositoryTest extends BaseRepositoryTest {
         List<UserEntity> sortedUsers = repository.findAllOrderByCreatedDate(false);
         assertEquals(userCount, sortedUsers.size(), "Сортировка должна работать с большими наборами данных");
     }
-}
+    @Test
+    void testSortUsersAsync() throws InterruptedException, ExecutionException {
+        int startCount = 1000;
+        int countDelta = 1000;
+        int functionsCount = 5;
+        int testAmount = 5;
+
+        UserRepository userRepository = new UserRepository(factory);
+        FunctionRepository functionRepository = new FunctionRepository(factory);
+        //clearDatabase1();
+        for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
+
+
+            CompletableFuture<Void>[] userFutures = new CompletableFuture[count];
+            List<UserEntity> users = Collections.synchronizedList(new ArrayList<>());
+
+            long startTime = System.currentTimeMillis();
+
+            // Асинхронное создание пользователей
+            for (int i = 0; i < count; i++) {
+                final int index = i;
+                userFutures[i] = CompletableFuture.runAsync(() -> {
+                    UserEntity user = new UserEntity();
+                    user.setUserId(idGenerator.getAndIncrement());
+                    user.setTypeId(1);
+                    user.setUserName("SortUser" + index);
+                    user.setPassword("SortPassword" + index);
+                    user.setCreatedDate(new Date());
+
+                    userRepository.save(user);
+                    users.add(user);
+                });
+            }
+
+            // Ждем завершения создания всех пользователей
+            CompletableFuture.allOf(userFutures).get();
+
+            // Асинхронное создание функций
+            int funcTotal = count * functionsCount;
+            CompletableFuture<Void>[] functionFutures = new CompletableFuture[funcTotal];
+
+            for (int i = 0; i < count; i++) {
+                final UserEntity user = users.get(i);
+                final String expr = Math.random() + "x+" + Math.random();
+
+                for (int j = 0; j < functionsCount; j++) {
+                    final int functionIndex = i * functionsCount + j;
+                    functionFutures[functionIndex] = CompletableFuture.runAsync(() -> {
+                        FunctionEntity function = new FunctionEntity();
+                        function.setFuncId(idGenerator.getAndIncrement());
+                        function.setTypeId(1); // MATH_FUNCTION_ID
+                        function.setExpression(expr);
+                        // function.setUser(user); // если есть связь
+
+                        functionRepository.save(function);
+                    });
+                }
+            }
+
+            // Ждем завершения создания всех функций
+            CompletableFuture.allOf(functionFutures).get();
+
+            float tookMillis = System.currentTimeMillis() - startTime;
+            float tookSeconds = tookMillis / 1000f;
+
+            Log.warn("Write of {} users + {} functions took: {}s ({}+{}/s)",
+                    count, funcTotal, tookSeconds, count / tookSeconds, funcTotal / tookSeconds);
+            // Проверяем сохранение
+            try (var session = factory.openSession()) {
+                Long userCount = session.createQuery("SELECT COUNT(u) FROM UserEntity u", Long.class)
+                        .uniqueResult();
+                Long funcCount = session.createQuery("SELECT COUNT(f) FROM FunctionEntity f", Long.class)
+                        .uniqueResult();
+
+
+
+            }
+        }
+
+        // Тестируем сортировку
+        List<UserEntity> allUsers = userRepository.findAll();
+        long sortStartTime = System.nanoTime();
+
+        List<UserEntity> sortedUsers = userRepository.findAllOrderByCreatedDate(true);
+
+        float sortTime = (System.nanoTime() - sortStartTime) * 1e-9f;
+        Log.warn("Took {}s to sort {} users", sortTime, allUsers.size());
+    }
+    private void clearDatabase1() {
+        try (var session = factory.openSession()) {
+            var transaction = session.beginTransaction();
+
+            try {
+                // Удаляем в правильном порядке из-за foreign key constraints
+                session.createQuery("DELETE FROM PointsEntity").executeUpdate();
+                session.createQuery("DELETE FROM CompositeFunctionEntity").executeUpdate();
+                session.createQuery("DELETE FROM FunctionOwnershipEntity").executeUpdate();
+                session.createQuery("DELETE FROM FunctionEntity").executeUpdate();
+                session.createQuery("DELETE FROM UserEntity").executeUpdate();
+
+                transaction.commit();
+            } catch (Exception e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+                Log.warn("Warning during database cleanup: " + e.getMessage());
+            }
+        }
+}}

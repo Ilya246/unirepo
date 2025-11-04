@@ -1,5 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
@@ -14,17 +15,20 @@ import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionRepositoryTest extends BaseRepositoryTest {
     private FunctionRepository repository;
     private UserRepository userRepository;
-
+    private SessionFactory sessionFactory;
     @BeforeEach
     void setUp() {
         repository = new FunctionRepository(TestHibernateSessionFactoryUtil.getSessionFactory());
         userRepository = new UserRepository(TestHibernateSessionFactoryUtil.getSessionFactory());
+        sessionFactory=TestHibernateSessionFactoryUtil.getSessionFactory();
     }
 
     @Test
@@ -376,5 +380,84 @@ class FunctionRepositoryTest extends BaseRepositoryTest {
         assertEquals(10.0, func.apply(3), 0.0001, "f(3) = 10 (linear interpolation between 2 and 4)");
     }
 
+    @Test
+    void testWriteGetMany() throws InterruptedException, ExecutionException {
+        int startCount = 1000;
+        int countDelta = 1000;
+        int testAmount = 10;
+        var writeTimes = new float[testAmount];
+
+        for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
+            //clearDatabase();
+
+            int pointCount = 50;
+            var functions = new CompletableFuture[count];
+
+            long startTime = System.currentTimeMillis();
+
+            for (int i = 0; i < count; i++) {
+                // генерируем случайные табулированные функции
+                double curX = -Math.random() * pointCount / 4;
+                var xValues = new double[pointCount];
+                var yValues = new double[pointCount];
+
+                for (int j = 0; j < pointCount; j++) {
+                    curX += Math.max(Math.random(), 0.001);
+                    xValues[j] = curX;
+                    yValues[j] = Math.random() * 10 - 5;
+                }
+
+                functions[i] = repository.createPureTabulated(xValues, yValues);
+            }
+
+            // Дожидаемся завершения всех операций
+            for (CompletableFuture f : functions) {
+                f.get();
+            }
+
+            float tookMillis = System.currentTimeMillis() - startTime;
+            float tookSeconds = tookMillis / 1000f;
+            writeTimes[it] = tookSeconds;
+
+            Log.info("Write of {} tabulated functions took: {}, {}/s", count, tookSeconds, count / tookSeconds);
+
+            // Проверяем, что функции действительно сохранились
+            try (var session = sessionFactory.openSession()) {
+                Long actualCount = session.createQuery(
+                        "SELECT COUNT(f) FROM FunctionEntity f WHERE f.expression = '<TABULATED>'",
+                        Long.class).uniqueResult();
+
+            }
+        }
+
+        // Вывод итоговой статистики
+        for (int i = 0; i < testAmount; i++) {
+            float time = writeTimes[i];
+            int amount = startCount + countDelta * i;
+            Log.info("Write {}: took {}s for {} ({}/s)", i + 1, time, amount, amount / time);
+        }
+    }
+
+    // Метод для очистки базы данных
+    private void clearDatabase() {
+        try (var session = sessionFactory.openSession()) {
+            var transaction = session.beginTransaction();
+
+            try {
+                // Удаляем в правильном порядке из-за foreign key constraints
+                session.createQuery("DELETE FROM PointsEntity").executeUpdate();
+                session.createQuery("DELETE FROM CompositeFunctionEntity").executeUpdate();
+                session.createQuery("DELETE FROM FunctionOwnershipEntity").executeUpdate();
+                session.createQuery("DELETE FROM FunctionEntity").executeUpdate();
+
+                transaction.commit();
+            } catch (Exception e) {
+                if (transaction != null) {
+                    transaction.rollback();
+                }
+
+            }
+        }
+    }
 
 }

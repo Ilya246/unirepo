@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FunctionRepository {
 
@@ -30,7 +32,7 @@ public class FunctionRepository {
     private static final int TABULATED_ID = 2;
     private static final int COMPOSITE_ID = 3;
     private static final String PURE_TABULATED_EXPRESSION = "<TABULATED>";
-
+    private final AtomicInteger idGenerator = new AtomicInteger(1000);
     public FunctionRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.pointsRepository = new PointsRepository(sessionFactory);
@@ -103,6 +105,7 @@ public class FunctionRepository {
             MathFunction mathFunc = parseFunction(expression);
 
             FunctionEntity function = new FunctionEntity();
+            function.setFuncId(idGenerator.getAndIncrement());
             function.setTypeId(TABULATED_ID);
             function.setExpression(expression);
             save(function);
@@ -132,6 +135,7 @@ public class FunctionRepository {
             }
 
             FunctionEntity function = new FunctionEntity();
+            function.setFuncId(idGenerator.getAndIncrement());
             function.setTypeId(TABULATED_ID);
             function.setExpression(PURE_TABULATED_EXPRESSION);
             save(function);
@@ -167,6 +171,7 @@ public class FunctionRepository {
 
             // Создаем основную функцию
             FunctionEntity compositeFunction = new FunctionEntity();
+            compositeFunction.setFuncId(idGenerator.getAndIncrement());
             compositeFunction.setTypeId(COMPOSITE_ID);
             compositeFunction.setExpression(compositeExpression);
             save(compositeFunction);
