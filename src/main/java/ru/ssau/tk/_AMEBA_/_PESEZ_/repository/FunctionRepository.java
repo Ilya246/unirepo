@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import net.objecthunter.exp4j.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.IsInCompositeException;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
 
@@ -23,6 +24,7 @@ public class FunctionRepository extends Repository {
     private static final String COMPOSITE_UPDATE = readCommand("CompositeFunctionUpdate");
     private static final String COMPOSITE_DELETE = readCommand("CompositeFunctionDelete");
     private static final String COMPOSITE_SELECT = readCommand("CompositeFunctionRead");
+    private static final String COMPOSITE_SELECT_CONTAINS = readCommand("CompositeFunctionReadOf");
 
     private static final String POINTS_ENSURE_TABLE = readCommand("PointsCreateTable");
     private static final String POINTS_INSERT = readCommand("PointsCreate");
@@ -190,6 +192,30 @@ public class FunctionRepository extends Repository {
         });
     }
 
+    public CompletableFuture<CompositeFunctionDTO[]> getCompositesContaining(int containsId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                DatabaseConnection database = databaseLocal.get();
+                try (ResultSet results = database.executeQuery(COMPOSITE_SELECT_CONTAINS, containsId, containsId)) {
+                    results.last();
+                    int count = results.getRow();
+                    results.first();
+                    var result = new CompositeFunctionDTO[count];
+                    for (int i = 0; i < count; i++) {
+                        result[i] = new CompositeFunctionDTO(results.getInt("func_id"),
+                                results.getInt("inner_func_id"),
+                                results.getInt("outer_func_id")
+                        );
+                        results.next();
+                    }
+                    return result;
+                }
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
     public CompletableFuture<PointsDTO> getPointsData(int funcId) {
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -297,11 +323,16 @@ public class FunctionRepository extends Repository {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
+                CompositeFunctionDTO[] comps = getCompositesContaining(funcId).get();
+                if (comps.length > 0)
+                    throw new IsInCompositeException("Function is present in at least one other composite function",
+                            Arrays.stream(comps).mapToInt(c -> c.funcId).toArray());
+
                 database.executeUpdate(POINTS_DELETE, funcId);
                 database.executeUpdate(COMPOSITE_DELETE, funcId);
                 database.executeUpdate(FUNCTION_DELETE, funcId);
                 return null;
-            } catch (SQLException e) {
+            } catch (SQLException | InterruptedException | ExecutionException e) {
                 throw new CompletionException(e);
             }
         });

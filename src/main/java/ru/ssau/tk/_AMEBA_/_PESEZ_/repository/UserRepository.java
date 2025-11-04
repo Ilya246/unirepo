@@ -54,15 +54,7 @@ public class UserRepository extends Repository {
         database.executeUpdate(FUNCTION_OWNERSHIP_ENSURE_TABLE);
     }
 
-    public CompletableFuture<Integer> createNormalUser(String userName, String password) {
-        return createUser(NormalUserID, userName, password);
-    }
-
-    public CompletableFuture<Integer> createAdminUser(String userName, String password) {
-        return createUser(AdminUserID, userName, password);
-    }
-
-    private CompletableFuture<Integer> createUser(int typeId, String userName, String password) {
+    public CompletableFuture<Integer> createUser(int typeId, String userName, String password) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -161,7 +153,8 @@ public class UserRepository extends Repository {
             try (ResultSet rs = databaseLocal.get().executeQuery(FUNCTION_OWNERSHIP_SELECT, userId, funcId)) {
                 if (!rs.first())
                     return null;
-                return new FunctionOwnershipDTO(rs.getInt("func_id"),
+                return new FunctionOwnershipDTO(userId,
+                        rs.getInt("func_id"),
                         rs.getTimestamp("created_date"),
                         rs.getString("func_name"));
             } catch (SQLException e) {
@@ -178,7 +171,8 @@ public class UserRepository extends Repository {
                 var result = new FunctionOwnershipDTO[count];
                 rs.first();
                 for (int i = 0; i < count; i++) {
-                    result[i] = new FunctionOwnershipDTO(rs.getInt("func_id"),
+                    result[i] = new FunctionOwnershipDTO(userId,
+                            rs.getInt("func_id"),
                             rs.getTimestamp("created_date"),
                             rs.getString("func_name"));
                     rs.next();

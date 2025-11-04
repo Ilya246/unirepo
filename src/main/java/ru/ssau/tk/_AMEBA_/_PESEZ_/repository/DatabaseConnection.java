@@ -19,7 +19,7 @@ public class DatabaseConnection {
         String password = "postgres"; // placeholder
         PROPERTIES.setProperty("user", user);
         PROPERTIES.setProperty("password", password);
-        Log.info("Connecting to database {} as {}:{}", URL, user, password);
+        Log.debug("Connecting to database {} as {}:{}", URL, user, password);
         JDBC_URL = URL;
         try {
             Class.forName("org.postgresql.Driver");

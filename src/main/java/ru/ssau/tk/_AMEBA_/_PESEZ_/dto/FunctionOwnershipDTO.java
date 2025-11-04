@@ -8,11 +8,13 @@ public class FunctionOwnershipDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = -5871923335808124847L;
 
+    public final int userId;
     public final int funcId;
     public final Timestamp createdDate;
     public final String funcName;
 
-    public FunctionOwnershipDTO(int funcId, Timestamp createdDate, String funcName) {
+    public FunctionOwnershipDTO(int userId, int funcId, Timestamp createdDate, String funcName) {
+        this.userId = userId;
         this.funcId = funcId;
         this.createdDate = createdDate;
         this.funcName = funcName;

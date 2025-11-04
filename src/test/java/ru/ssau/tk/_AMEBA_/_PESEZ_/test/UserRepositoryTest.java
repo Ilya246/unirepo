@@ -41,7 +41,7 @@ class UserRepositoryTest {
         String username = "TestUser";
         String password = "password";
         // Пишем в базу данных
-        int id = repository.createNormalUser(username, password).get();
+        int id = repository.createUser(NormalUserID, username, password).get();
         UserDTO user = repository.getUser(id).get();
         assertEquals(username, user.username);
         assertEquals(password, user.password);
@@ -53,7 +53,7 @@ class UserRepositoryTest {
 
     @Test
     void testAdminUser() throws InterruptedException, ExecutionException {
-        int id = repository.createAdminUser("AdminUser", "adminPass").get();
+        int id = repository.createUser(AdminUserID, "AdminUser", "adminPass").get();
         UserDTO user = repository.getUser(id).get();
         assertEquals("AdminUser", user.username);
         assertEquals("adminPass", user.password);
@@ -64,7 +64,7 @@ class UserRepositoryTest {
 
     @Test
     void testUpdateUser() throws InterruptedException, ExecutionException {
-        int id = repository.createNormalUser("OldName", "OldPass").get();
+        int id = repository.createUser(NormalUserID, "OldName", "OldPass").get();
         
         repository.updateUser(id, "NewName", "NewPass").get();
         UserDTO user = repository.getUser(id).get();
@@ -76,9 +76,9 @@ class UserRepositoryTest {
 
     @Test
     void testGetUsers() throws InterruptedException, ExecutionException {
-        repository.createNormalUser("User1", "Pass1").get();
-        repository.createNormalUser("User2", "Pass2").get();
-        repository.createNormalUser("User3", "Pass3").get();
+        repository.createUser(NormalUserID, "User1", "Pass1").get();
+        repository.createUser(NormalUserID, "User2", "Pass2").get();
+        repository.createUser(NormalUserID, "User3", "Pass3").get();
 
         UserDTO[] all = repository.getAllUsers().get();
         assertTrue(Arrays.stream(all).anyMatch(a -> a.username.equals("User1") && a.password.equals("Pass1")));
@@ -88,7 +88,7 @@ class UserRepositoryTest {
 
     @Test
     void testCRUDFunctionOwnership() throws InterruptedException, ExecutionException {
-        int userId = repository.createNormalUser("FunctionOwner", "testPass").get();
+        int userId = repository.createUser(NormalUserID, "FunctionOwner", "testPass").get();
         int funcId = functionRepo.createMathFunction("x^2").get();
 
         String funcName = "Quadratic";
@@ -109,7 +109,7 @@ class UserRepositoryTest {
 
     @Test
     void testMultipleFunctionOwnership() throws InterruptedException, ExecutionException {
-        int userId = repository.createNormalUser("SeveralFunctionOwner", "testPass").get();
+        int userId = repository.createUser(NormalUserID, "SeveralFunctionOwner", "testPass").get();
         int funcId1 = functionRepo.createMathFunction("2x^2").get();
         int funcId2 = functionRepo.createMathFunction("3x^3").get();
         int funcId3 = functionRepo.createMathFunction("4x^4").get();
