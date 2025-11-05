@@ -84,6 +84,13 @@ class UserServiceTest {
         OwnedFunctionDTO[] functions = service.getUserFunctions(userId).join();
         assertEquals(4, functions.length);
         UserService.sortFunctionsDate(functions);
+
+        OwnedFunctionDTO pFunc = functions[0];
+        for (int i = 1; i < functions.length; i++) {
+            assertTrue(functions[i].ownership.createdDate.compareTo(pFunc.ownership.createdDate) >= 0);
+            pFunc = functions[i];
+        }
+
         assertEquals("MyMath", functions[0].ownership.funcName);
         assertEquals("MyTabulated", functions[1].ownership.funcName);
         assertEquals("MyPure", functions[2].ownership.funcName);
@@ -131,5 +138,11 @@ class UserServiceTest {
         UserService.sortUsersDate(allUsers);
         float tookTime = (System.nanoTime() - startTime) * 1e-9f;
         Log.warn("Took {}s to sort {} users", tookTime, allUsers.length);
+
+        UserDTO pUser = allUsers[0];
+        for (int i = 1; i < allUsers.length; i++) {
+            assertTrue(allUsers[i].createdDate.compareTo(pUser.createdDate) >= 0);
+            pUser = allUsers[i];
+        }
     }
 }
