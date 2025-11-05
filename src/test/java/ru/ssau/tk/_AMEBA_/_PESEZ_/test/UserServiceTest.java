@@ -103,7 +103,7 @@ class UserServiceTest {
         Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);
         int startCount = 1000;
         int countDelta = 1000;
-        int functionsCount = 5;
+        int functionsCount = 50;
         int testAmount = 5;
         for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
             CompletableFuture<Void>[] users = new CompletableFuture[count];
