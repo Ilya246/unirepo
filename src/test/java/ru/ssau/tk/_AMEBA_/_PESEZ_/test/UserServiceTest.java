@@ -99,7 +99,7 @@ class UserServiceTest {
     }
 
     @Test
-    void testSortUsers() {
+    void benchmarkManyUsers() {
         Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);
         int startCount = 1000;
         int countDelta = 1000;

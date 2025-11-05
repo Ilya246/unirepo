@@ -1,5 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.jupiter.api.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.CompositeFunctionDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionDTO;
@@ -171,7 +173,8 @@ class FunctionRepositoryTest {
     }
 
     @Test
-    void testWriteGetMany() {
+    void benchmarkWriteGetMany() {
+        Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);
         int startCount = 1000;
         int countDelta = 1000;
         int testAmount = 5;
@@ -196,12 +199,7 @@ class FunctionRepositoryTest {
             float tookMillis = System.currentTimeMillis() - startTime;
             float tookSeconds = tookMillis / 1000f;
             writeTimes[it] = tookSeconds;
-            Log.info("Write of {} tabulated functions took: {}, {}/s", count, tookSeconds, count / tookSeconds);
-        }
-        for (int i = 0; i < testAmount; i++) {
-            float time = writeTimes[i];
-            int amount = startCount + countDelta * i;
-            Log.info("Write {}: took {}s for {} ({}/s)", i + 1, time, amount, amount / time);
+            Log.warn("Write of {} tabulated functions took {}s, {}/s", count, tookSeconds, count / tookSeconds);
         }
     }
 
