@@ -33,6 +33,7 @@ public class TestHibernateSessionFactoryUtil {
                 Metadata metadata = sources.getMetadataBuilder().build();
                 sessionFactory = metadata.getSessionFactoryBuilder().build();
 
+
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("Failed to create Hibernate SessionFactory", e);
