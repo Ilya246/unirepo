@@ -4,20 +4,20 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class PointId implements Serializable {
-    private int function; // соответствует funcId
+    private Long function; // соответствует funcId
     private double xValue;
 
     // Default constructor
     public PointId() {}
 
-    public PointId(int function, double xValue) {
+    public PointId(Long function, double xValue) {
         this.function = function;
         this.xValue = xValue;
     }
 
     // Getters and Setters
-    public int getFunction() { return function; }
-    public void setFunction(int function) { this.function = function; }
+    public Long getFunction() { return function; }
+    public void setFunction(Long function) { this.function = function; }
 
     public double getxValue() { return xValue; }
     public void setxValue(double xValue) { this.xValue = xValue; }

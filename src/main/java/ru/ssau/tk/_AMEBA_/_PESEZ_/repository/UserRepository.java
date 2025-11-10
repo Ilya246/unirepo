@@ -26,7 +26,7 @@ public class UserRepository {
         }
     }
 
-    public UserEntity findById(int id) {
+    public UserEntity findById(Long id) {
         try (Session session = sessionFactory.openSession()) {
             return session.find(UserEntity.class, id);
         }
@@ -38,7 +38,7 @@ public class UserRepository {
         }
     }
 
-    public void deleteById(int userId) {
+    public void deleteById(Long userId) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             UserEntity user = session.find(UserEntity.class, userId);

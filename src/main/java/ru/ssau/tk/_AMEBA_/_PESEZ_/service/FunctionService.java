@@ -27,7 +27,7 @@ public class FunctionService {
         Log.debug("Все репозитории успешно инициализированы");
     }
 
-    public Optional<UserEntity> getFunctionOwner(int functionId) {
+    public Optional<UserEntity> getFunctionOwner(Long functionId) {
         try {
             Optional<UserEntity> owner = ownershipRepository.findOwnerByFunctionId(functionId);
             if (owner.isPresent()) {
@@ -42,7 +42,7 @@ public class FunctionService {
         }
     }
 
-    public FunctionEntity getFunctionById(int functionId) {
+    public FunctionEntity getFunctionById(Long functionId) {
         try {
             FunctionEntity function = functionRepository.findById(functionId);
             if (function != null) {
@@ -90,7 +90,7 @@ public class FunctionService {
     }
 
 
-    public List<FunctionEntity> getUserFunctionsSortedByDate(int userId, boolean descending) {
+    public List<FunctionEntity> getUserFunctionsSortedByDate(Long userId, boolean descending) {
         String order = descending ? "убыванию" : "возрастанию";
         try {
             List<FunctionEntity> functions = ownershipRepository.findUserFunctionsOrderByDate(userId, descending);
@@ -103,7 +103,7 @@ public class FunctionService {
         }
     }
 
-    public CompletableFuture<Integer> createMathFunction(String expression) {
+    public CompletableFuture<Long> createMathFunction(String expression) {
         return functionRepository.createMathFunction(expression)
                 .whenComplete((funcId, throwable) -> {
                     if (throwable != null) {
@@ -115,7 +115,7 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<Integer> createTabulated(String expression, double from, double to, int pointCount) {
+    public CompletableFuture<Long> createTabulated(String expression, double from, double to, int pointCount) {
         return functionRepository.createTabulated(expression, from, to, pointCount)
                 .whenComplete((funcId, throwable) -> {
                     if (throwable != null) {
@@ -127,7 +127,7 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<Integer> createComposite(int innerId, int outerId) {
+    public CompletableFuture<Long> createComposite(Long innerId, Long outerId) {
         return functionRepository.createComposite(innerId, outerId)
                 .whenComplete((funcId, throwable) -> {
                     if (throwable != null) {
@@ -139,7 +139,7 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<MathFunction> getFunction(int funcId) {
+    public CompletableFuture<MathFunction> getFunction(Long funcId) {
         return functionRepository.getFunction(funcId)
                 .whenComplete((mathFunction, throwable) -> {
                     if (throwable != null) {
@@ -151,7 +151,7 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<Void> updateComposite(int funcId, Integer newInner, Integer newOuter) {
+    public CompletableFuture<Void> updateComposite(Long funcId, Long newInner, Long newOuter) {
 
         return functionRepository.updateComposite(funcId, newInner, newOuter)
                 .whenComplete((result, throwable) -> {
@@ -164,7 +164,7 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<Void> updatePoint(int funcId, double xValue, double newY) {
+    public CompletableFuture<Void> updatePoint(Long funcId, double xValue, double newY) {
         return functionRepository.updatePoint(funcId, xValue, newY)
                 .whenComplete((result, throwable) -> {
                     if (throwable != null) {
@@ -177,7 +177,7 @@ public class FunctionService {
                 });
     }
 
-    public CompletableFuture<Void> deletePoint(int funcId, double xValue) {
+    public CompletableFuture<Void> deletePoint(Long funcId, double xValue) {
         return functionRepository.deletePoint(funcId, xValue)
                 .whenComplete((result, throwable) -> {
                     if (throwable != null) {

@@ -26,7 +26,7 @@ public class CompositeFunctionRepository {
             transaction.commit();
         }
     }
-    public Optional<CompositeFunctionEntity> findById(int compositeFunctionId) {
+    public Optional<CompositeFunctionEntity> findById(Long compositeFunctionId) {
         try (Session session = sessionFactory.openSession()) {
             CompositeFunctionEntity composite = session.find(CompositeFunctionEntity.class, compositeFunctionId);
             return Optional.ofNullable(composite);

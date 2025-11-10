@@ -11,8 +11,9 @@ import java.util.List;
 public class FunctionEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "func_Id")
-    private int funcId;
+    private Long funcId;
 
     @Column(name = "type_Id", columnDefinition = "INT CHECK (type_Id >= 1 AND type_Id <= 3)")
     private int typeId;
@@ -41,15 +42,14 @@ public class FunctionEntity {
     // Constructors
     public FunctionEntity() {}
 
-    public FunctionEntity(int funcId, int typeId, String expression) {
-        this.funcId = funcId;
+    public FunctionEntity(int typeId, String expression) {
         setTypeId(typeId); // Используем сеттер для валидации
         this.expression = expression;
     }
 
     // Getters and Setters
-    public int getFuncId() { return funcId; }
-    public void setFuncId(int funcId) { this.funcId = funcId; }
+    public Long getFuncId() { return funcId; }
+    //public void setFuncId(int funcId) { this.funcId = funcId; }
 
     public int getTypeId() { return typeId; }
     public void setTypeId(int typeId) {

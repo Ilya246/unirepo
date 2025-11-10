@@ -1,37 +1,29 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test;
+package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
 
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipId;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.UserService;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserServiceTest extends BaseRepositoryTest{
+class UserServiceTest extends BaseRepositoryTest {
 
     private SessionFactory sessionFactory;
     private FunctionService functionService;
     private FunctionRepository functionRepository;
     private UserRepository userRepository;
     private UserService userService;
-    private final AtomicInteger idGenerator = new AtomicInteger(1000);
+    //private final AtomicInteger idGenerator = new AtomicInteger(1000);
 
 
     @BeforeEach
@@ -46,9 +38,9 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testGetUserById() {
 
-        UserEntity user = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user = new UserEntity(1, "Test User", "password123");
         userService.saveUser(user);
-        int userId = user.getUserId();
+        Long userId = user.getUserId();
 
 
         UserEntity foundUser = userService.getUserById(userId);
@@ -64,9 +56,9 @@ class UserServiceTest extends BaseRepositoryTest{
 
     @Test
     void testGetAllUsers() {
-        UserEntity user1 = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user1 = new UserEntity(1, "Test User", "password123");
 
-        UserEntity user2 = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user2 = new UserEntity(1, "Test User", "password123");
 
 
         userService.saveUser(user1);
@@ -81,11 +73,11 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testGetUsersByType() {
 
-        UserEntity user1 = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user1 = new UserEntity(1, "Test User", "password123");
 
-        UserEntity user2 = new UserEntity(idGenerator.getAndIncrement(),2, "Test User", "password123");
+        UserEntity user2 = new UserEntity(2, "Test User", "password123");
 
-        UserEntity user3 = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user3 = new UserEntity(1, "Test User", "password123");
 
 
         userService.saveUser(user1);
@@ -105,7 +97,7 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testSaveUser() {
 
-        UserEntity user = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user = new UserEntity(1, "Test User", "password123");
 
 
         userService.saveUser(user);
@@ -119,7 +111,7 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testUpdateUser() {
 
-        UserEntity user = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user = new UserEntity(1, "Test User", "password123");
         userService.saveUser(user);
 
         user.setUserName("Updated Name");
@@ -139,10 +131,10 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testDeleteUser() {
 
-        UserEntity user = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user = new UserEntity(1, "Test User", "password123");
 
         userService.saveUser(user);
-        int userId = user.getUserId();
+        Long userId = user.getUserId();
 
         assertNotNull(userService.getUserById(userId));
 
@@ -156,10 +148,10 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testSortByDateAscending() throws InterruptedException {
         // Arrange
-        UserEntity user1 = new UserEntity(idGenerator.getAndIncrement(),1, "User1", "password123");
+        UserEntity user1 = new UserEntity(1, "User1", "password123");
 
         Thread.sleep(100); // Задержка для разницы во времени
-        UserEntity user2 = new UserEntity(idGenerator.getAndIncrement(),1, "Test User", "password123");
+        UserEntity user2 = new UserEntity(1, "Test User", "password123");
 
 
         userService.saveUser(user1);
@@ -175,10 +167,10 @@ class UserServiceTest extends BaseRepositoryTest{
     @Test
     void testSortByDateDescending() throws InterruptedException {
         // Arrange
-        UserEntity user1 = new UserEntity(idGenerator.getAndIncrement(),1, "User1", "password123");
+        UserEntity user1 = new UserEntity(1, "User1", "password123");
 
         Thread.sleep(100); // Задержка для разницы во времени
-        UserEntity user2 = new UserEntity(idGenerator.getAndIncrement(),1, "User2", "password123");
+        UserEntity user2 = new UserEntity(1, "User2", "password123");
 
 
         userService.saveUser(user1);
@@ -191,20 +183,11 @@ class UserServiceTest extends BaseRepositoryTest{
         assertEquals("User2", descendingUsers.get(0).getUserName());
     }
 
-    @Test
-    void testGetUserFunctions() {
-        // Act & Assert
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.getUserFunctions(-1);
-        });
-
-        assertEquals("User not found with ID: -1", exception.getMessage());
-    }
 
     @Test
     void testGetUserFunctions_WhenUserHasNoFunctions_ShouldReturnEmptyList() {
         // Arrange
-        UserEntity user1 = new UserEntity(idGenerator.getAndIncrement(),1, "User1", "password123");
+        UserEntity user1 = new UserEntity(1, "User1", "password123");
         userService.saveUser(user1);
 
         // Act

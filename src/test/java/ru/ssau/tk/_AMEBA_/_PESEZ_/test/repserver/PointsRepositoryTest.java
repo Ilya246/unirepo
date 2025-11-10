@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test;
+package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
 
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PointsRepositoryTest extends BaseRepositoryTest{
+class PointsRepositoryTest extends BaseRepositoryTest {
 
     private SessionFactory factory = TestHibernateSessionFactoryUtil.getSessionFactory();;
     private PointsRepository pointsRepository= new PointsRepository(factory);
@@ -23,7 +23,7 @@ class PointsRepositoryTest extends BaseRepositoryTest{
     @Test
     void testSaveAndFindById() {
 
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         PointsEntity point = new PointsEntity(function, 2.0, 4.0);
@@ -40,7 +40,7 @@ class PointsRepositoryTest extends BaseRepositoryTest{
     @Test
     void testFindByFunction() {
 
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         PointsEntity point1 = new PointsEntity(function, -2.0, 4.0);
@@ -64,13 +64,13 @@ class PointsRepositoryTest extends BaseRepositoryTest{
     void testUpdateById() {
 
 
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         PointsEntity point = new PointsEntity(function, 3.0, 9.0);
         pointsRepository.save(point);
 
-        pointsRepository.updateById(1, 3.0, 10.0);
+        pointsRepository.updateById(function.getFuncId(), 3.0, 10.0);
 
         Optional<PointsEntity> updated = pointsRepository.findById(function, 3.0);
         assertTrue(updated.isPresent(), "Точка должна существовать после обновления");
@@ -81,7 +81,7 @@ class PointsRepositoryTest extends BaseRepositoryTest{
     @Test
     void testDeleteById() {
 
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         PointsEntity point = new PointsEntity(function, 5.0, 25.0);
@@ -90,7 +90,7 @@ class PointsRepositoryTest extends BaseRepositoryTest{
         Optional<PointsEntity> foundBefore = pointsRepository.findById(function, 5.0);
         assertTrue(foundBefore.isPresent(), "Точка должна существовать до удаления");
 
-        pointsRepository.deleteById(1, 5.0);
+        pointsRepository.deleteById(function.getFuncId(), 5.0);
 
         Optional<PointsEntity> foundAfter = pointsRepository.findById(function, 5.0);
         assertFalse(foundAfter.isPresent(), "Точка должна быть удалена");
@@ -99,7 +99,7 @@ class PointsRepositoryTest extends BaseRepositoryTest{
     @Test
     void testDeleteByFunction() {
 
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         PointsEntity point1 = new PointsEntity(function, 1.0, 1.0);
@@ -123,8 +123,8 @@ class PointsRepositoryTest extends BaseRepositoryTest{
     void testCountByFunction() {
 
         // Создаем две функции
-        FunctionEntity function1 = new FunctionEntity(1, 1, "x^2");
-        FunctionEntity function2 = new FunctionEntity(2, 2, "sin(x)");
+        FunctionEntity function1 = new FunctionEntity(1, "x^2");
+        FunctionEntity function2 = new FunctionEntity(2, "sin(x)");
         functionRepository.save(function1);
         functionRepository.save(function2);
 
@@ -152,7 +152,7 @@ class PointsRepositoryTest extends BaseRepositoryTest{
 
     @Test
     void testFindByIdNotFound() {
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         // Пытаемся найти несуществующую точку

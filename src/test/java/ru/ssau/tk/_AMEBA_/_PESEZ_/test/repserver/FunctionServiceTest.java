@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test;
+package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
 
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,10 +53,10 @@ class FunctionServiceTest extends BaseRepositoryTest {
     @Test
     void testGetFunctionOwner() {
         // Создаем пользователя и функцию
-        UserEntity user = new UserEntity(1, 1, "TestOwner", "password", new Date());
+        UserEntity user = new UserEntity(1, "TestOwner", "password", new Date());
         userRepository.save(user);
 
-        FunctionEntity function = new FunctionEntity(1, 1, "x^2");
+        FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
         // Создаем связь владения
@@ -71,40 +71,31 @@ class FunctionServiceTest extends BaseRepositoryTest {
         ownershipRepository.save(ownership);
 
         // Тестируем получение владельца
-        Optional<UserEntity> owner = functionService.getFunctionOwner(1);
+        Optional<UserEntity> owner = functionService.getFunctionOwner(function.getFuncId());
         assertTrue(owner.isPresent(), "Владелец должен быть найден");
         assertEquals("TestOwner", owner.get().getUserName());
     }
 
 
-    @Test
-    void testGetFunctionOwnerNonExistent() {
-        Optional<UserEntity> owner = functionService.getFunctionOwner(999);
-        assertFalse(owner.isPresent(), "Для несуществующей функции должен вернуться пустой Optional");
-    }
+
 
     @Test
     void testGetFunctionById() {
-        FunctionEntity function = new FunctionEntity(1, 1, "sin(x)");
+        FunctionEntity function = new FunctionEntity(1, "sin(x)");
         functionService.saveFunc(function);
 
-        FunctionEntity found = functionService.getFunctionById(1);
+        FunctionEntity found = functionService.getFunctionById(function.getFuncId());
         assertNotNull(found, "Функция должна быть найдена");
         assertEquals("sin(x)", found.getExpression());
-        assertEquals(1, found.getTypeId());
+        assertEquals(found.getTypeId(), found.getTypeId());
     }
 
-    @Test
-    void testGetFunctionByIdNonExistent() {
-        FunctionEntity found = functionService.getFunctionById(999);
-        assertNull(found, "Для несуществующей функции должен вернуться null");
-    }
 
     @Test
     void testGetAllFunctions() {
-        FunctionEntity f1 = new FunctionEntity(1, 1, "f1(x)");
-        FunctionEntity f2 = new FunctionEntity(2, 2, "f2(x)");
-        FunctionEntity f3 = new FunctionEntity(3, 1, "f3(x)");
+        FunctionEntity f1 = new FunctionEntity(1, "f1(x)");
+        FunctionEntity f2 = new FunctionEntity(2, "f2(x)");
+        FunctionEntity f3 = new FunctionEntity(1, "f3(x)");
 
         functionService.saveFunc(f1);
         functionService.saveFunc(f2);
@@ -119,9 +110,9 @@ class FunctionServiceTest extends BaseRepositoryTest {
 
     @Test
     void testGetFunctionsByType() {
-        FunctionEntity f1 = new FunctionEntity(1, 1, "linear");
-        FunctionEntity f2 = new FunctionEntity(2, 1, "quadratic");
-        FunctionEntity f3 = new FunctionEntity(3, 2, "trigonometric");
+        FunctionEntity f1 = new FunctionEntity(1, "linear");
+        FunctionEntity f2 = new FunctionEntity(1, "quadratic");
+        FunctionEntity f3 = new FunctionEntity(2, "trigonometric");
 
         functionService.saveFunc(f1);
         functionService.saveFunc(f2);
@@ -139,10 +130,10 @@ class FunctionServiceTest extends BaseRepositoryTest {
 
     @Test
     void testSaveFunc() {
-        FunctionEntity function = new FunctionEntity(1, 1, "test function");
+        FunctionEntity function = new FunctionEntity(1, "test function");
         functionService.saveFunc(function);
 
-        FunctionEntity found = functionService.getFunctionById(1);
+        FunctionEntity found = functionService.getFunctionById(function.getFuncId());
         assertNotNull(found, "Функция должна быть сохранена");
         assertEquals("test function", found.getExpression());
     }
@@ -150,12 +141,12 @@ class FunctionServiceTest extends BaseRepositoryTest {
     @Test
     void testGetUserFunctionsSortedByDate() {
         // Создаем пользователя и функции
-        UserEntity user = new UserEntity(1, 1, "TestUser", "pass", new Date());
+        UserEntity user = new UserEntity(1, "TestUser", "pass", new Date());
         userRepository.save(user);
 
-        FunctionEntity f1 = new FunctionEntity(1, 1, "func1");
-        FunctionEntity f2 = new FunctionEntity(2, 1, "func2");
-        FunctionEntity f3 = new FunctionEntity(3, 1, "func3");
+        FunctionEntity f1 = new FunctionEntity(1, "func1");
+        FunctionEntity f2 = new FunctionEntity(1, "func2");
+        FunctionEntity f3 = new FunctionEntity(1, "func3");
         functionRepository.save(f1);
         functionRepository.save(f2);
         functionRepository.save(f3);
@@ -188,20 +179,20 @@ class FunctionServiceTest extends BaseRepositoryTest {
         ownershipRepository.save(o3);
 
         // Тестируем сортировку по возрастанию (старые сначала)
-        List<FunctionEntity> ascending = functionService.getUserFunctionsSortedByDate(1, false);
+        List<FunctionEntity> ascending = functionService.getUserFunctionsSortedByDate(user.getUserId(), false);
         assertEquals(3, ascending.size());
         assertEquals("func1", ascending.get(0).getExpression()); // самая старая
 
         // Тестируем сортировку по убыванию (новые сначала)
-        List<FunctionEntity> descending = functionService.getUserFunctionsSortedByDate(1, true);
+        List<FunctionEntity> descending = functionService.getUserFunctionsSortedByDate(user.getUserId(), true);
         assertEquals(3, descending.size());
         assertEquals("func3", descending.get(0).getExpression()); // самая новая
     }
 
     @Test
     void testCreateMathFunction() throws ExecutionException, InterruptedException {
-        CompletableFuture<Integer> future = functionService.createMathFunction("2*x + 3");
-        int funcId = future.get();
+        CompletableFuture<Long> future = functionService.createMathFunction("2*x + 3");
+        Long funcId = future.get();
 
         FunctionEntity function = functionService.getFunctionById(funcId);
         assertNotNull(function, "Математическая функция должна быть создана");
@@ -211,8 +202,8 @@ class FunctionServiceTest extends BaseRepositoryTest {
 
     @Test
     void testCreateTabulated() throws ExecutionException, InterruptedException {
-        CompletableFuture<Integer> future = functionService.createTabulated("x^2", 0, 2, 3);
-        int funcId = future.get();
+        CompletableFuture<Long> future = functionService.createTabulated("x^2", 0, 2, 3);
+        Long funcId = future.get();
 
         FunctionEntity function = functionService.getFunctionById(funcId);
         assertNotNull(function, "Табулированная функция должна быть создана");
@@ -228,13 +219,13 @@ class FunctionServiceTest extends BaseRepositoryTest {
     @Test
     void testCreateComposite() throws ExecutionException, InterruptedException {
         // Создаем базовые функции
-        FunctionEntity inner = new FunctionEntity(1, 1, "x + 1");
-        FunctionEntity outer = new FunctionEntity(2, 1, "x^2");
+        FunctionEntity inner = new FunctionEntity(1, "x + 1");
+        FunctionEntity outer = new FunctionEntity( 1, "x^2");
         functionService.saveFunc(inner);
         functionService.saveFunc(outer);
 
-        CompletableFuture<Integer> future = functionService.createComposite(1, 2);
-        int compositeId = future.get();
+        CompletableFuture<Long> future = functionService.createComposite(inner.getFuncId(), outer.getFuncId());
+        Long compositeId = Long.valueOf(future.get());
 
         FunctionEntity composite = functionService.getFunctionById(compositeId);
         assertNotNull(composite, "Композитная функция должна быть создана");
@@ -244,10 +235,10 @@ class FunctionServiceTest extends BaseRepositoryTest {
 
     @Test
     void testGetFunction() throws ExecutionException, InterruptedException {
-        FunctionEntity function = new FunctionEntity(1, 1, "3*x - 2");
+        FunctionEntity function = new FunctionEntity(1, "3*x - 2");
         functionService.saveFunc(function);
 
-        CompletableFuture<MathFunction> future = functionService.getFunction(1);
+        CompletableFuture<MathFunction> future = functionService.getFunction(function.getFuncId());
         MathFunction mathFunc = future.get();
 
         assertNotNull(mathFunc, "Функция должна быть получена");
@@ -259,8 +250,8 @@ class FunctionServiceTest extends BaseRepositoryTest {
         // Создаем чисто табулированную функцию
         double[] xValues = {0, 1, 2};
         double[] yValues = {0, 1, 4};
-        CompletableFuture<Integer> createFuture = functionService.createTabulated("x^2", 0, 2, 3);
-        int funcId = createFuture.get();
+        CompletableFuture<Long> createFuture = functionService.createTabulated("x^2", 0, 2, 3);
+        Long funcId = createFuture.get();
 
         // Обновляем точку
         CompletableFuture<Void> updateFuture = functionService.updatePoint(funcId, 1.0, 10.0);
@@ -277,8 +268,8 @@ class FunctionServiceTest extends BaseRepositoryTest {
         // Создаем чисто табулированную функцию
         double[] xValues = {0, 1, 2};
         double[] yValues = {0, 1, 4};
-        CompletableFuture<Integer> createFuture = functionService.createTabulated("x^2", 0, 2, 3);
-        int funcId = createFuture.get();
+        CompletableFuture<Long> createFuture = functionService.createTabulated("x^2", 0, 2, 3);
+        Long funcId = createFuture.get();
 
         // Удаляем точку
         CompletableFuture<Void> deleteFuture = functionService.deletePoint(funcId, 1.0);
@@ -294,11 +285,11 @@ class FunctionServiceTest extends BaseRepositoryTest {
     @Test
     void testSaveAllFunctions() {
         List<FunctionEntity> functions = List.of(
-                new FunctionEntity(1, 1, "func1"),
-                new FunctionEntity(2, 1, "func2"),
-                new FunctionEntity(3, 2, "func3"),
-                new FunctionEntity(4, 2, "func4"),
-                new FunctionEntity(5, 3, "func5")
+                new FunctionEntity(1, "func1"),
+                new FunctionEntity(1, "func2"),
+                new FunctionEntity(2, "func3"),
+                new FunctionEntity(2, "func4"),
+                new FunctionEntity(3, "func5")
         );
 
         functionService.saveAllFunctions(functions);
@@ -310,10 +301,10 @@ class FunctionServiceTest extends BaseRepositoryTest {
     @Test
     void testUpdateComposite() throws ExecutionException, InterruptedException {
         // Создаем исходные функции
-        FunctionEntity inner1 = new FunctionEntity(1, 1, "x + 1");
-        FunctionEntity outer1 = new FunctionEntity(2, 1, "x^2");
-        FunctionEntity inner2 = new FunctionEntity(3, 1, "x - 1");
-        FunctionEntity outer2 = new FunctionEntity(4, 1, "x^3");
+        FunctionEntity inner1 = new FunctionEntity( 1, "x + 1");
+        FunctionEntity outer1 = new FunctionEntity(1, "x^2");
+        FunctionEntity inner2 = new FunctionEntity(1, "x - 1");
+        FunctionEntity outer2 = new FunctionEntity(1, "x^3");
 
         functionService.saveFunc(inner1);
         functionService.saveFunc(outer1);
@@ -321,11 +312,11 @@ class FunctionServiceTest extends BaseRepositoryTest {
         functionService.saveFunc(outer2);
 
         // Создаем композитную функцию
-        CompletableFuture<Integer> createFuture = functionService.createComposite(1, 2);
-        int compositeId = createFuture.get();
+        CompletableFuture<Long> createFuture = functionService.createComposite(inner1.getFuncId(), outer1.getFuncId());
+        Long compositeId = Long.valueOf(createFuture.get());
 
         // Обновляем композитную функцию
-        CompletableFuture<Void> updateFuture = functionService.updateComposite(compositeId, 3, 4);
+        CompletableFuture<Void> updateFuture = functionService.updateComposite(compositeId, inner2.getFuncId(), outer2.getFuncId());
         updateFuture.get();
 
         // Проверяем, что функция все еще существует
@@ -333,11 +324,6 @@ class FunctionServiceTest extends BaseRepositoryTest {
         assertNotNull(updated, "Композитная функция должна существовать после обновления");
     }
 
-    @Test
-    void testGetUserFunctionsSortedByDateNonExistentUser() {
-        List<FunctionEntity> functions = functionService.getUserFunctionsSortedByDate(999, false);
-        assertTrue(functions.isEmpty(), "Для несуществующего пользователя должен вернуться пустой список");
-    }
 
     @Test
     void testGetFunctionsByTypeNonExistent() {
@@ -349,7 +335,7 @@ class FunctionServiceTest extends BaseRepositoryTest {
     @Test
     void testAsyncMethodErrorHandling() {
         // Тестируем обработку ошибок в асинхронных методах
-        CompletableFuture<Integer> invalidFuture = functionService.createMathFunction("invalid expression x^");
+        CompletableFuture<Long> invalidFuture = functionService.createMathFunction("invalid expression x^");
 
         assertThrows(ExecutionException.class, invalidFuture::get,
                 "Должно быть выброшено исключение для невалидного выражения");

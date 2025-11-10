@@ -49,7 +49,7 @@ public class PointsRepository {
             .list();
         }
     }
-    public void updateById(int functionId, double xValue, Double newYValue) {
+    public void updateById(Long functionId, double xValue, Double newYValue) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
@@ -65,7 +65,7 @@ public class PointsRepository {
         }
     }
 
-    public void deleteById(int functionId, double xValue) {
+    public void deleteById(Long functionId, double xValue) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 

@@ -32,7 +32,7 @@ public class FunctionRepository {
     private static final int TABULATED_ID = 2;
     private static final int COMPOSITE_ID = 3;
     private static final String PURE_TABULATED_EXPRESSION = "<TABULATED>";
-    private final AtomicInteger idGenerator = new AtomicInteger(1000);
+  //  private final AtomicInteger idGenerator = new AtomicInteger(1000);
     public FunctionRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
         this.pointsRepository = new PointsRepository(sessionFactory);
@@ -45,7 +45,7 @@ public class FunctionRepository {
         return (double x) -> expr.setVariable("x", x).evaluate();
     }
 
-    public FunctionEntity findById(int id) {
+    public FunctionEntity findById(Long id) {
         try (Session session = sessionFactory.openSession()) {
             return session.find(FunctionEntity.class, id);
         }
@@ -75,7 +75,7 @@ public class FunctionRepository {
     }
 
     // Создание математической функции
-    public CompletableFuture<Integer> createMathFunction(String expression) {
+    public CompletableFuture<Long> createMathFunction(String expression) {
         return CompletableFuture.supplyAsync(() -> {
             // Валидация через парсинг
             parseFunction(expression);
@@ -90,12 +90,12 @@ public class FunctionRepository {
     }
 
     // Создание табулированной функции из математического выражения
-    public CompletableFuture<Integer> createTabulated(String expression, double from, double to, int pointCount) {
+    public CompletableFuture<Long> createTabulated(String expression, double from, double to, int pointCount) {
         return CompletableFuture.supplyAsync(() -> {
             MathFunction mathFunc = parseFunction(expression);
 
             FunctionEntity function = new FunctionEntity();
-            function.setFuncId(idGenerator.getAndIncrement());
+/*            function.setFuncId(idGenerator.getAndIncrement());*/
             function.setTypeId(TABULATED_ID);
             function.setExpression(expression);
             save(function);
@@ -118,14 +118,16 @@ public class FunctionRepository {
     }
 
     // Создание чисто табулированной функции
-    public CompletableFuture<Integer> createPureTabulated(double[] xValues, double[] yValues) {
+    public CompletableFuture<Long> createPureTabulated(double[] xValues, double[] yValues) {
         return CompletableFuture.supplyAsync(() -> {
             if (xValues.length != yValues.length) {
                 throw new IllegalArgumentException("Arrays length mismatch");
             }
 
             FunctionEntity function = new FunctionEntity();
+/*
             function.setFuncId(idGenerator.getAndIncrement());
+*/
             function.setTypeId(TABULATED_ID);
             function.setExpression(PURE_TABULATED_EXPRESSION);
             save(function);
@@ -144,7 +146,7 @@ public class FunctionRepository {
     }
 
     // Создание композитной функции
-    public CompletableFuture<Integer> createComposite(int innerId, int outerId) {
+    public CompletableFuture<Long> createComposite(Long innerId, Long outerId) {
         return CompletableFuture.supplyAsync(() -> {
             if (innerId == outerId) {
                 throw new IllegalArgumentException("Inner and outer function IDs cannot be the same");
@@ -161,7 +163,9 @@ public class FunctionRepository {
 
             // Создаем основную функцию
             FunctionEntity compositeFunction = new FunctionEntity();
+/*
             compositeFunction.setFuncId(idGenerator.getAndIncrement());
+*/
             compositeFunction.setTypeId(COMPOSITE_ID);
             compositeFunction.setExpression(compositeExpression);
             save(compositeFunction);
@@ -178,11 +182,11 @@ public class FunctionRepository {
     }
 
     // Получение функции как MathFunction
-    public CompletableFuture<MathFunction> getFunction(int funcId) {
+    public CompletableFuture<MathFunction> getFunction(Long funcId) {
         return getFunction(funcId, false);
     }
 
-    public CompletableFuture<MathFunction> getFunction(int funcId, boolean asMath) {
+    public CompletableFuture<MathFunction> getFunction(Long funcId, boolean asMath) {
         return CompletableFuture.supplyAsync(() -> {
             FunctionEntity function = findById(funcId);
             if (function == null) {
@@ -216,16 +220,19 @@ public class FunctionRepository {
     }
 
     // Обновление композитной функции
-    public CompletableFuture<Void> updateComposite(int funcId, Integer newInner, Integer newOuter) {
+    public CompletableFuture<Void> updateComposite(Long funcId, Long newInner, Long newOuter) {
         return CompletableFuture.supplyAsync(() -> {
             Optional<CompositeFunctionEntity> compositeOpt = compositeRepository.findById(funcId);
             FunctionEntity inner = findById(newInner);
             FunctionEntity outer = findById(newOuter);
-            if (compositeOpt.isEmpty()) {
-                throw new IllegalArgumentException("Composite function not found");
+
+            if (compositeOpt.isEmpty() || inner == null || outer == null) {
+                throw new IllegalArgumentException("Composite function or inner/outer functions not found");
             }
 
             CompositeFunctionEntity composite = compositeOpt.get();
+            composite.setInnerFunction(inner);
+            composite.setOuterFunction(outer);
 
             compositeRepository.update(composite);
             return null;
@@ -233,7 +240,7 @@ public class FunctionRepository {
     }
 
     // Обновление точки
-    public CompletableFuture<Void> updatePoint(int funcId, double xValue, double newY) {
+    public CompletableFuture<Void> updatePoint(Long funcId, double xValue, double newY) {
         return CompletableFuture.supplyAsync(() -> {
             pointsRepository.updateById(funcId, xValue, newY);
             return null;
@@ -241,7 +248,7 @@ public class FunctionRepository {
     }
 
     // Удаление точки
-    public CompletableFuture<Void> deletePoint(int funcId, double xValue) {
+    public CompletableFuture<Void> deletePoint(Long funcId, double xValue) {
         return CompletableFuture.supplyAsync(() -> {
             pointsRepository.deleteById(funcId, xValue);
             return null;
@@ -272,7 +279,7 @@ public class FunctionRepository {
         return new ArrayTabulatedFunction(xValues, yValues);
     }
 
-    private CompositeFunction createCompositeFunction(int funcId) {
+    private CompositeFunction createCompositeFunction(Long funcId) {
         // Используем CompositeFunctionRepository для получения композитной связи
         Optional<CompositeFunctionEntity> compositeOpt = compositeRepository.findById(funcId);
         if (compositeOpt.isEmpty()) {
@@ -280,8 +287,8 @@ public class FunctionRepository {
         }
 
         CompositeFunctionEntity composite = compositeOpt.get();
-        int innerId = composite.getInnerFunction().getFuncId();
-        int outerId = composite.getOuterFunction().getFuncId();
+        Long innerId = composite.getInnerFunction().getFuncId();
+        Long outerId = composite.getOuterFunction().getFuncId();
 
         if (innerId == funcId || outerId == funcId) {
             throw new RuntimeException("Attempt to make self-referential composite function");

@@ -27,7 +27,7 @@ public class FunctionOwnershipRepository {
         }
     }
 
-    public Optional<FunctionOwnershipEntity> findById(int userId, int functionId) {
+    public Optional<FunctionOwnershipEntity> findById(Long userId, Long functionId) {
         try (Session session = sessionFactory.openSession()) {
             FunctionOwnershipId id = new FunctionOwnershipId(userId, functionId);
             FunctionOwnershipEntity ownership = session.find(FunctionOwnershipEntity.class, id);
@@ -41,7 +41,7 @@ public class FunctionOwnershipRepository {
         }
     }
 
-    public void deleteById(int userId, int functionId) {
+    public void deleteById(Long userId, Long functionId) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
@@ -61,7 +61,7 @@ public class FunctionOwnershipRepository {
         }
     }
 
-    public void deleteByFuncId(int functionId) {
+    public void deleteByFuncId(Long functionId) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
@@ -80,7 +80,7 @@ public class FunctionOwnershipRepository {
         }
     }
 
-    public void updateById(int userId, int functionId, String newFuncName) {
+    public void updateById(Long userId, Long functionId, String newFuncName) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
@@ -95,7 +95,7 @@ public class FunctionOwnershipRepository {
             transaction.commit();
         }
     }
-    public List<FunctionOwnershipEntity> findByUserId(int userId) {
+    public List<FunctionOwnershipEntity> findByUserId(Long userId) {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery(
                             "FROM FunctionOwnershipEntity WHERE id.userId = :userId",
@@ -104,7 +104,7 @@ public class FunctionOwnershipRepository {
                     .list();
         }
     }
-    public Optional<UserEntity> findOwnerByFunctionId(int functionId) {
+    public Optional<UserEntity> findOwnerByFunctionId(Long functionId) {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery(
                             "SELECT u FROM FunctionOwnershipEntity fo " +
@@ -115,7 +115,7 @@ public class FunctionOwnershipRepository {
                     .uniqueResultOptional();
         }
     }
-    public List<FunctionEntity> findUserFunctionsOrderByDate(int userId, boolean descending) {
+    public List<FunctionEntity> findUserFunctionsOrderByDate(Long userId, boolean descending) {
         try (Session session = sessionFactory.openSession()) {
             String order = descending ? "DESC" : "ASC";
             return session.createQuery(

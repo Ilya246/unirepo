@@ -23,7 +23,7 @@ public class UserService {
         Log.debug("Все репозитории UserService успешно инициализированы");
     }
 
-    public List<FunctionEntity> getUserFunctions(int userId) {
+    public List<FunctionEntity> getUserFunctions(Long userId) {
         try {
             UserEntity user = userRepository.findById(userId);
             if (user == null) {
@@ -43,7 +43,7 @@ public class UserService {
         }
     }
 
-    public UserEntity getUserById(int userId) {
+    public UserEntity getUserById(Long userId) {
         try {
             UserEntity user = userRepository.findById(userId);
             if (user != null) {
@@ -90,7 +90,7 @@ public class UserService {
         }
     }
 
-    public void deleteUser(int userId) {
+    public void deleteUser(Long userId) {
         try {
             userRepository.deleteById(userId);
             Log.debug("Пользователь с ID {} успешно удален", userId);

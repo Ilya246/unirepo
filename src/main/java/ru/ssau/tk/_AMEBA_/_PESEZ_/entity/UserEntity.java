@@ -9,8 +9,9 @@ import java.util.List;
 @Table(name = "users")
 public class UserEntity {
     @Id
-    @Column(name = "user_Id")
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_Id",nullable = false)
+    private Long userId;
 
     @Column(name = "type_Id", columnDefinition = "INT CHECK (type_Id >= 1 AND type_Id <= 2)")
     private int typeId;
@@ -31,8 +32,7 @@ public class UserEntity {
     // Constructors
     public UserEntity() {}
 
-    public UserEntity(int userId, int typeId, String userName, String password, Date createdDate) {
-        this.userId = userId;
+    public UserEntity(int typeId, String userName, String password, Date createdDate) {
         setTypeId(typeId);
         this.userName = userName;
         this.password = password;
@@ -40,13 +40,13 @@ public class UserEntity {
     }
 
 
-    public UserEntity(int userId, int typeId, String userName, String password) {
-        this(userId, typeId, userName, password, new Date());
+    public UserEntity(int typeId, String userName, String password) {
+        this(typeId, userName, password, new Date());
     }
 
     // Getters and Setters
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    //public void setUserId(int userId) { this.userId = userId; }
 
     public int getTypeId() { return typeId; }
     public void setTypeId(int typeId) {

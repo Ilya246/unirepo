@@ -10,24 +10,24 @@ import java.util.Objects;
 public class FunctionOwnershipId implements Serializable {
 
     @Column(name = "user_Id")
-    private int userId;
+    private Long userId;
 
     @Column(name = "func_Id")
-    private int funcId;
+    private Long funcId;
 
     public FunctionOwnershipId() {}
 
-    public FunctionOwnershipId(int userId, int funcId) {
+    public FunctionOwnershipId(Long userId, Long funcId) {
         this.userId = userId;
         this.funcId = funcId;
     }
 
     // Getters and Setters
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public int getFuncId() { return funcId; }
-    public void setFuncId(int funcId) { this.funcId = funcId; }
+    public Long getFuncId() { return funcId; }
+    public void setFuncId(Long funcId) { this.funcId = funcId; }
 
     @Override
     public boolean equals(Object o) {

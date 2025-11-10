@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test;
+package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
 
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
+class CompositeFunctionRepositoryTest extends BaseRepositoryTest {
     private SessionFactory factory  = TestHibernateSessionFactoryUtil.getSessionFactory();
     private CompositeFunctionRepository compositeFunctionRepository= new CompositeFunctionRepository(factory);
     private FunctionRepository functionRepository= new FunctionRepository(factory);
@@ -24,9 +24,9 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
     @Test
     void testSaveAndFindById() {
 
-        FunctionEntity innerFunc = new FunctionEntity(1, 1, "x");
-        FunctionEntity outerFunc = new FunctionEntity(2, 1, "x^2");
-        FunctionEntity compositeFunc = new FunctionEntity(3, 3, "(x)^2"); // композитная функция
+        FunctionEntity innerFunc = new FunctionEntity(1, "x");
+        FunctionEntity outerFunc = new FunctionEntity(1, "x^2");
+        FunctionEntity compositeFunc = new FunctionEntity(3, "(x)^2"); // композитная функция
 
         functionRepository.save(innerFunc);
         functionRepository.save(outerFunc);
@@ -37,7 +37,7 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
         );
         compositeFunctionRepository.save(composite);
 
-        Optional<CompositeFunctionEntity> found = compositeFunctionRepository.findById(3);
+        Optional<CompositeFunctionEntity> found = compositeFunctionRepository.findById(compositeFunc.getFuncId());
 
         assertTrue(found.isPresent(), "Композитная функция должна быть найдена");
         assertEquals(3, found.get().getCompositeFunction().getFuncId());
@@ -50,13 +50,13 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
     @Test
     void testFindAll() {
 
-        FunctionEntity inner1 = new FunctionEntity(1, 1, "x");
-        FunctionEntity outer1 = new FunctionEntity(2, 1, "x^2");
-        FunctionEntity composite1 = new FunctionEntity(3, 3, "(x)^2");
+        FunctionEntity inner1 = new FunctionEntity(1, "x");
+        FunctionEntity outer1 = new FunctionEntity(1, "x^2");
+        FunctionEntity composite1 = new FunctionEntity(3, "(x)^2");
 
-        FunctionEntity inner2 = new FunctionEntity(4, 1, "2*x");
-        FunctionEntity outer2 = new FunctionEntity(5, 2, "sin(x)");
-        FunctionEntity composite2 = new FunctionEntity(6, 3, "sin(2*x)");
+        FunctionEntity inner2 = new FunctionEntity(1, "2*x");
+        FunctionEntity outer2 = new FunctionEntity(2, "sin(x)");
+        FunctionEntity composite2 = new FunctionEntity(3, "sin(2*x)");
 
         functionRepository.save(inner1);
         functionRepository.save(outer1);
@@ -84,10 +84,10 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
     @Test
     void testUpdate() {
 
-        FunctionEntity inner = new FunctionEntity(1, 1, "x");
-        FunctionEntity outer = new FunctionEntity(2, 1, "x^2");
-        FunctionEntity composite = new FunctionEntity(3, 3, "(x)^2");
-        FunctionEntity newOuter = new FunctionEntity(4, 2, "cos(x)");
+        FunctionEntity inner = new FunctionEntity(1, "x");
+        FunctionEntity outer = new FunctionEntity(1, "x^2");
+        FunctionEntity composite = new FunctionEntity(3, "(x)^2");
+        FunctionEntity newOuter = new FunctionEntity(2, "cos(x)");
 
         functionRepository.save(inner);
         functionRepository.save(outer);
@@ -105,7 +105,7 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
         assertEquals(1, updated.getInnerFunction().getFuncId()); // внутренняя не изменилась
         assertEquals(3, updated.getCompositeFunction().getFuncId()); // композитная не изменилась
 
-        Optional<CompositeFunctionEntity> foundAfterUpdate = compositeFunctionRepository.findById(3);
+        Optional<CompositeFunctionEntity> foundAfterUpdate = compositeFunctionRepository.findById(composite.getFuncId());
         assertTrue(foundAfterUpdate.isPresent());
     }
 
@@ -116,9 +116,9 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
         PointsRepository pointsRepository = new PointsRepository(factory);
 
         // Создаем базовые функции
-        FunctionEntity inner = new FunctionEntity(1, 1, "x");           // f(x) = x
-        FunctionEntity outer = new FunctionEntity(2, 1, "x^2");         // g(x) = x²
-        FunctionEntity composite = new FunctionEntity(3, 3, "(x)^2");   // композитная: g(f(x)) = (x)² = x²
+        FunctionEntity inner = new FunctionEntity(1, "x");           // f(x) = x
+        FunctionEntity outer = new FunctionEntity(1, "x^2");         // g(x) = x²
+        FunctionEntity composite = new FunctionEntity(3, "(x)^2");   // композитная: g(f(x)) = (x)² = x²
 
         functionRepository.save(inner);
         functionRepository.save(outer);
@@ -152,7 +152,7 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest{
         pointsRepository.save(innerPoint3);
 
         // Проверяем композитную функцию
-        Optional<CompositeFunctionEntity> foundComp = compositeFunctionRepository.findById(3);
+        Optional<CompositeFunctionEntity> foundComp = compositeFunctionRepository.findById(composite.getFuncId());
         assertTrue(foundComp.isPresent(), "Композитная функция должна быть найдена");
 
         CompositeFunctionEntity retrievedComp = foundComp.get();

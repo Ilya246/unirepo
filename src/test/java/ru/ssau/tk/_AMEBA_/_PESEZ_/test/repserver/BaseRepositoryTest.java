@@ -1,13 +1,10 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test;
+package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
-
-import java.util.List;
 
 public abstract class BaseRepositoryTest {
 
@@ -57,22 +54,22 @@ public abstract class BaseRepositoryTest {
             createTransaction = session.beginTransaction();
 
             session.createNativeQuery("""
-            CREATE TABLE IF NOT EXISTS users (
-                user_Id INTEGER PRIMARY KEY,
-                type_Id INTEGER CHECK (type_Id >= 1 AND type_Id <= 2),
-                user_Name VARCHAR(100),
-                password VARCHAR(20),
-                created_Date TIMESTAMP
-            )
+             CREATE TABLE IF NOT EXISTS users (
+                                        user_Id SERIAL PRIMARY KEY,
+                                        type_Id INTEGER CHECK (type_Id >= 1 AND type_Id <= 2),
+                                        user_Name VARCHAR(100),
+                                        password VARCHAR(20),
+                                        created_Date TIMESTAMP
+                                    )
         """).executeUpdate();
 
             // 2. Function - независимая таблица
             session.createNativeQuery("""
             CREATE TABLE IF NOT EXISTS Function (
-                func_Id INTEGER PRIMARY KEY,
-                type_Id INTEGER CHECK (type_Id >= 1 AND type_Id <= 3),
-                expression VARCHAR(200)
-            )
+                                        func_Id SERIAL PRIMARY KEY,
+                                        type_Id INTEGER CHECK (type_Id >= 1 AND type_Id <= 3),
+                                        expression VARCHAR(200)
+                                    )
         """).executeUpdate();
 
             session.createNativeQuery("""
