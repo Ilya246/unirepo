@@ -1,0 +1,949 @@
+openapi: 3.0.3
+info:
+  title: AMEBA_PESEZ API
+  description: Единый унифицированный контракт API для системы управления математическими функциями
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@mathfunctions.com
+
+servers:
+  - url: /api
+    description: URL API
+
+tags:
+  - name: Functions
+    description: Операции с математическими функциями
+  - name: Users
+    description: Операции с пользователями
+  - name: Points
+    description: Операции с точками функций
+  - name: Ownership
+    description: Связи пользователей и функций
+
+paths:
+  # ========== ФУНКЦИИ ==========
+  /functions:
+    get:
+      tags: [Functions]
+      summary: Получить все функции
+      responses:
+        '200':
+          description: Успешное получение списка функций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Function'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /functions/{id}:
+    get:
+      tags: [Functions]
+      summary: Получить функцию по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Функция найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Function'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /functions/type/{typeId}:
+    get:
+      tags: [Functions]
+      summary: Получить функции по типу
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 3
+      responses:
+        '200':
+          description: Успешное получение функций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Function'
+
+  /functions/math:
+    post:
+      tags: [Functions]
+      summary: Создать математическую функцию
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [expression]
+              properties:
+                expression:
+                  type: string
+                  example: "x^2 + 2*x + 1"
+      responses:
+        '201':
+          description: Математическая функция создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  typeId:
+                    type: integer
+                  expression:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /functions/tabulated/from-expression:
+    post:
+      tags: [Functions]
+      summary: Создать табулированную функцию из математического выражения
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [expression, from, to, pointsCount]
+              properties:
+                expression:
+                  type: string
+                  example: "sin(x)"
+                from:
+                  type: number
+                  format: double
+                  example: 0.0
+                to:
+                  type: number
+                  format: double
+                  example: 3.14
+                pointsCount:
+                  type: integer
+                  example: 10
+      responses:
+        '201':
+          description: Табулированная функция создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  typeId:
+                    type: integer
+                  expression:
+                    type: string
+                  pointsCount:
+                    type: integer
+                  message:
+                    type: string
+
+  /functions/tabulated/from-points:
+    post:
+      tags: [Functions]
+      summary: Создать чисто табулированную функцию из точек
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [xValues, yValues]
+              properties:
+                xValues:
+                  type: array
+                  items:
+                    type: number
+                    format: double
+                  example: [1.0, 2.0, 3.0, 4.0]
+                yValues:
+                  type: array
+                  items:
+                    type: number
+                    format: double
+                  example: [1.0, 4.0, 9.0, 16.0]
+      responses:
+        '201':
+          description: Чисто табулированная функция создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  typeId:
+                    type: integer
+                  expression:
+                    type: string
+                  pointsCount:
+                    type: integer
+                  message:
+                    type: string
+
+  /functions/composite:
+    post:
+      tags: [Functions]
+      summary: Создать композитную функцию
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [innerFunctionId, outerFunctionId]
+              properties:
+                innerFunctionId:
+                  type: integer
+                  format: int64
+                  example: 1
+                outerFunctionId:
+                  type: integer
+                  format: int64
+                  example: 2
+      responses:
+        '201':
+          description: Композитная функция создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  typeId:
+                    type: integer
+                  expression:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: Нельзя использовать одинаковые функции
+        '404':
+          description: Функции не найдены
+
+  /functions/{id}/as-math:
+    get:
+      tags: [Functions]
+      summary: Получить функцию как MathFunction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: asMath
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Успешное получение функции
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  expression:
+                    type: string
+                  type:
+                    type: string
+                  canBeEvaluated:
+                    type: boolean
+
+  /functions/composite/{id}:
+    put:
+      tags: [Functions]
+      summary: Обновить композитную функцию
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [newInnerFunctionId, newOuterFunctionId]
+              properties:
+                newInnerFunctionId:
+                  type: integer
+                  format: int64
+                newOuterFunctionId:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Композитная функция обновлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  message:
+                    type: string
+
+  # ========== ТОЧКИ ФУНКЦИЙ ==========
+  /functions/{id}/points:
+    get:
+      tags: [Points]
+      summary: Получить все точки функции
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Успешное получение точек
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Point'
+
+    put:
+      tags: [Points]
+      summary: Обновить точку функции
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [xValue, newYValue]
+              properties:
+                xValue:
+                  type: number
+                  format: double
+                newYValue:
+                  type: number
+                  format: double
+      responses:
+        '200':
+          description: Точка обновлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  point:
+                    $ref: '#/components/schemas/Point'
+
+    delete:
+      tags: [Points]
+      summary: Удалить точку функции
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [xValue]
+              properties:
+                xValue:
+                  type: number
+                  format: double
+      responses:
+        '200':
+          description: Точка удалена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /functions/{id}/points/count:
+    get:
+      tags: [Points]
+      summary: Получить количество точек функции
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Успешное получение количества точек
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  funcId:
+                    type: integer
+                    format: int64
+                  pointsCount:
+                    type: integer
+
+  # ========== ПОЛЬЗОВАТЕЛИ ==========
+  /users:
+    get:
+      tags: [Users]
+      summary: Получить всех пользователей
+      parameters:
+        - name: sortByDate
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: typeId
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2
+      responses:
+        '200':
+          description: Успешное получение пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+    post:
+      tags: [Users]
+      summary: Создать пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userName, password, typeId]
+              properties:
+                userName:
+                  type: string
+                password:
+                  type: string
+                typeId:
+                  type: integer
+                  minimum: 1
+                  maximum: 2
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    format: int64
+                  userName:
+                    type: string
+                  typeId:
+                    type: integer
+                  createdDate:
+                    type: string
+                    format: date-time
+                  message:
+                    type: string
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Получить пользователя по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Users]
+      summary: Обновить пользователя
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                password:
+                  type: string
+                typeId:
+                  type: integer
+                  minimum: 1
+                  maximum: 2
+      responses:
+        '200':
+          description: Пользователь обновлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    format: int64
+                  userName:
+                    type: string
+                  typeId:
+                    type: integer
+                  message:
+                    type: string
+
+    delete:
+      tags: [Users]
+      summary: Удалить пользователя
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Пользователь удален
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /users/type/{typeId}:
+    get:
+      tags: [Users]
+      summary: Получить пользователей по типу
+      parameters:
+        - name: typeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 2
+      responses:
+        '200':
+          description: Успешное получение пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/sorted:
+    get:
+      tags: [Users]
+      summary: Отсортировать пользователей по дате создания
+      parameters:
+        - name: order
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Успешная сортировка
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  # ========== СВЯЗИ ПОЛЬЗОВАТЕЛЕЙ И ФУНКЦИЙ ==========
+  /functions/{id}/owner:
+    get:
+      tags: [Ownership]
+      summary: Получить владельца функции
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Владелец найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Владелец не найден
+
+  /users/{id}/functions:
+    get:
+      tags: [Ownership]
+      summary: Получить все функции пользователя
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: sortByDate
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Успешное получение функций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Function'
+
+  /users/{id}/functions/sorted:
+    get:
+      tags: [Ownership]
+      summary: Получить функции пользователя с сортировкой по дате
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: order
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Успешное получение отсортированных функций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/Function'
+                    - type: object
+                      properties:
+                        createdDate:
+                          type: string
+                          format: date-time
+
+  /ownership:
+    post:
+      tags: [Ownership]
+      summary: Создать связь пользователя с функцией
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, functionId]
+              properties:
+                userId:
+                  type: integer
+                  format: int64
+                functionId:
+                  type: integer
+                  format: int64
+                funcName:
+                  type: string
+      responses:
+        '201':
+          description: Связь создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    format: int64
+                  functionId:
+                    type: integer
+                    format: int64
+                  funcName:
+                    type: string
+                  createdDate:
+                    type: string
+                    format: date-time
+                  message:
+                    type: string
+
+    delete:
+      tags: [Ownership]
+      summary: Удалить связь пользователя с функцией
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [userId, functionId]
+              properties:
+                userId:
+                  type: integer
+                  format: int64
+                functionId:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Связь удалена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  # ========== МАССОВЫЕ ОПЕРАЦИИ ==========
+  /functions/batch:
+    post:
+      tags: [Functions]
+      summary: Массовое сохранение функций
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  typeId:
+                    type: integer
+                  expression:
+                    type: string
+      responses:
+        '201':
+          description: Функции сохранены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  savedCount:
+                    type: integer
+                  message:
+                    type: string
+
+  /points/batch:
+    post:
+      tags: [Points]
+      summary: Массовое сохранение точек
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  functionId:
+                    type: integer
+                    format: int64
+                  xValue:
+                    type: number
+                    format: double
+                  yValue:
+                    type: number
+                    format: double
+      responses:
+        '201':
+          description: Точки сохранены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  savedCount:
+                    type: integer
+                  message:
+                    type: string
+
+components:
+  schemas:
+    Function:
+      type: object
+      properties:
+        funcId:
+          type: integer
+          format: int64
+        typeId:
+          type: integer
+        expression:
+          type: string
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+
+    User:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        typeId:
+          type: integer
+        userName:
+          type: string
+        password:
+          type: string
+        createdDate:
+          type: string
+          format: date-time
+
+    Point:
+      type: object
+      properties:
+        xValue:
+          type: number
+          format: double
+        yValue:
+          type: number
+          format: double
+
+    CompositeFunction:
+      type: object
+      properties:
+        compositeFunction:
+          $ref: '#/components/schemas/Function'
+        innerFunction:
+          $ref: '#/components/schemas/Function'
+        outerFunction:
+          $ref: '#/components/schemas/Function'
+
+    FunctionOwnership:
+      type: object
+      properties:
+        id:
+          type: object
+          properties:
+            userId:
+              type: integer
+              format: int64
+            funcId:
+              type: integer
+              format: int64
+        user:
+          $ref: '#/components/schemas/User'
+        function:
+          $ref: '#/components/schemas/Function'
+        createdDate:
+          type: string
+          format: date-time
+        funcName:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Неверные данные запроса
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+

@@ -5,9 +5,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import java.util.function.Function;
-
+import lombok.*;
 @Entity
 @Table(name = "Function_Ownership")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class FunctionOwnershipEntity {
     @EmbeddedId
     private FunctionOwnershipId id;
@@ -29,9 +33,7 @@ public class FunctionOwnershipEntity {
     @Column(name = "func_Name", length = 100)
     private String funcName;
 
-    // Constructors
-    public FunctionOwnershipEntity() {}
-
+    // Конструктор
     public FunctionOwnershipEntity(UserEntity user, FunctionEntity function, Date createdDate, String funcName) {
         this.user = user;
         this.function = function;
@@ -39,20 +41,4 @@ public class FunctionOwnershipEntity {
         this.funcName = funcName;
         this.id = new FunctionOwnershipId(user.getUserId(), function.getFuncId());
     }
-
-    // Getters and Setters
-    public FunctionOwnershipId getId() { return id; }
-    public void setId(FunctionOwnershipId id) { this.id = id; }
-
-    public UserEntity getUser() { return user; }
-    public void setUser(UserEntity user) { this.user = user; }
-
-    public FunctionEntity getFunction() { return function; }
-    public void setFunction(FunctionEntity function) { this.function = function; }
-
-    public Date getCreatedDate() { return createdDate; }
-    public void setCreatedDate(Date createdDate) { this.createdDate = createdDate; }
-
-    public String getFuncName() { return funcName; }
-    public void setFuncName(String funcName) { this.funcName = funcName; }
 }

@@ -35,7 +35,7 @@ public class PointsRepository {
     public Optional<PointsEntity> findById(FunctionEntity function, double xValue) {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery(
-                            "FROM PointsEntity WHERE function = :function AND xValue = :xValue", PointsEntity.class)
+                            "FROM PointsEntity WHERE function = :function AND id.xValue = :xValue", PointsEntity.class)
                     .setParameter("function", function)
                     .setParameter("xValue", xValue)
                     .uniqueResultOptional();
@@ -44,7 +44,7 @@ public class PointsRepository {
     public List<PointsEntity> findByFunction(FunctionEntity function) {
         try (Session session = sessionFactory.openSession()) {
             return session.createQuery(
-                    "FROM PointsEntity WHERE function = :function ORDER BY xValue", PointsEntity.class)
+                    "FROM PointsEntity WHERE function = :function ORDER BY id.xValue", PointsEntity.class)
             .setParameter("function", function)
             .list();
         }
@@ -55,7 +55,7 @@ public class PointsRepository {
 
             Query<?> query = session.createQuery(
                     "UPDATE PointsEntity SET yValue = :yValue " +
-                            "WHERE function.funcId = :funcId AND xValue = :xValue");
+                            "WHERE function.funcId = :funcId AND id.xValue = :xValue");
             query.setParameter("yValue", newYValue);
             query.setParameter("funcId", functionId);
             query.setParameter("xValue", xValue);
@@ -70,7 +70,7 @@ public class PointsRepository {
             Transaction transaction = session.beginTransaction();
 
             Query<?> query = session.createQuery(
-                    "DELETE FROM PointsEntity WHERE function.funcId = :funcId AND xValue = :xValue");
+                    "DELETE FROM PointsEntity WHERE function.funcId = :funcId AND id.xValue = :xValue");
             query.setParameter("funcId", functionId);
             query.setParameter("xValue", xValue);
             query.executeUpdate();

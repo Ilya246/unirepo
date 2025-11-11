@@ -32,8 +32,8 @@ class PointsRepositoryTest extends BaseRepositoryTest {
         Optional<PointsEntity> found = pointsRepository.findById(function, 2.0);
 
         assertTrue(found.isPresent(), "Точка должна быть найдена");
-        assertEquals(2.0, found.get().get_xValue(), 0.001);
-        assertEquals(4.0, found.get().get_yValue(), 0.001);
+        assertEquals(2.0, found.get().getXValue(), 0.001);
+        assertEquals(4.0, found.get().getYValue(), 0.001);
         assertEquals(function.getFuncId(), found.get().getFunction().getFuncId());
     }
 
@@ -74,8 +74,8 @@ class PointsRepositoryTest extends BaseRepositoryTest {
 
         Optional<PointsEntity> updated = pointsRepository.findById(function, 3.0);
         assertTrue(updated.isPresent(), "Точка должна существовать после обновления");
-        assertEquals(10.0, updated.get().get_yValue(), 0.001, "yValue должно быть обновлено");
-        assertEquals(3.0, updated.get().get_xValue(), 0.001, "xValue не должно измениться");
+        assertEquals(10.0, updated.get().getYValue(), 0.001, "yValue должно быть обновлено");
+        assertEquals(3.0, updated.get().getXValue(), 0.001, "xValue не должно измениться");
     }
 
     @Test

@@ -168,11 +168,11 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest {
 
         // Проверяем конкретные значения точек композитной функции
         assertTrue(compositePoints.stream().anyMatch(p ->
-                p.get_xValue() == -2.0 && p.get_yValue() == 4.0));
+                p.getXValue() == -2.0 && p.getYValue() == 4.0));
         assertTrue(compositePoints.stream().anyMatch(p ->
-                p.get_xValue() == 0.0 && p.get_yValue() == 0.0));
+                p.getXValue() == 0.0 && p.getYValue() == 0.0));
         assertTrue(compositePoints.stream().anyMatch(p ->
-                p.get_xValue() == 2.0 && p.get_yValue() == 4.0));
+                p.getXValue() == 2.0 && p.getYValue() == 4.0));
 
         // Проверяем точки ВНУТРЕННЕЙ функции
         List<PointsEntity> innerPoints = pointsRepository.findByFunction(inner);
@@ -180,9 +180,9 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest {
 
         // Проверяем конкретные значения точек внутренней функции
         assertTrue(innerPoints.stream().anyMatch(p ->
-                p.get_xValue() == -2.0 && p.get_yValue() == -2.0));
+                p.getXValue() == -2.0 && p.getYValue() == -2.0));
         assertTrue(innerPoints.stream().anyMatch(p ->
-                p.get_xValue() == 0.0 && p.get_yValue() == 0.0));
+                p.getXValue() == 0.0 && p.getYValue() == 0.0));
 
         // Проверяем количество точек через count
         long compositePointsCount = pointsRepository.countByFunction(composite);
@@ -196,6 +196,6 @@ class CompositeFunctionRepositoryTest extends BaseRepositoryTest {
         // Проверяем, что можем найти конкретную точку композитной функции
         Optional<PointsEntity> specificPoint = pointsRepository.findById(composite, 2.0);
         assertTrue(specificPoint.isPresent(), "Должна быть найдена точка (2.0, 4.0)");
-        assertEquals(4.0, specificPoint.get().get_yValue(), 0.001);
+        assertEquals(4.0, specificPoint.get().getYValue(), 0.001);
     }
 }

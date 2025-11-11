@@ -89,27 +89,21 @@ public class FunctionRepository {
         });
     }
 
-    // Создание табулированной функции из математического выражения
     public CompletableFuture<Long> createTabulated(String expression, double from, double to, int pointCount) {
         return CompletableFuture.supplyAsync(() -> {
             MathFunction mathFunc = parseFunction(expression);
 
             FunctionEntity function = new FunctionEntity();
-/*            function.setFuncId(idGenerator.getAndIncrement());*/
             function.setTypeId(TABULATED_ID);
             function.setExpression(expression);
             save(function);
 
-            // Создание точек табулированной функции
             TabulatedFunction tabFunc = new ArrayTabulatedFunction(mathFunc, from, to, pointCount);
             Point[] points = TabulatedFunctionOperationService.asPoints(tabFunc);
 
-            // Используем PointsRepository для сохранения точек
+
             for (Point point : points) {
-                PointsEntity pointEntity = new PointsEntity();
-                pointEntity.setFunction(function);
-                pointEntity.set_xValue(point.getX());
-                pointEntity.set_yValue(point.getY());
+                PointsEntity pointEntity = new PointsEntity(function, point.getX(), point.getY());
                 pointsRepository.save(pointEntity);
             }
 
@@ -125,19 +119,13 @@ public class FunctionRepository {
             }
 
             FunctionEntity function = new FunctionEntity();
-/*
-            function.setFuncId(idGenerator.getAndIncrement());
-*/
             function.setTypeId(TABULATED_ID);
             function.setExpression(PURE_TABULATED_EXPRESSION);
             save(function);
 
-            // Используем PointsRepository для сохранения точек
+
             for (int i = 0; i < xValues.length; i++) {
-                PointsEntity point = new PointsEntity();
-                point.setFunction(function);
-                point.set_xValue(xValues[i]);
-                point.set_yValue(yValues[i]);
+                PointsEntity point = new PointsEntity(function, xValues[i], yValues[i]);
                 pointsRepository.save(point);
             }
 
@@ -265,15 +253,15 @@ public class FunctionRepository {
         }
 
         // Сортируем точки по X
-        pointsEntities.sort(Comparator.comparingDouble(PointsEntity::get_xValue));
+        pointsEntities.sort(Comparator.comparingDouble(PointsEntity::getXValue));
 
         double[] xValues = new double[pointsEntities.size()];
         double[] yValues = new double[pointsEntities.size()];
 
         for (int i = 0; i < pointsEntities.size(); i++) {
             PointsEntity point = pointsEntities.get(i);
-            xValues[i] = point.get_xValue();
-            yValues[i] = point.get_yValue();
+            xValues[i] = point.getXValue();
+            yValues[i] = point.getYValue();
         }
 
         return new ArrayTabulatedFunction(xValues, yValues);

@@ -5,55 +5,56 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
+import lombok.*;
+
 @Entity
 @Table(name = "Points")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class PointsEntity {
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "func_Id")
-    private FunctionEntity function;
 
-    @Id
-    @Column(name = "x_Value")
-    private double xValue;
+    @EmbeddedId
+    private PointId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "func_Id", insertable = false, updatable = false)
+    private FunctionEntity function;
 
     @Column(name = "y_Value")
     private double yValue;
 
-    // Constructors
-    public PointsEntity() {}
 
     public PointsEntity(FunctionEntity function, double xValue, double yValue) {
+        this.id = new PointId(function.getFuncId(), xValue);
         this.function = function;
-        this.xValue = xValue;
         this.yValue = yValue;
     }
 
-    // Getters and Setters
-    public FunctionEntity getFunction() { return function; }
-    public void setFunction(FunctionEntity function) { this.function = function; }
-
-    public double get_xValue() { return xValue; }
-    public void set_xValue(double xValue) { this.xValue = xValue; }
-
-    public double get_yValue() { return yValue; }
-    public void set_yValue(double yValue) { this.yValue = yValue; }
-
-    // Convenience methods
     public String getPointAsString() {
-        return "(" + xValue + ", " + yValue + ")";
+        return "(" + id.getXValue() + ", " + yValue + ")";
     }
 
     public double distanceToOrigin() {
-        return Math.sqrt(xValue * xValue + yValue * yValue);
+        return Math.sqrt(id.getXValue() * id.getXValue() + yValue * yValue);
     }
 
-    @Override
-    public String toString() {
-        return "PointsEntity{funcId=" +
-                (function != null ? function.getFuncId() : "null") +
-                ", xValue=" + xValue + ", yValue=" + yValue + "}";
+    // Геттеры для удобного доступа
+    public double getXValue() {
+        return id.getXValue();
     }
 
+    public void setXValue(double xValue) {
+        this.id.setXValue(xValue);
+    }
 
+    public Long getFunctionId() {
+        return id.getFunctionId();
+    }
+
+    public void setFunctionId(Long functionId) {
+        this.id.setFunctionId(functionId);
+        // Если нужно обновить связанную сущность, нужно загрузить её отдельно
+    }
 }
