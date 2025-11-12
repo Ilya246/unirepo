@@ -6,17 +6,19 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
+
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 
 import java.util.List;
 
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final FunctionOwnershipRepository ownershipRepository;
     private final FunctionRepository functionRepository;
 
-    public UserService(SessionFactory sessionFactory) {
+    public UserServiceImpl(SessionFactory sessionFactory) {
         this.userRepository = new UserRepository(sessionFactory);
         this.ownershipRepository = new FunctionOwnershipRepository(sessionFactory);
         this.functionRepository = new FunctionRepository(sessionFactory);

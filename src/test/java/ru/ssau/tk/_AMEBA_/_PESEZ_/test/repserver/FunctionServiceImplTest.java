@@ -11,7 +11,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionServiceImpl;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import java.util.Date;
@@ -22,17 +22,17 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FunctionServiceTest extends BaseRepositoryTest {
+class FunctionServiceImplTest extends BaseRepositoryTest {
 
     private SessionFactory sessionFactory;
-    private FunctionService functionService;
+    private FunctionServiceImpl functionService;
     private FunctionRepository functionRepository;
     private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
         sessionFactory = TestHibernateSessionFactoryUtil.getSessionFactory();
-        functionService = new FunctionService(sessionFactory);
+        functionService = new FunctionServiceImpl(sessionFactory);
         functionRepository = new FunctionRepository(sessionFactory);
         userRepository = new UserRepository(sessionFactory);
         clearDatabase();

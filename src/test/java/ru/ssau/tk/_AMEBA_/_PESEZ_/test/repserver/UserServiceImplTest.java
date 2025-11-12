@@ -7,32 +7,31 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
-import ru.ssau.tk._AMEBA_._PESEZ_.service.UserService;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionServiceImpl;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.UserServiceImpl;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserServiceTest extends BaseRepositoryTest {
+class UserServiceImplTest extends BaseRepositoryTest {
 
     private SessionFactory sessionFactory;
-    private FunctionService functionService;
+    private FunctionServiceImpl functionService;
     private FunctionRepository functionRepository;
     private UserRepository userRepository;
-    private UserService userService;
+    private UserServiceImpl userService;
     //private final AtomicInteger idGenerator = new AtomicInteger(1000);
 
 
     @BeforeEach
     void setUp() {
         sessionFactory = TestHibernateSessionFactoryUtil.getSessionFactory();
-        functionService = new FunctionService(sessionFactory);
+        functionService = new FunctionServiceImpl(sessionFactory);
         functionRepository = new FunctionRepository(sessionFactory);
         userRepository = new UserRepository(sessionFactory);
-        userService=new UserService(sessionFactory);
+        userService=new UserServiceImpl(sessionFactory);
     }
 
     @Test

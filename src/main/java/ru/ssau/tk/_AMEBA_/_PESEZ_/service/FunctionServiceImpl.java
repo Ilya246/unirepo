@@ -8,18 +8,20 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.CompositeFunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.PointsRepository;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionService;
+
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-public class FunctionService {
+public class FunctionServiceImpl implements FunctionService {
     private final FunctionRepository functionRepository;
     private final FunctionOwnershipRepository ownershipRepository;
     private final CompositeFunctionRepository compositeRepository;
     private final PointsRepository pointsRepository;
 
-    public FunctionService(SessionFactory sessionFactory) {
+    public FunctionServiceImpl(SessionFactory sessionFactory) {
         this.functionRepository = new FunctionRepository(sessionFactory);
         this.ownershipRepository = new FunctionOwnershipRepository(sessionFactory);
         this.compositeRepository = new CompositeFunctionRepository(sessionFactory);
