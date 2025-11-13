@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PointRequest {
-
+    Long functionId;
+    double xValue;
     double yValue;
 }

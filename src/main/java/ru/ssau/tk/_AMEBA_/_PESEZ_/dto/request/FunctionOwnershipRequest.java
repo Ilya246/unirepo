@@ -14,5 +14,7 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FunctionOwnershipRequest {
+    Long userId;
+    Long functionId;
     String funcName;
 }

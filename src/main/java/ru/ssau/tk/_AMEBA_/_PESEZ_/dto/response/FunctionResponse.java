@@ -17,3 +17,4 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 public class FunctionResponse extends FunctionRequest {
     Long funcId;
 }
+

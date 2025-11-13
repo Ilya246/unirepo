@@ -1,128 +1,139 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
-import org.hibernate.SessionFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.UserRequest;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 
-import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
-
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
+@Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
     private final FunctionOwnershipRepository ownershipRepository;
     private final FunctionRepository functionRepository;
 
-    public UserServiceImpl(SessionFactory sessionFactory) {
-        this.userRepository = new UserRepository(sessionFactory);
-        this.ownershipRepository = new FunctionOwnershipRepository(sessionFactory);
-        this.functionRepository = new FunctionRepository(sessionFactory);
-        Log.debug("Все репозитории UserService успешно инициализированы");
+    @Override
+    public UserResponse createUser(UserRequest request) {
+        UserEntity user = new UserEntity();
+        user.setTypeId(request.getTypeId());
+        user.setUserName(request.getUserName());
+        user.setPassword(request.getPassword());
+        userRepository.save(user);
+        log.info("User created with id: {}", user.getUserId());
+
+        return convertToResponse(user);
     }
 
+    @Override
+    public UserResponse getUser(Long id) {
+        UserEntity user = getUserDb(id);
+        return convertToResponse(user);
+    }
+
+    @Override
+    public UserEntity getUserDb(Long id) {
+        UserEntity user = userRepository.findById(id);
+        if (user == null) {
+            throw new CustomException("User not found with id: " + id, HttpStatus.NOT_FOUND);
+        }
+        return user;
+    }
+
+    @Override
+    public UserResponse updateUser(Long id, UserRequest request) {
+        UserEntity user = getUserDb(id);
+
+
+        if (request.getTypeId() != 0) {
+            user.setTypeId(request.getTypeId());
+        }
+        if (request.getUserName() != null && !request.getUserName().isEmpty()) {
+            user.setUserName(request.getUserName());
+        }
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            user.setPassword(request.getPassword());
+        }
+        if (request.getCreatedDate() != null) {
+            user.setCreatedDate(request.getCreatedDate());
+        }
+
+        UserEntity updatedUser = userRepository.update(user);
+        log.info("User updated with id: {}", id);
+
+        return convertToResponse(updatedUser);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        UserEntity user = getUserDb(id);
+        userRepository.deleteById(id);
+        log.info("User deleted with id: {}", id);
+    }
+
+    @Override
+    public List<UserResponse> getAllUsers() {
+        List<UserEntity> users = userRepository.findAll();
+        log.info("Found {} users", users.size());
+
+        return users.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponse> getUsersByType(Integer typeId) {
+        List<UserEntity> users = userRepository.findByType(typeId);
+        log.info("Found {} users with type: {}", users.size(), typeId);
+
+        return users.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponse> getUsersSortedByDate(Boolean descending) {
+        boolean sortDescending = descending != null ? descending : true;
+        List<UserEntity> users = userRepository.findAllOrderByCreatedDate(sortDescending);
+        log.info("Found {} users sorted by date {}", users.size(), sortDescending ? "DESC" : "ASC");
+
+        return users.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<FunctionEntity> getUserFunctions(Long userId) {
-        try {
-            UserEntity user = userRepository.findById(userId);
-            if (user == null) {
-                throw new IllegalArgumentException("User not found with ID: " + userId);
-            }
+        UserEntity user = getUserDb(userId);
 
-            List<FunctionEntity> functions = ownershipRepository.findByUserId(userId).stream()
-                    .map(ownership -> functionRepository.findById(ownership.getId().getFuncId()))
-                    .filter(function -> function != null)
-                    .toList();
+        List<FunctionEntity> functions = ownershipRepository.findByUserId(userId).stream()
+                .map(ownership -> functionRepository.findById(ownership.getId().getFuncId()))
+                .filter(function -> function != null)
+                .collect(Collectors.toList());
 
-            Log.debug("Для пользователя {} найдено {} функций", userId, functions.size());
-            return functions;
-        } catch (Exception e) {
-            Log.error("Ошибка при получении функций пользователя {}: {}", userId, e.getMessage(), e);
-            throw e;
-        }
+        log.info("Found {} functions for user: {}", functions.size(), userId);
+        return functions;
     }
 
-    public UserEntity getUserById(Long userId) {
-        try {
-            UserEntity user = userRepository.findById(userId);
-            if (user != null) {
-                Log.debug("Пользователь найден: ID {}, имя: {}", userId, user.getUserName());
-            } else {
-                Log.debug("Пользователь с ID {} не найден", userId);
-            }
-            return user;
-        } catch (Exception e) {
-            Log.error("Ошибка при получении пользователя {}: {}", userId, e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    public List<UserEntity> getAllUsers() {
-        try {
-            List<UserEntity> users = userRepository.findAll();
-            Log.debug("Получено {} пользователей из базы данных", users.size());
-            return users;
-        } catch (Exception e) {
-            Log.error("Ошибка при получении списка всех пользователей: {}", e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    public List<UserEntity> getUsersByType(int typeId) {
-        try {
-            List<UserEntity> users = userRepository.findByType(typeId);
-            Log.debug("Найдено {} пользователей типа {}", users.size(), typeId);
-            return users;
-        } catch (Exception e) {
-            Log.error("Ошибка при поиске пользователей типа {}: {}", typeId, e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    public void saveUser(UserEntity user) {
-        try {
-            userRepository.save(user);
-            Log.debug("Пользователь успешно сохранен с ID: {}", user.getUserId());
-        } catch (Exception e) {
-            Log.error("Ошибка при сохранении пользователя '{}': {}", user.getUserName(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    public void deleteUser(Long userId) {
-        try {
-            userRepository.deleteById(userId);
-            Log.debug("Пользователь с ID {} успешно удален", userId);
-        } catch (Exception e) {
-            Log.error("Ошибка при удалении пользователя {}: {}", userId, e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    public UserEntity updateUser(UserEntity user) {
-        try {
-            UserEntity updatedUser = userRepository.update(user);
-            Log.debug("Пользователь с ID {} успешно обновлен. Новое имя: {}",
-                    user.getUserId(), updatedUser.getUserName());
-            return updatedUser;
-        } catch (Exception e) {
-            Log.error("Ошибка при обновлении пользователя {}: {}", user.getUserId(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    public List<UserEntity> sortByDate(boolean descending) {
-        String order = descending ? "убыванию" : "возрастанию";
-        try {
-            List<UserEntity> sortedUsers = userRepository.findAllOrderByCreatedDate(descending);
-            Log.debug("Получено {} пользователей, отсортированных по {}", sortedUsers.size(), order);
-            return sortedUsers;
-        } catch (Exception e) {
-            Log.error("Ошибка при сортировке пользователей по дате: {}", e.getMessage(), e);
-            throw e;
-        }
+    private UserResponse convertToResponse(UserEntity user) {
+        return UserResponse.builder()
+                .userId(user.getUserId())
+                .typeId(user.getTypeId())
+                .userName(user.getUserName())
+                .password(user.getPassword()) // Осторожно! Возможно стоит не возвращать пароль
+                .createdDate(user.getCreatedDate())
+                .build();
     }
 }

@@ -74,6 +74,8 @@ public class FunctionRepository {
         }
     }
 
+
+
     // Создание математической функции
     public CompletableFuture<Long> createMathFunction(String expression) {
         return CompletableFuture.supplyAsync(() -> {
