@@ -18,19 +18,19 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionRepositoryTest {
-    static String databaseUrl = "jdbc:postgresql://localhost:5432/function_db_test";
+    static String databaseConfig = "test_config.properties";
     static FunctionRepository repository;
 
     @BeforeAll
     static void setup() {
-        repository = new FunctionRepository(databaseUrl);
+        repository = new FunctionRepository(databaseConfig);
         repository.ensureTables();
     }
 
     // Финальная очистка
     @AfterAll
     static void cleanup() throws SQLException {
-        var database = new DatabaseConnection(databaseUrl);
+        var database = new DatabaseConnection(databaseConfig);
         database.executeUpdate("DROP TABLE points");
         database.executeUpdate("DROP TABLE composite_function");
         database.executeUpdate("DROP TABLE function");

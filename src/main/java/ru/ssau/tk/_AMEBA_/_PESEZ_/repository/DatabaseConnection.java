@@ -1,7 +1,11 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.DatabaseConnectionFailedException;
+
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
 import java.util.Properties;
 
@@ -10,15 +14,17 @@ public class DatabaseConnection {
     private final Properties PROPERTIES = new Properties();
     private Connection connection = null;
 
-    public DatabaseConnection() {
-        this("jdbc:postgresql://localhost:5432/function_db");
-    }
+    public DatabaseConnection(String configFile) {
+        String filepath = DatabaseConnection.class.getClassLoader().getResource("config/" + configFile).getPath();
+        try (var propertiesReader = new FileReader(filepath)) {
+            PROPERTIES.load(propertiesReader);
+        } catch (IOException e) {
+            throw new DatabaseConnectionFailedException(e);
+        }
 
-    public DatabaseConnection(String URL) {
-        String user = "postgres"; // placeholder
-        String password = "postgres"; // placeholder
-        PROPERTIES.setProperty("user", user);
-        PROPERTIES.setProperty("password", password);
+        String URL = PROPERTIES.getProperty("url");
+        String user = PROPERTIES.getProperty("user");
+        String password = PROPERTIES.getProperty("password");
         Log.debug("Connecting to database {} as {}:{}", URL, user, password);
         JDBC_URL = URL;
         try {

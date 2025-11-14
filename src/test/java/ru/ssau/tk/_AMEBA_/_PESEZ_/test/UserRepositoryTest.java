@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 class UserRepositoryTest {
-    static String databaseUrl = "jdbc:postgresql://localhost:5432/function_db_test";
+    static String databaseConfig = "test_config.properties";
     static FunctionRepository functionRepo;
     static UserRepository repository;
 
     @BeforeAll
     static void setup() {
-        functionRepo = new FunctionRepository(databaseUrl);
-        repository = new UserRepository(databaseUrl);
+        functionRepo = new FunctionRepository(databaseConfig);
+        repository = new UserRepository(databaseConfig);
         functionRepo.ensureTables();
         repository.ensureTables();
     }
@@ -27,7 +27,7 @@ class UserRepositoryTest {
     // Финальная очистка
     @AfterAll
     static void cleanup() throws SQLException {
-        var database = new DatabaseConnection(databaseUrl);
+        var database = new DatabaseConnection(databaseConfig);
         database.executeUpdate("DROP TABLE function_ownership");
         database.executeUpdate("DROP TABLE users");
         database.executeUpdate("DROP TABLE composite_function");

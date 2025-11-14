@@ -9,8 +9,8 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 public abstract class Repository {
     protected ThreadLocal<DatabaseConnection> databaseLocal;
 
-    public Repository(String url) {
-        this.databaseLocal = ThreadLocal.withInitial(() -> new DatabaseConnection(url));
+    public Repository(String config) {
+        this.databaseLocal = ThreadLocal.withInitial(() -> new DatabaseConnection(config));
     }
 
     public Repository(DatabaseConnection connection) {

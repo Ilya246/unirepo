@@ -17,17 +17,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 
 class UserServiceTest {
-    static String URL = "jdbc:postgresql://localhost:5432/function_db_test";
+    static String databaseConfig = "test_config.properties";
     static UserService service;
 
     @BeforeAll
     static void setup() {
-        service = new UserService(URL);
+        service = new UserService(databaseConfig);
     }
 
     @AfterAll
     static void cleanup() throws SQLException {
-        var database = new DatabaseConnection(URL);
+        var database = new DatabaseConnection(databaseConfig);
         database.executeUpdate("DROP TABLE function_ownership");
         database.executeUpdate("DROP TABLE users");
         database.executeUpdate("DROP TABLE composite_function");

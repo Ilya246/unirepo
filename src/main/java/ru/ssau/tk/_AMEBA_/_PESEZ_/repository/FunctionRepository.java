@@ -38,8 +38,8 @@ public class FunctionRepository extends Repository {
     public static final int CompositeID = 1 << 2;
     public static final int PureTabulatedID = 1 << 3;
 
-    public FunctionRepository(String url) {
-        super(url);
+    public FunctionRepository(String config) {
+        super(config);
     }
 
     public FunctionRepository(DatabaseConnection connection) {

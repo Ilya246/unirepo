@@ -27,8 +27,8 @@ public class UserRepository extends Repository {
     public static final int NormalUserID = 1;
     public static final int AdminUserID = 1 << 1;
 
-    public UserRepository(String url) {
-        super(url);
+    public UserRepository(String config) {
+        super(config);
     }
 
     public UserRepository(DatabaseConnection connection) {

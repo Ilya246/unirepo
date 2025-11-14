@@ -12,9 +12,9 @@ public class UserService {
     private final FunctionRepository funcRepo;
     private final UserRepository userRepo;
 
-    public UserService(String url) {
-        funcRepo = new FunctionRepository(url);
-        userRepo = new UserRepository(url);
+    public UserService(String config) {
+        funcRepo = new FunctionRepository(config);
+        userRepo = new UserRepository(config);
         funcRepo.ensureTables();
         userRepo.ensureTables();
     }
