@@ -3,12 +3,13 @@ package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 
 
 import java.util.List;
-
+@Repository
 public class UserRepository {
 
     private final SessionFactory sessionFactory;

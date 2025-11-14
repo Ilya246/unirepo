@@ -34,19 +34,6 @@ public class FunctionController {
         return functionService.getFunction(id);
     }
 
-
-    @GetMapping
-    @Operation(summary = "Получение всех функций")
-    public List<FunctionResponse> getAllFunctions() {
-        return functionService.getAllFunctions();
-    }
-
-    @GetMapping("/type/{typeId}")
-    @Operation(summary = "Получение функций по типу")
-    public List<FunctionResponse> getFunctionsByType(@PathVariable Integer typeId) {
-        return functionService.getFunctionsByType(typeId);
-    }
-
     // Специализированные операции
     @PostMapping("/math")
     @Operation(summary = "Создание математической функции")
@@ -60,11 +47,6 @@ public class FunctionController {
         return functionService.createTabulatedFunction(request);
     }
 
-    @PostMapping("/pure-tabulated")
-    @Operation(summary = "Создание чисто табулированной функции")
-    public FunctionResponse createPureTabulatedFunction(@RequestBody @Valid PureTabulatedRequest request) {
-        return functionService.createPureTabulatedFunction(request);
-    }
 
     @PostMapping("/composite")
     @Operation(summary = "Создание композитной функции")
@@ -72,12 +54,6 @@ public class FunctionController {
         return functionService.createCompositeFunction(request);
     }
 
-    // Вычисления
-    @GetMapping("/{id}/math")
-    @Operation(summary = "Получение математической функции")
-    public CompletableFuture<MathFunction> getMathFunction(@PathVariable Long id) {
-        return functionService.getMathFunction(id);
-    }
 
     @GetMapping("/{id}/calculate")
     @Operation(summary = "Вычисление значения функции в точке")

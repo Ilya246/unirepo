@@ -70,7 +70,7 @@ public class FunctionOwnershipController {
         return ownershipService.getOwnerByFunctionId(functionId);
     }
 
-    @GetMapping("/user/{userId}/functions/ordered")
+    @GetMapping("/user/{userId}/functions")
     @Operation(summary = "Получение функций пользователя с сортировкой по дате")
     public List<FunctionEntity> getUserFunctionsOrdered(
             @PathVariable Long userId,

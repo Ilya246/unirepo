@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.utility;
+package ru.ssau.tk._AMEBA_._PESEZ_;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

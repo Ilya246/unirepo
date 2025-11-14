@@ -1,26 +1,21 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
-
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Repository;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.PointsEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.utility.HibernateSessionFactoryUtil;
 
 import java.util.List;
 import java.util.Optional;
-
-
-
+@Repository
 public class PointsRepository {
 
     private final SessionFactory sessionFactory;
 
-    // Передаём SessionFactory при создании репозитория
     public PointsRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
@@ -32,30 +27,38 @@ public class PointsRepository {
             transaction.commit();
         }
     }
+
     public Optional<PointsEntity> findById(FunctionEntity function, double xValue) {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery(
-                            "FROM PointsEntity WHERE function = :function AND id.xValue = :xValue", PointsEntity.class)
-                    .setParameter("function", function)
-                    .setParameter("xValue", xValue)
-                    .uniqueResultOptional();
+            // Используем правильный синтаксис для составного ключа
+            Query<PointsEntity> query = session.createQuery(
+                    "FROM PointsEntity p WHERE p.function = :function AND p.id.xValue = :xValue",
+                    PointsEntity.class);
+            query.setParameter("function", function);
+            query.setParameter("xValue", xValue);
+
+            List<PointsEntity> results = query.getResultList();
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
         }
     }
+
     public List<PointsEntity> findByFunction(FunctionEntity function) {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery(
-                    "FROM PointsEntity WHERE function = :function ORDER BY id.xValue", PointsEntity.class)
-            .setParameter("function", function)
-            .list();
+            Query<PointsEntity> query = session.createQuery(
+                    "FROM PointsEntity p WHERE p.function = :function ORDER BY p.id.xValue",
+                    PointsEntity.class);
+            query.setParameter("function", function);
+            return query.getResultList();
         }
     }
+
     public void updateById(Long functionId, double xValue, Double newYValue) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
             Query<?> query = session.createQuery(
-                    "UPDATE PointsEntity SET yValue = :yValue " +
-                            "WHERE function.funcId = :funcId AND id.xValue = :xValue");
+                    "UPDATE PointsEntity p SET p.yValue = :yValue " +
+                            "WHERE p.function.funcId = :funcId AND p.id.xValue = :xValue");
             query.setParameter("yValue", newYValue);
             query.setParameter("funcId", functionId);
             query.setParameter("xValue", xValue);
@@ -70,7 +73,7 @@ public class PointsRepository {
             Transaction transaction = session.beginTransaction();
 
             Query<?> query = session.createQuery(
-                    "DELETE FROM PointsEntity WHERE function.funcId = :funcId AND id.xValue = :xValue");
+                    "DELETE FROM PointsEntity p WHERE p.function.funcId = :funcId AND p.id.xValue = :xValue");
             query.setParameter("funcId", functionId);
             query.setParameter("xValue", xValue);
             query.executeUpdate();
@@ -79,35 +82,36 @@ public class PointsRepository {
         }
     }
 
-
-        public void deleteByFunction(FunctionEntity function) {
+    public void deleteByFunction(FunctionEntity function) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             Query<?> query = session.createQuery(
-                    "DELETE FROM PointsEntity WHERE function = :function");
+                    "DELETE FROM PointsEntity p WHERE p.function = :function");
             query.setParameter("function", function);
             query.executeUpdate();
             transaction.commit();
         }
     }
+
     public long countByFunction(FunctionEntity function) {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery(
-                    "SELECT COUNT(p) FROM PointsEntity p WHERE p.function = :function", Long.class)
-            .setParameter("function", function)
-            .uniqueResult();
+            Query<Long> query = session.createQuery(
+                    "SELECT COUNT(p) FROM PointsEntity p WHERE p.function = :function", Long.class);
+            query.setParameter("function", function);
+            return query.uniqueResult();
         }
     }
 
     public List<PointsEntity> findAll() {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("FROM PointsEntity", PointsEntity.class).list();
+            Query<PointsEntity> query = session.createQuery("FROM PointsEntity", PointsEntity.class);
+            return query.getResultList();
         }
     }
 
     public void saveAll(List<PointsEntity> points) {
-        var session = sessionFactory.openSession();
-        var transaction = session.beginTransaction();
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
 
         try {
             for (int i = 0; i < points.size(); i++) {
@@ -127,9 +131,4 @@ public class PointsRepository {
             session.close();
         }
     }
-
-
-
-
-
 }
