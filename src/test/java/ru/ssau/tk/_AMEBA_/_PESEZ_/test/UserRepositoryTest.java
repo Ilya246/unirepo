@@ -65,7 +65,7 @@ class UserRepositoryTest {
     void testUpdateUser() {
         int id = repository.createUser(UserType.Normal, "OldName", "OldPass").join();
         
-        repository.updateUser(id, "NewName", "NewPass").join();
+        repository.updateUser(id, "NewName", "NewPass", UserType.Normal).join();
         UserDTO user = repository.getUser(id).join();
         assertEquals("NewName", user.username);
         assertEquals("NewPass", user.password);

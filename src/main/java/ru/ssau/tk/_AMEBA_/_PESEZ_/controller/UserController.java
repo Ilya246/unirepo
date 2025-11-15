@@ -84,7 +84,8 @@ public class UserController extends Controller {
             // PUT /users?id={id}
             if (path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
-                userService.deleteUser(id).join();
+                UserChangeRequest request = parseBody(req, UserChangeRequest.class);
+                userService.updateUser(id, request.username, request.password, request.userType).join();
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);

@@ -82,7 +82,7 @@ public class UserRepository extends Repository {
         });
     }
 
-    public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword) {
+    public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword, UserType newType) {
         return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();

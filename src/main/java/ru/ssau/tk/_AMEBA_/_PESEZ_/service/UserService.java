@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,5 +135,9 @@ public class UserService {
 
     public static void sortFunctionsDate(OwnedFunctionDTO[] in) {
         Arrays.sort(in, Comparator.comparing(dto -> dto.ownership.createdDate));
+    }
+
+    public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword, UserType newType) {
+        return userRepo.updateUser(userId, newUserName, newPassword, newType);
     }
 }
