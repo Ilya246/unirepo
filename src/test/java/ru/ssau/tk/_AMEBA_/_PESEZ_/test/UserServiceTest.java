@@ -7,7 +7,9 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.DatabaseConnection;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.UserService;
 
+import java.io.*;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository.*;
@@ -19,19 +21,27 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 class UserServiceTest {
     static String databaseConfig = "test_config.properties";
     static UserService service;
+    static Properties PROPERTIES = new Properties();
 
     @BeforeAll
     static void setup() {
         service = new UserService(databaseConfig);
+
+        String filepath = DatabaseConnection.class.getClassLoader().getResource("config/" + databaseConfig).getPath();
+        try (var propertiesReader = new FileReader(filepath)) {
+            PROPERTIES.load(propertiesReader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @AfterAll
     static void cleanup() throws SQLException {
         var database = new DatabaseConnection(databaseConfig);
+        database.executeUpdate("DROP TABLE points");
+        database.executeUpdate("DROP TABLE composite_function");
         database.executeUpdate("DROP TABLE function_ownership");
         database.executeUpdate("DROP TABLE users");
-        database.executeUpdate("DROP TABLE composite_function");
-        database.executeUpdate("DROP TABLE points");
         database.executeUpdate("DROP TABLE function");
     }
 
@@ -107,6 +117,9 @@ class UserServiceTest {
 
     @Test
     void benchmarkManyUsers() {
+        if (PROPERTIES.getProperty("bench").equals("false"))
+            return;
+
         Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);
         int startCount = 1000;
         int countDelta = 1000;

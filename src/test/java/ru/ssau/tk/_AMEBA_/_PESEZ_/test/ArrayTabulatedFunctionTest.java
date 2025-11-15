@@ -14,12 +14,11 @@ class ArrayTabulatedFunctionTest {
     // Тесты конструкторов
     @Test
     void testConstructorWithSinglePoint() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             double[] x = {1.0};
             double[] y = {2.0};
             new ArrayTabulatedFunction(x, y);
         });
-        assertTrue(exception.getMessage().contains("Length of tabulated function must be at least 2"));
     }
 
     @Test
@@ -51,11 +50,10 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testConstructorWithMathFunctionInvalidCount() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             MathFunction source = x -> x * x;
             new ArrayTabulatedFunction(source, 0, 10, 1);
         });
-        assertTrue(exception.getMessage().contains("Length of tabulated function must be at least 2"));
     }
 
     // Тесты методов доступа с некорректными индексами

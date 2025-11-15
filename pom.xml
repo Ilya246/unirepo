@@ -7,6 +7,7 @@
     <groupId>ru.ssau.tk._AMEBA_._PESEZ_</groupId>
     <artifactId>_AMEBA_-_PESEZ_</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <properties>
         <maven.compiler.source>26</maven.compiler.source>
@@ -74,6 +75,14 @@
                 <configuration>
                     <source>16</source>
                     <target>16</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.opoo.maven</groupId>
+                <artifactId>tomcat9-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <path>/</path>
                 </configuration>
             </plugin>
         </plugins>

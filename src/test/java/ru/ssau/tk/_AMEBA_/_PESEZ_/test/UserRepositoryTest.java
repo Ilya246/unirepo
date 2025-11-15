@@ -28,10 +28,10 @@ class UserRepositoryTest {
     @AfterAll
     static void cleanup() throws SQLException {
         var database = new DatabaseConnection(databaseConfig);
+        database.executeUpdate("DROP TABLE points");
+        database.executeUpdate("DROP TABLE composite_function");
         database.executeUpdate("DROP TABLE function_ownership");
         database.executeUpdate("DROP TABLE users");
-        database.executeUpdate("DROP TABLE composite_function");
-        database.executeUpdate("DROP TABLE points");
         database.executeUpdate("DROP TABLE function");
     }
 

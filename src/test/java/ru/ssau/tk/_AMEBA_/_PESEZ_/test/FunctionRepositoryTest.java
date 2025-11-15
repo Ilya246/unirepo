@@ -12,7 +12,10 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,11 +23,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class FunctionRepositoryTest {
     static String databaseConfig = "test_config.properties";
     static FunctionRepository repository;
+    static Properties PROPERTIES = new Properties();
 
     @BeforeAll
     static void setup() {
         repository = new FunctionRepository(databaseConfig);
         repository.ensureTables();
+
+        String filepath = DatabaseConnection.class.getClassLoader().getResource("config/" + databaseConfig).getPath();
+        try (var propertiesReader = new FileReader(filepath)) {
+            PROPERTIES.load(propertiesReader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Финальная очистка
@@ -174,11 +185,13 @@ class FunctionRepositoryTest {
 
     @Test
     void benchmarkWriteGetMany() {
+        if (PROPERTIES.getProperty("bench").equals("false"))
+            return;
+
         Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);
         int startCount = 1000;
         int countDelta = 1000;
         int testAmount = 5;
-        var writeTimes = new float[testAmount];
         for (int count = startCount, it = 0; it < testAmount; count += countDelta, it++) {
             int pointCount = 50;
             var functions = new CompletableFuture[count];
@@ -198,7 +211,6 @@ class FunctionRepositoryTest {
             CompletableFuture.allOf(functions).join();
             float tookMillis = System.currentTimeMillis() - startTime;
             float tookSeconds = tookMillis / 1000f;
-            writeTimes[it] = tookSeconds;
             Log.warn("Write of {} tabulated functions took {}s, {}/s", count, tookSeconds, count / tookSeconds);
         }
     }
