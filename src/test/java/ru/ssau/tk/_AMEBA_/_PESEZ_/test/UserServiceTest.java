@@ -47,10 +47,10 @@ class UserServiceTest {
 
     @Test
     void testAddGetDeleteUser() {
-        int userId = service.createUser(NormalUserID, "MyUser", "MyPassword").join();
+        int userId = service.createUser(UserType.Normal, "MyUser", "MyPassword").join();
 
         UserDTO user = service.getUser(userId).join();
-        assertEquals(NormalUserID, user.userType);
+        assertEquals(UserType.Normal, user.userType);
         assertEquals(userId, user.userId);
         assertEquals("MyPassword", user.password);
         assertEquals("MyUser", user.username);
@@ -65,7 +65,7 @@ class UserServiceTest {
 
     @Test
     void testAddGetDeleteFunction() {
-        int userId = service.createUser(NormalUserID, "TestUser", "TestPassword").join();
+        int userId = service.createUser(UserType.Normal, "TestUser", "TestPassword").join();
 
         String expr = "3x+5";
         int funcId = service.createUserFunction(userId, "MyFunc", expr).join();
@@ -83,7 +83,7 @@ class UserServiceTest {
 
     @Test
     void testSeveralFunctions() {
-        int userId = service.createUser(NormalUserID, "TestUser2", "TestPassword2").join();
+        int userId = service.createUser(UserType.Normal, "TestUser2", "TestPassword2").join();
 
         String expr = "3x+5";
         int mathId = service.createUserFunction(userId, "MyMath", expr).join();
@@ -131,7 +131,7 @@ class UserServiceTest {
             int funcTotal = count * functionsCount;
             for (int i = 0; i < count; i++) {
                 final String nameFirst = "Func" + count + "," + i + ",";
-                users[i] = service.createUser(NormalUserID, "SortUser" + i, "SortPassword" + i).thenAccept(userId -> {
+                users[i] = service.createUser(UserType.Normal, "SortUser" + i, "SortPassword" + i).thenAccept(userId -> {
                     String expr = Math.random() + "x+" + Math.random();
                     CompletableFuture<Integer>[] functions = new CompletableFuture[functionsCount];
                     for (int j = 0; j < functionsCount; j++) {

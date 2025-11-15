@@ -24,8 +24,23 @@ public class UserRepository extends Repository {
     private static final String FUNCTION_OWNERSHIP_SELECT = readCommand("FunctionOwnershipRead");
     private static final String FUNCTION_OWNERSHIP_SELECT_MANY = readCommand("FunctionOwnershipReadMany");
 
-    public static final int NormalUserID = 1;
-    public static final int AdminUserID = 1 << 1;
+    public enum UserType {
+        Normal(1),
+        Admin(1 << 1);
+
+        public final int typeId;
+        UserType(int typeId) {
+            this.typeId = typeId;
+        }
+
+        public static UserType fromInt(int from) {
+            return switch (from) {
+                case 1 -> Normal;
+                case 1 << 1 -> Admin;
+                default -> throw new IllegalArgumentException("Illegal user type " + from);
+            };
+        }
+    }
 
     public UserRepository(String config) {
         super(config);
@@ -54,7 +69,7 @@ public class UserRepository extends Repository {
         database.executeUpdate(FUNCTION_OWNERSHIP_ENSURE_TABLE);
     }
 
-    public CompletableFuture<Integer> createUser(int typeId, String userName, String password) {
+    public CompletableFuture<Integer> createUser(UserType typeId, String userName, String password) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
@@ -97,7 +112,7 @@ public class UserRepository extends Repository {
                 if (!rs.first())
                     return null;
                 return new UserDTO(rs.getInt("user_id"),
-                        rs.getInt("type_id"),
+                        UserType.fromInt(rs.getInt("type_id")),
                         rs.getString("user_name"),
                         rs.getString("password"),
                         rs.getTimestamp("created_date"));
@@ -188,7 +203,7 @@ public class UserRepository extends Repository {
                 rs.first();
                 for (int i = 0; i < count; i++) {
                     result[i] = new UserDTO(rs.getInt("user_id"),
-                            rs.getInt("type_id"),
+                            UserType.fromInt(rs.getInt("type_id")),
                             rs.getString("user_name"),
                             rs.getString("password"),
                             rs.getTimestamp("created_date"));

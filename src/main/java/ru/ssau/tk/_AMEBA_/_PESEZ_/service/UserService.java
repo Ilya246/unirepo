@@ -65,7 +65,7 @@ public class UserService {
 
             var userList = new ArrayList<UserDTO>();
             for (UserDTO user : users) {
-                if ((user.userType & types) != 0)
+                if ((user.userType.typeId & types) != 0)
                     userList.add(user);
             }
             return userList.toArray(new UserDTO[0]);
@@ -124,7 +124,7 @@ public class UserService {
         });
     }
 
-    public CompletableFuture<Integer> createUser(int typeId, String username, String password) {
+    public CompletableFuture<Integer> createUser(UserRepository.UserType typeId, String username, String password) {
         return userRepo.createUser(typeId, username, password);
     }
 

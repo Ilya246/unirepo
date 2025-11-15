@@ -40,7 +40,7 @@ class UserRepositoryTest {
         String username = "TestUser";
         String password = "password";
         // Пишем в базу данных
-        int id = repository.createUser(NormalUserID, username, password).join();
+        int id = repository.createUser(UserType.Normal, username, password).join();
         UserDTO user = repository.getUser(id).join();
         assertEquals(username, user.username);
         assertEquals(password, user.password);
@@ -52,18 +52,18 @@ class UserRepositoryTest {
 
     @Test
     void testAdminUser() {
-        int id = repository.createUser(AdminUserID, "AdminUser", "adminPass").join();
+        int id = repository.createUser(UserType.Admin, "AdminUser", "adminPass").join();
         UserDTO user = repository.getUser(id).join();
         assertEquals("AdminUser", user.username);
         assertEquals("adminPass", user.password);
-        assertEquals(AdminUserID, user.userType);
+        assertEquals(UserType.Admin, user.userType);
 
         repository.deleteUser(id).join();
     }
 
     @Test
     void testUpdateUser() {
-        int id = repository.createUser(NormalUserID, "OldName", "OldPass").join();
+        int id = repository.createUser(UserType.Normal, "OldName", "OldPass").join();
         
         repository.updateUser(id, "NewName", "NewPass").join();
         UserDTO user = repository.getUser(id).join();
@@ -75,9 +75,9 @@ class UserRepositoryTest {
 
     @Test
     void testGetUsers() {
-        repository.createUser(NormalUserID, "User1", "Pass1").join();
-        repository.createUser(NormalUserID, "User2", "Pass2").join();
-        repository.createUser(NormalUserID, "User3", "Pass3").join();
+        repository.createUser(UserType.Normal, "User1", "Pass1").join();
+        repository.createUser(UserType.Normal, "User2", "Pass2").join();
+        repository.createUser(UserType.Normal, "User3", "Pass3").join();
 
         UserDTO[] all = repository.getAllUsers().join();
         assertTrue(Arrays.stream(all).anyMatch(a -> a.username.equals("User1") && a.password.equals("Pass1")));
@@ -87,7 +87,7 @@ class UserRepositoryTest {
 
     @Test
     void testCRUDFunctionOwnership() {
-        int userId = repository.createUser(NormalUserID, "FunctionOwner", "testPass").join();
+        int userId = repository.createUser(UserType.Normal, "FunctionOwner", "testPass").join();
         int funcId = functionRepo.createMathFunction("x^2").join();
 
         String funcName = "Quadratic";
@@ -108,7 +108,7 @@ class UserRepositoryTest {
 
     @Test
     void testMultipleFunctionOwnership() {
-        int userId = repository.createUser(NormalUserID, "SeveralFunctionOwner", "testPass").join();
+        int userId = repository.createUser(UserType.Normal, "SeveralFunctionOwner", "testPass").join();
         int funcId1 = functionRepo.createMathFunction("2x^2").join();
         int funcId2 = functionRepo.createMathFunction("3x^3").join();
         int funcId3 = functionRepo.createMathFunction("4x^4").join();
