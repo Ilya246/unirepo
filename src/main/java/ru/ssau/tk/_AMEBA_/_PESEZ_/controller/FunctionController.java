@@ -62,25 +62,25 @@ public class FunctionController extends Controller {
                 case "/math" -> {
                     MathFunctionCreateRequest request = parseBody(req, MathFunctionCreateRequest.class);
                     int response = functionService.createMathFunction(request.expression).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /functions/tabulated
                 case "/tabulated" -> {
                     TabulatedFunctionCreateRequest request = parseBody(req, TabulatedFunctionCreateRequest.class);
                     int response = functionService.createTabulated(request.expression, request.xFrom, request.xTo, request.pointCount).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /functions/pure-tabulated
                 case "/pure-tabulated" -> {
                     PureTabulatedCreateRequest request = parseBody(req, PureTabulatedCreateRequest.class);
                     int response = functionService.createPureTabulated(request.xValues, request.yValues).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /functions/composite
                 case "/composite" -> {
                     CompositeFunctionCreateRequest request = parseBody(req, CompositeFunctionCreateRequest.class);
                     int response = functionService.createComposite(request.innerId, request.outerId).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }

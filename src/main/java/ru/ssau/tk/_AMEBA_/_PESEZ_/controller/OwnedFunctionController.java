@@ -9,7 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
 
-@WebServlet("/owned-functions")
+@WebServlet("/owned-functions/*")
 public class OwnedFunctionController extends Controller {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -63,28 +63,28 @@ public class OwnedFunctionController extends Controller {
                 case "/math" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     int response = userService.createUserFunction(userId, request.name, ((MathFunctionCreateRequest)request.funcParams).expression).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/tabulated
                 case "/tabulated" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (TabulatedFunctionCreateRequest)request.funcParams;
                     int response = userService.createUserTabulatedFunction(userId, request.name, params.expression, params.xFrom, params.xTo, params.pointCount).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/pure-tabulated
                 case "/pure-tabulated" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (PureTabulatedCreateRequest)request.funcParams;
                     int response = userService.createUserPureTabulated(userId, request.name, params.xValues, params.yValues).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/composite
                 case "/composite" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (CompositeFunctionCreateRequest)request.funcParams;
                     int response = userService.createUserComposite(userId, request.name, params.innerId, params.outerId).join();
-                    resp.getWriter().write(response);
+                    resp.getWriter().write(objectMapper.writeValueAsString(response)    );
                 }
                 // POST /owned-functions/own?id={id}&name={name}
                 case "/own" -> {

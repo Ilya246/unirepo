@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
 
-@WebServlet("/points")
+@WebServlet("/points/*")
 public class PointsController extends Controller {
     private FunctionService functionService;
 

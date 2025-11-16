@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
 
-@WebServlet("/composite-functions")
+@WebServlet("/composite-functions/*")
 public class CompositeFunctionController extends Controller {
     private FunctionService functionService;
 
