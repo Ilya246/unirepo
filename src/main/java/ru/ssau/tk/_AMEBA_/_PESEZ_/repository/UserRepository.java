@@ -73,7 +73,7 @@ public class UserRepository extends Repository {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int userId = database.executeUpdateAndGetId(USER_INSERT, typeId, userName, password);
+                int userId = database.executeUpdateAndGetId(USER_INSERT, typeId.typeId, userName, password);
                 Log.info("Created user {} with ID {}", userName, userId);
                 return userId;
             } catch (SQLException e) {
@@ -86,7 +86,7 @@ public class UserRepository extends Repository {
         return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                database.executeUpdate(USER_UPDATE, newUserName, newPassword, userId);
+                database.executeUpdate(USER_UPDATE, newUserName, newPassword, newType.typeId, userId);
                 Log.info("Updated user ID {}", userId);
             } catch (SQLException e) {
                 throw new CompletionException(e);
@@ -134,12 +134,12 @@ public class UserRepository extends Repository {
         });
     }
 
-    public CompletableFuture<Void> updateFunctionOwnership(int userId, int oldFuncId, int newFuncId) {
+    public CompletableFuture<Void> updateFunctionOwnership(int userId, int funcId, String newName) {
         return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                database.executeUpdate(FUNCTION_OWNERSHIP_UPDATE, newFuncId, userId, oldFuncId);
-                Log.info("Updated ownership for user {} from {} to {}", userId, oldFuncId, newFuncId);
+                database.executeUpdate(FUNCTION_OWNERSHIP_UPDATE, newName, userId, funcId);
+                Log.info("Updated ownership {} for user {} to name {}", funcId, userId, newName);
             } catch (SQLException e) {
                 throw new CompletionException(e);
             }

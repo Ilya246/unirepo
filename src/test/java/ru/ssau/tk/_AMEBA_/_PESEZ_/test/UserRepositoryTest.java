@@ -96,13 +96,14 @@ class UserRepositoryTest {
         assertEquals(funcId, ownership.funcId);
         assertEquals(funcName, ownership.funcName);
 
-        int newFuncId = functionRepo.createMathFunction("x^3").join();
-        repository.updateFunctionOwnership(userId, funcId, newFuncId).join();
-        ownership = repository.getFunctionOwnership(userId, newFuncId).join();
-        assertEquals(newFuncId, ownership.funcId);
+        String newName = "New";
+        repository.updateFunctionOwnership(userId, funcId, newName).join();
+        ownership = repository.getFunctionOwnership(userId, funcId).join();
+        assertEquals(funcId, ownership.funcId);
+        assertEquals(newName, ownership.funcName);
 
-        repository.removeFunctionOwnership(userId, newFuncId).join();
-        ownership = repository.getFunctionOwnership(userId, newFuncId).join();
+        repository.removeFunctionOwnership(userId, funcId).join();
+        ownership = repository.getFunctionOwnership(userId, funcId).join();
         assertNull(ownership);
     }
 

@@ -23,7 +23,7 @@ public class PointsController extends Controller {
         resp.setContentType("application/json");
         try {
             // GET /points?id={id}
-            if (path.isEmpty()) {
+            if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 PointsDTO points = functionService.getPoints(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(points));
@@ -39,7 +39,7 @@ public class PointsController extends Controller {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
         // PUT /points?id={id}&x={x}&y={y}
-        if (path.isEmpty()) {
+        if (path == null || path.isEmpty()) {
             int id = Integer.parseInt(req.getParameter("id"));
             double x = Double.parseDouble(req.getParameter("x"));
             double y = Double.parseDouble(req.getParameter("y"));
@@ -54,7 +54,7 @@ public class PointsController extends Controller {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
         // DELETE /points?id={id}&x={x}
-        if (path.isEmpty()) {
+        if (path == null || path.isEmpty()) {
             int id = Integer.parseInt(req.getParameter("id"));
             double x = Double.parseDouble(req.getParameter("x"));
             functionService.deletePoint(id, x).join();

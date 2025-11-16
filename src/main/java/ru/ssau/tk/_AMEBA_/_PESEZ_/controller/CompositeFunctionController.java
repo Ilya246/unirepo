@@ -23,7 +23,7 @@ public class CompositeFunctionController extends Controller {
         resp.setContentType("application/json");
         try {
             // GET /composite-functions?id={id}
-            if (path.isEmpty()) {
+            if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 CompositeFunctionDTO function = functionService.getCompositeData(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(function));

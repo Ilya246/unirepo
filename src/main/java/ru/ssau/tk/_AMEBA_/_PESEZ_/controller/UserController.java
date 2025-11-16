@@ -23,15 +23,15 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            // GET /users
+            if (path == null || path.isEmpty()) {
+                UserDTO[] result = userService.getUsers().join();
+                resp.getWriter().write(objectMapper.writeValueAsString(result));
             // GET /users/user?id={id}
-            if (path.matches("/user")) {
+            } else if (path.matches("/user")) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 UserDTO user = userService.getUser(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(user));
-            // GET /users
-            } else if (path.matches("")) {
-                UserDTO[] result = userService.getUsers().join();
-                resp.getWriter().write(objectMapper.writeValueAsString(result));
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
@@ -46,7 +46,7 @@ public class UserController extends Controller {
         resp.setContentType("application/json");
         try {
             // POST /users
-            if (path.isEmpty()) {
+            if (path == null || path.isEmpty()) {
                 UserCreateRequest request = parseBody(req, UserCreateRequest.class);
                 int response = userService.createUser(request.userType, request.username, request.password).join();
                 resp.getWriter().write(response);
@@ -64,7 +64,7 @@ public class UserController extends Controller {
         resp.setContentType("application/json");
         try {
             // DELETE /users?id={id}
-            if (path.isEmpty()) {
+            if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 userService.deleteUser(id).join();
                 resp.setStatus(HttpServletResponse.SC_OK);
@@ -82,7 +82,7 @@ public class UserController extends Controller {
         resp.setContentType("application/json");
         try {
             // PUT /users?id={id}
-            if (path.isEmpty()) {
+            if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 UserChangeRequest request = parseBody(req, UserChangeRequest.class);
                 userService.updateUser(id, request.username, request.password, request.userType).join();

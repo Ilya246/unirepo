@@ -25,12 +25,12 @@ public class FunctionController extends Controller {
         resp.setContentType("application/json");
         try {
             // GET /functions?id={id}
-            if (path.matches("/\\d+")) {
+            if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 FunctionDTO function = functionService.getFunction(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(function));
             // GET /functions/calculate?id={id}&x={x}
-            } else if (path.matches("/\\d+/calculate")) {
+            } else if (path.equals("/calculate")) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 double x = Double.parseDouble(req.getParameter("x"));
                 double result = functionService.calculateFunction(id, x).join();

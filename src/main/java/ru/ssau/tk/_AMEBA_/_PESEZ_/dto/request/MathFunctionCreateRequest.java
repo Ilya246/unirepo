@@ -1,9 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.request;
 
 import java.io.Serial;
-import java.io.Serializable;
 
-public class MathFunctionCreateRequest implements Serializable {
+public class MathFunctionCreateRequest implements FunctionCreateRequest {
     @Serial
     private static final long serialVersionUID = 5375409949798463584L;
 

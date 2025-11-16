@@ -125,6 +125,14 @@ public class UserService {
         });
     }
 
+    public CompletableFuture<Void> addOwnership(int userId, int funcId, String name) {
+        return userRepo.addFunctionOwnership(userId, funcId, name);
+    }
+
+    public CompletableFuture<Void> updateOwnership(int userId, int funcId, String newName) {
+        return userRepo.updateFunctionOwnership(userId, funcId, newName);
+    }
+
     public CompletableFuture<Integer> createUser(UserRepository.UserType typeId, String username, String password) {
         return userRepo.createUser(typeId, username, password);
     }
