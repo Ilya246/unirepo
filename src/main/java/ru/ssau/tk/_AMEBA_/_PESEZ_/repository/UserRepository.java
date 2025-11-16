@@ -14,6 +14,7 @@ public class UserRepository extends Repository {
     private static final String USER_INSERT = readCommand("UserCreate");
     private static final String USER_DELETE = readCommand("UserDelete");
     private static final String USER_SELECT = readCommand("UserRead");
+    private static final String USER_GET = readCommand("UserGet");
     private static final String USER_SELECT_ALL = readCommand("UserReadAll");
     private static final String USER_UPDATE = readCommand("UserUpdate");
 
@@ -109,6 +110,22 @@ public class UserRepository extends Repository {
     public CompletableFuture<UserDTO> getUser(int userId) {
         return CompletableFuture.supplyAsync(() -> {
             try (ResultSet rs = databaseLocal.get().executeQuery(USER_SELECT, userId)) {
+                if (!rs.first())
+                    return null;
+                return new UserDTO(rs.getInt("user_id"),
+                        UserType.fromInt(rs.getInt("type_id")),
+                        rs.getString("user_name"),
+                        rs.getString("password"),
+                        rs.getTimestamp("created_date"));
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    public CompletableFuture<UserDTO> getUser(String username, String password) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (ResultSet rs = databaseLocal.get().executeQuery(USER_GET, username, password)) {
                 if (!rs.first())
                     return null;
                 return new UserDTO(rs.getInt("user_id"),

@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.PointsDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +23,10 @@ public class PointsController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // GET /points?id={id}
             if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
@@ -38,29 +43,45 @@ public class PointsController extends Controller {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
-        // PUT /points?id={id}&x={x}&y={y}
-        if (path == null || path.isEmpty()) {
-            int id = Integer.parseInt(req.getParameter("id"));
-            double x = Double.parseDouble(req.getParameter("x"));
-            double y = Double.parseDouble(req.getParameter("y"));
-            functionService.updatePoint(id, x, y).join();
-            resp.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            // PUT /points?id={id}&x={x}&y={y}
+            if (path == null || path.isEmpty()) {
+                int id = Integer.parseInt(req.getParameter("id"));
+                double x = Double.parseDouble(req.getParameter("x"));
+                double y = Double.parseDouble(req.getParameter("y"));
+                functionService.updatePoint(id, x, y).join();
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
-        // DELETE /points?id={id}&x={x}
-        if (path == null || path.isEmpty()) {
-            int id = Integer.parseInt(req.getParameter("id"));
-            double x = Double.parseDouble(req.getParameter("x"));
-            functionService.deletePoint(id, x).join();
-            resp.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            // DELETE /points?id={id}&x={x}
+            if (path == null || path.isEmpty()) {
+                int id = Integer.parseInt(req.getParameter("id"));
+                double x = Double.parseDouble(req.getParameter("x"));
+                functionService.deletePoint(id, x).join();
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
 }

@@ -81,6 +81,10 @@ public class UserService {
             return userRepo.getUser(userId);
     }
 
+    public CompletableFuture<UserDTO> getUserByCredentials(String username, String password) {
+        return userRepo.getUser(username, password);
+    }
+
     public CompletableFuture<Void> deleteUser(int userId) {
         return CompletableFuture.runAsync(() -> {
             FunctionOwnershipDTO[] ownerships = userRepo.getFunctionOwnerships(userId).join();

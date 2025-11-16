@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.UserService;
 
 import javax.servlet.annotation.WebServlet;
@@ -10,19 +11,15 @@ import java.io.*;
 
 @WebServlet("/users")
 public class UserController extends Controller {
-    private UserService userService;
-
-    @Override
-    public void init() {
-        super.init();
-        this.userService = new UserService("main.properties");
-    }
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // GET /users
             if (path == null || path.isEmpty()) {
                 UserDTO[] result = userService.getUsers().join();
@@ -45,6 +42,10 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // POST /users
             if (path == null || path.isEmpty()) {
                 UserCreateRequest request = parseBody(req, UserCreateRequest.class);
@@ -63,6 +64,10 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // DELETE /users?id={id}
             if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
@@ -81,6 +86,10 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // PUT /users?id={id}
             if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));

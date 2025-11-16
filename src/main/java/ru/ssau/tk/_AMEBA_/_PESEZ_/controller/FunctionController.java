@@ -3,6 +3,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
+import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -24,6 +25,10 @@ public class FunctionController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // GET /functions?id={id}
             if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
@@ -48,6 +53,10 @@ public class FunctionController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             switch (path) {
                 // POST /functions/math
                 case "/math" -> {

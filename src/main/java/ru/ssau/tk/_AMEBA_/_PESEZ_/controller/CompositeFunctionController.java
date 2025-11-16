@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.CompositeFunctionDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +23,10 @@ public class CompositeFunctionController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
             // GET /composite-functions?id={id}
             if (path == null || path.isEmpty()) {
                 int id = Integer.parseInt(req.getParameter("id"));
