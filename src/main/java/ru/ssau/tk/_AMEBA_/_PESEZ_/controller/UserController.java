@@ -51,12 +51,14 @@ public class UserController extends Controller {
                 UserCreateRequest request = parseBody(req, UserCreateRequest.class);
                 int response = userService.createUser(request.userType, request.username, request.password).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(response));
+                Log.info("Registered new user {} of role {} with ID {}", request.username, request.userType, response);
             // POST /users/register?username={username}&password={password}
             } else if (path.equals("/register")) {
                 String username = req.getParameter("username");
                 String password = req.getParameter("password");
                 int response = userService.createUser(UserRepository.UserType.Normal, username, password).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(response));
+                Log.info("Registered new user {} with ID {}", username, response);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }

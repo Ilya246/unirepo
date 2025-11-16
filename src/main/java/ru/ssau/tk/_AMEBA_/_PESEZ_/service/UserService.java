@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InvalidLoginException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
@@ -138,7 +139,14 @@ public class UserService {
     }
 
     public CompletableFuture<Integer> createUser(UserRepository.UserType typeId, String username, String password) {
-        return userRepo.createUser(typeId, username, password);
+        return CompletableFuture.supplyAsync(() -> {
+            if (username.isEmpty())
+                throw new InvalidLoginException("Username cannot be empty.");
+            if (password.isEmpty())
+                throw new InvalidLoginException("Password cannot be empty.");
+
+            return userRepo.createUser(typeId, username, password).join();
+        });
     }
 
     public static void sortUsersDate(UserDTO[] in) {
