@@ -26,13 +26,13 @@ class PointsRepositoryTest extends BaseRepositoryTest {
         FunctionEntity function = new FunctionEntity(1, "x^2");
         functionRepository.save(function);
 
-        PointsEntity point = new PointsEntity(function, 2.0, 4.0);
+        PointsEntity point = new PointsEntity(function, 2.5, 4.0);
         pointsRepository.save(point);
 
-        Optional<PointsEntity> found = pointsRepository.findById(function, 2.0);
+        Optional<PointsEntity> found = pointsRepository.findById(function, 2.5);
 
         assertTrue(found.isPresent(), "Точка должна быть найдена");
-        assertEquals(2.0, found.get().getXValue(), 0.001);
+        assertEquals(2.5, found.get().getXValue(), 0.001);
         assertEquals(4.0, found.get().getYValue(), 0.001);
         assertEquals(function.getFuncId(), found.get().getFunction().getFuncId());
     }

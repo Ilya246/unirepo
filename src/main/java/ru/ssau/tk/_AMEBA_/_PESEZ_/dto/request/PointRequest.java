@@ -3,6 +3,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
 
 
 @Getter
@@ -12,8 +13,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class PointRequest {
-    Long functionId;
-    double xValue;
-    double yValue;
+     Long functionId;
+     Double xValue;
+     Double yValue;
 }

@@ -14,7 +14,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeFunctionRequest {
-    FunctionEntity compositeFunction;
-    FunctionEntity innerFunction;
-    FunctionEntity outerFunction;
+    private Long compositeFunctionId;
+    private Long innerFunctionId;
+    private Long outerFunctionId;
 }

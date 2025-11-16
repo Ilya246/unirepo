@@ -23,12 +23,12 @@ public class PointsRepository {
     public void save(PointsEntity points) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.persist(points);
+            session.merge(points);
             transaction.commit();
         }
     }
 
-    public Optional<PointsEntity> findById(FunctionEntity function, double xValue) {
+    public Optional<PointsEntity> findById(FunctionEntity function, Double xValue) {
         try (Session session = sessionFactory.openSession()) {
             // Используем правильный синтаксис для составного ключа
             Query<PointsEntity> query = session.createQuery(
@@ -52,7 +52,7 @@ public class PointsRepository {
         }
     }
 
-    public void updateById(Long functionId, double xValue, Double newYValue) {
+    public void updateById(Long functionId, Double xValue, Double newYValue) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
@@ -68,7 +68,7 @@ public class PointsRepository {
         }
     }
 
-    public void deleteById(Long functionId, double xValue) {
+    public void deleteById(Long functionId, Double xValue) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
 
@@ -115,7 +115,7 @@ public class PointsRepository {
 
         try {
             for (int i = 0; i < points.size(); i++) {
-                session.persist(points.get(i));
+                session.merge(points.get(i));
                 if (i % 50 == 0) {
                     session.flush();
                     session.clear();

@@ -23,7 +23,7 @@ public class FunctionOwnershipRepository {
     public void save(FunctionOwnershipEntity ownership){
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.persist(ownership);
+            session.merge(ownership);
             transaction.commit();
         }
     }

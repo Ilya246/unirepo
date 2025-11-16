@@ -1,6 +1,5 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,8 +12,11 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipId;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionOwnershipService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,24 +25,51 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     private final FunctionOwnershipRepository ownershipRepo;
-    private final ObjectMapper mapper;
+    private final UserRepository userRepo;
+    private final FunctionRepository functionRepo;
 
     @Override
     public FunctionOwnershipResponse create(FunctionOwnershipRequest request) {
-        FunctionOwnershipEntity ownership = mapper.convertValue(request, FunctionOwnershipEntity.class);
+        // Валидация входных данных
+        if (request.getUserId() == null) {
+            throw new CustomException("User ID is required", HttpStatus.BAD_REQUEST);
+        }
+        if (request.getFunctionId() == null) {
+            throw new CustomException("Function ID is required", HttpStatus.BAD_REQUEST);
+        }
 
+        // Находим пользователя и функцию
+        UserEntity user = userRepo.findById(request.getUserId());
+
+        FunctionEntity function = functionRepo.findById(request.getFunctionId());
+
+        // Проверяем, не существует ли уже такая связь
+        Optional<FunctionOwnershipEntity> existingOwnership = ownershipRepo.findById(request.getUserId(), request.getFunctionId());
+        if (existingOwnership.isPresent()) {
+            throw new CustomException("Function ownership already exists for user: " + request.getUserId() + " and function: " + request.getFunctionId(), HttpStatus.CONFLICT);
+        }
+
+        // Создаем entity вручную
+        FunctionOwnershipEntity ownership = new FunctionOwnershipEntity();
+        ownership.setUser(user);
+        ownership.setFunction(function);
+        ownership.setFuncName(request.getFuncName());
+        ownership.setCreatedDate(new Date()); // устанавливаем текущую дату
+
+        // Создаем и устанавливаем composite ID
         FunctionOwnershipId id = new FunctionOwnershipId(request.getUserId(), request.getFunctionId());
         ownership.setId(id);
+
         ownershipRepo.save(ownership);
         log.info("Function ownership created for user: {}, function: {}",
                 request.getUserId(), request.getFunctionId());
 
-        return mapper.convertValue(ownership, FunctionOwnershipResponse.class);
+        return convertToResponse(ownership);
     }
 
     @Override
     public FunctionOwnershipResponse getOwnership(Long userId, Long functionId) {
-        return mapper.convertValue(getOwnershipDb(userId, functionId), FunctionOwnershipResponse.class);
+        return convertToResponse(getOwnershipDb(userId, functionId));
     }
 
     @Override
@@ -51,16 +80,12 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
                         HttpStatus.NOT_FOUND
                 ));
     }
+
     @Override
     public void deleteOwnership(Long userId, Long functionId) {
         FunctionOwnershipEntity ownership = getOwnershipDb(userId, functionId);
-        if (ownership.getId() != null) {
-            ownershipRepo.deleteById(userId, functionId);
-            log.info("Function ownership deleted for user: {}, function: {}", userId, functionId);
-        } else {
-            log.error("Function ownership not found for deletion");
-            throw new CustomException("Function ownership not found", HttpStatus.NOT_FOUND);
-        }
+        ownershipRepo.deleteById(userId, functionId);
+        log.info("Function ownership deleted for user: {}, function: {}", userId, functionId);
     }
 
     @Override
@@ -95,17 +120,22 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     public FunctionOwnershipResponse updateOwnership(Long userId, Long functionId, FunctionOwnershipRequest request) {
         FunctionOwnershipEntity ownership = getOwnershipDb(userId, functionId);
 
-        if (ownership.getId() != null) {
-            ownership.setFuncName(request.getFuncName() == null ? ownership.getFuncName() : request.getFuncName());
-
-            ownershipRepo.updateById(userId, functionId, ownership.getFuncName());
+        // Обновляем только funcName, если он предоставлен
+        if (request.getFuncName() != null) {
+            ownership.setFuncName(request.getFuncName());
+            ownershipRepo.updateById(userId, functionId, request.getFuncName());
             log.info("Function ownership updated for user: {}, function: {}", userId, functionId);
-        } else {
-            log.error("Function ownership not found for update");
-            throw new CustomException("Function ownership not found", HttpStatus.NOT_FOUND);
         }
 
-        return mapper.convertValue(ownership, FunctionOwnershipResponse.class);
+        return convertToResponse(ownership);
     }
 
+    // Ручное преобразование Entity в Response
+    private FunctionOwnershipResponse convertToResponse(FunctionOwnershipEntity ownership) {
+        FunctionOwnershipResponse response = new FunctionOwnershipResponse();
+        response.setUserId(ownership.getUser().getUserId());
+        response.setFunctionId(ownership.getFunction().getFuncId());
+        response.setFuncName(ownership.getFuncName());
+        return response;
+    }
 }

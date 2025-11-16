@@ -55,7 +55,7 @@ public class FunctionRepository {
     public void save(FunctionEntity function) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.persist(function);
+            session.merge(function);
             transaction.commit();
         }
     }

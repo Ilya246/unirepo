@@ -24,16 +24,20 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public PointResponse createPoint(PointRequest request) {
+        // Находим функцию и проверяем, что она существует
         FunctionEntity function = functionRepo.findById(request.getFunctionId());
         if (function == null) {
             throw new CustomException("Function not found with id: " + request.getFunctionId(), HttpStatus.NOT_FOUND);
         }
 
+
+        // Проверяем, не существует ли уже точка с таким xValue для этой функции
         pointsRepo.findById(function, request.getXValue())
                 .ifPresent(point -> {
                     throw new CustomException("Point already exists for function " + request.getFunctionId() + " with x=" + request.getXValue(), HttpStatus.CONFLICT);
                 });
 
+        // Создаем новую точку
         PointsEntity point = new PointsEntity(function, request.getXValue(), request.getYValue());
         pointsRepo.save(point);
 

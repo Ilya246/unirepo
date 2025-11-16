@@ -19,11 +19,11 @@ import java.io.Serializable;
 @ToString
 public class PointId implements Serializable {
 
-    @Column(name = "func_Id")
-    private Long functionId;  // переименовал для ясности
+    @Column(name = "func_Id", nullable = false)
+    private Long functionId;
 
-    @Column(name = "x_Value")
-    private double xValue;
+    @Column(name = "x_Value", nullable = false)
+    private Double xValue;
 
 
 }

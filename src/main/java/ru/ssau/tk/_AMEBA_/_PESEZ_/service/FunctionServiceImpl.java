@@ -130,19 +130,19 @@ public class FunctionServiceImpl implements FunctionService {
     @Override
     public CompositeFunctionResponse createCompositeFunction(CompositeFunctionRequest request) {
         try {
-            Long innerFuncId = request.getInnerFunction().getFuncId();
-            Long outerFuncId = request.getOuterFunction().getFuncId();
+            Long innerFuncId = request.getInnerFunctionId();
+            Long outerFuncId = request.getOuterFunctionId();
 
             Long compositeFuncId = functionRepo.createComposite(innerFuncId, outerFuncId).get();
 
-            FunctionEntity compositeFunction = getFunctionDb(compositeFuncId);
+            /*FunctionEntity compositeFunction = getFunctionDb(compositeFuncId);
             FunctionEntity innerFunction = getFunctionDb(innerFuncId);
-            FunctionEntity outerFunction = getFunctionDb(outerFuncId);
+            FunctionEntity outerFunction = getFunctionDb(outerFuncId);*/
 
             CompositeFunctionResponse response = new CompositeFunctionResponse();
-            response.setCompositeFunction(compositeFunction);
-            response.setInnerFunction(innerFunction);
-            response.setOuterFunction(outerFunction);
+            response.setCompositeFunctionId(compositeFuncId);
+            response.setInnerFunctionId(innerFuncId);
+            response.setOuterFunctionId(outerFuncId);
 
             log.info("Composite function created with id: {}", compositeFuncId);
             return response;

@@ -15,7 +15,7 @@ import lombok.*;
 @ToString
 public class CompositeFunctionEntity {
     @Id
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "func_Id")
     private FunctionEntity compositeFunction;
 

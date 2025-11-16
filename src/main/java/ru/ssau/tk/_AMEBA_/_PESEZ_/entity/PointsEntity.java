@@ -1,5 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.entity;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -19,14 +20,15 @@ public class PointsEntity {
     private PointId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("functionId")
     @JoinColumn(name = "func_Id", insertable = false, updatable = false)
     private FunctionEntity function;
 
     @Column(name = "y_Value")
-    private double yValue;
+    private Double yValue;
 
 
-    public PointsEntity(FunctionEntity function, double xValue, double yValue) {
+    public PointsEntity(FunctionEntity function, Double xValue, Double yValue) {
         this.id = new PointId(function.getFuncId(), xValue);
         this.function = function;
         this.yValue = yValue;
@@ -36,16 +38,16 @@ public class PointsEntity {
         return "(" + id.getXValue() + ", " + yValue + ")";
     }
 
-    public double distanceToOrigin() {
+    public Double distanceToOrigin() {
         return Math.sqrt(id.getXValue() * id.getXValue() + yValue * yValue);
     }
 
     // Геттеры для удобного доступа
-    public double getXValue() {
+    public Double getXValue() {
         return id.getXValue();
     }
 
-    public void setXValue(double xValue) {
+    public void setXValue(Double xValue) {
         this.id.setXValue(xValue);
     }
 

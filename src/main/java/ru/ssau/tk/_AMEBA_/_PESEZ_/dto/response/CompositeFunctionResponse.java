@@ -14,5 +14,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeFunctionResponse extends CompositeFunctionRequest {
-    FunctionEntity compositeFunction;
+    private Long compositeFunctionId;
+    private Long innerFunctionId;
+    private Long outerFunctionId;
 }

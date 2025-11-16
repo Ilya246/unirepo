@@ -1,6 +1,5 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,6 +9,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.CompositeFunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.CompositeFunctionRepository;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.CompositeFunctionService;
 
 import java.util.List;
@@ -19,14 +19,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompositeFunctionServiceImpl implements CompositeFunctionService {
     private final CompositeFunctionRepository compositeFunctionRepo;
-    private final ObjectMapper mapper;
+    private final FunctionRepository functionRepository;
 
     @Override
     public CompositeFunctionResponse create(CompositeFunctionRequest request) {
-        CompositeFunctionEntity function = mapper.convertValue(request, CompositeFunctionEntity.class);
+        // Ручное создание Entity вместо ObjectMapper
+        CompositeFunctionEntity function = new CompositeFunctionEntity();
+        function.setCompositeFunction(functionRepository.findById(request.getCompositeFunctionId()));
+        function.setInnerFunction(functionRepository.findById(request.getInnerFunctionId()));
+        function.setOuterFunction(functionRepository.findById(request.getOuterFunctionId()));
+
         compositeFunctionRepo.save(function);
         log.info("Composite function created with id: {}", function.getCompositeFunction().getFuncId());
-        return mapper.convertValue(function, CompositeFunctionResponse.class);
+
+        // Ручное создание Response вместо ObjectMapper
+        return convertToResponse(function);
     }
 
     @Override
@@ -36,7 +43,8 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
 
     @Override
     public CompositeFunctionResponse getFunction(Long id) {
-        return mapper.convertValue(getFunctionDb(id), CompositeFunctionResponse.class);
+        CompositeFunctionEntity function = getFunctionDb(id);
+        return convertToResponse(function);
     }
 
     @Override
@@ -48,16 +56,27 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
     @Override
     public CompositeFunctionResponse update(Long id, CompositeFunctionRequest request) {
         CompositeFunctionEntity function = getFunctionDb(id);
-        if (function.getCompositeFunction().getFuncId() != null) {
-            function.setInnerFunction(request.getInnerFunction() == null ? function.getInnerFunction() : request.getInnerFunction());
-            function.setOuterFunction(request.getOuterFunction() == null ? function.getOuterFunction() : request.getOuterFunction());
 
-            function = compositeFunctionRepo.update(function);
-        } else {
-            log.error("Composite function not found");
+        // Обновляем только не-null поля из запроса
+        if (request.getInnerFunctionId() != null) {
+            function.setInnerFunction(functionRepository.findById(request.getInnerFunctionId()));
         }
-        return mapper.convertValue(function, CompositeFunctionResponse.class);
+        if (request.getOuterFunctionId() != null) {
+            function.setOuterFunction(functionRepository.findById(request.getOuterFunctionId()));
+        }
+
+        function = compositeFunctionRepo.update(function);
+        log.info("Composite function updated with id: {}", id);
+
+        return convertToResponse(function);
     }
 
-
+    // Ручное преобразование Entity в Response (аналогично FunctionServiceImpl)
+    private CompositeFunctionResponse convertToResponse(CompositeFunctionEntity function) {
+        CompositeFunctionResponse response = new CompositeFunctionResponse();
+        response.setCompositeFunctionId(function.getCompositeFunction().getFuncId());
+        response.setInnerFunctionId(function.getInnerFunction().getFuncId());
+        response.setOuterFunctionId(function.getOuterFunction().getFuncId());
+        return response;
+    }
 }

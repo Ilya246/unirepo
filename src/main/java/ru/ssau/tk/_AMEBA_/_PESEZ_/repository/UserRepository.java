@@ -22,7 +22,7 @@ public class UserRepository {
     public void save(UserEntity user) {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.persist(user);
+            session.merge(user);
             transaction.commit();
         }
     }
