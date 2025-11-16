@@ -77,7 +77,7 @@ class UserServiceTest {
         assertEquals(userId, func.ownership.userId);
         assertEquals("MyFunc", func.ownership.funcName);
 
-        service.deleteUserFunction(userId, funcId).join();
+        service.deleteFunctionOwnership(userId, funcId).join();
         assertNull(service.getUserFunction(userId, funcId).join());
     }
 
@@ -110,7 +110,7 @@ class UserServiceTest {
         assertEquals(PureTabulatedID, functions[2].function.funcType);
         assertEquals(CompositeID, functions[3].function.funcType);
 
-        service.deleteUserFunction(userId, tabId).join();
+        service.deleteFunctionOwnership(userId, tabId).join();
         functions = service.getUserFunctions(userId).join();
         assertEquals(3, functions.length);
     }

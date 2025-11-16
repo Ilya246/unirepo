@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
+
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 import javax.servlet.annotation.WebServlet;
@@ -122,6 +123,32 @@ public class OwnedFunctionController extends Controller {
                 int id = Integer.parseInt(req.getParameter("id"));
                 String name = req.getParameter("name");
                 userService.updateOwnership(userId, id, name).join();
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String path = req.getPathInfo();
+        try {
+            UserDTO user = authenticate(req);
+            if (user == null) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            int userId = user.userId;
+            if (hasRequiredRole(user, UserType.Admin) && req.getParameterMap().containsKey("user")) {
+                userId = Integer.parseInt(req.getParameter("user"));
+            }
+            // DELETE /owned-functions?id={id}
+            if (path == null || path.isEmpty()) {
+                int id = Integer.parseInt(req.getParameter("id"));
+                userService.deleteFunctionOwnership(userId, id);
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);

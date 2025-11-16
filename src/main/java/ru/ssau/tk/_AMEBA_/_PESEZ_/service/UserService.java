@@ -53,7 +53,7 @@ public class UserService {
         });
     }
 
-    public CompletableFuture<Void> deleteUserFunction(int userId, int funcId) {
+    public CompletableFuture<Void> deleteFunctionOwnership(int userId, int funcId) {
         return userRepo.removeFunctionOwnership(userId, funcId);
     }
 
