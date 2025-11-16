@@ -1,11 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.request;
 
-import java.io.Serial;
-
 public class TabulatedFunctionCreateRequest implements FunctionCreateRequest {
-    @Serial
-    private static final long serialVersionUID = 2424081206842985076L;
-
     public final String expression;
     public final int pointCount;
     public final double xFrom;

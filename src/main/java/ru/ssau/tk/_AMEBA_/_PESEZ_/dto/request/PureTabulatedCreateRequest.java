@@ -1,11 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.request;
 
-import java.io.Serial;
-
 public class PureTabulatedCreateRequest implements FunctionCreateRequest {
-    @Serial
-    private static final long serialVersionUID = 8581644486022925562L;
-
     public final double[] xValues;
     public final double[] yValues;
 
