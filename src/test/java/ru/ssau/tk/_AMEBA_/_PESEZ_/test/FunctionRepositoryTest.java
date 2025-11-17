@@ -185,7 +185,7 @@ class FunctionRepositoryTest {
 
     @Test
     void benchmarkWriteGetMany() {
-        if (PROPERTIES.getProperty("bench").equals("false"))
+        if (System.getenv(PROPERTIES.getProperty("bench")).equals("false"))
             return;
 
         Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);

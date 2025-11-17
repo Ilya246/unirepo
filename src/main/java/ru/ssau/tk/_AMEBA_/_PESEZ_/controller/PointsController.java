@@ -36,7 +36,31 @@ public class PointsController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String path = req.getPathInfo();
+        resp.setContentType("application/json");
+        try {
+            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            // POST /points?id={id}&x={x}&y={y}
+            if (path == null || path.isEmpty()) {
+                int id = Integer.parseInt(req.getParameter("id"));
+                double x = Double.parseDouble(req.getParameter("x"));
+                double y = Double.parseDouble(req.getParameter("y"));
+                functionService.createPoint(id, x, y).join();
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
 

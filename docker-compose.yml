@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  function-app:
+    build:
+      context: .
+      args:
+        - DB_URL=jdbc:postgresql://localhost:5432/function_db
+        - DB_URL_TEST=jdbc:postgresql://localhost:5432/function_db_test
+    ports:
+      - "8080:8080"
+    network_mode: host

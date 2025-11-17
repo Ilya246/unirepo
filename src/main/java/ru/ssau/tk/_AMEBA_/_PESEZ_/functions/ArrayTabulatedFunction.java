@@ -17,7 +17,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @JsonCreator
     public ArrayTabulatedFunction(@JsonProperty(value = "xValues") double[] xValues, @JsonProperty(value = "yValues") double[] yValues) {
-        Log.debug("Crate {} out of arrays of lengths {} and {}, id: {}",
+        Log.debug("Create {} out of arrays of lengths {} and {}, id: {}",
                 getClass().getSimpleName(), xValues.length, yValues.length, hashCode());
 
         if (xValues.length < 2) throw new IllegalArgumentException("At least 2 points are required");

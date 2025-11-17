@@ -26,7 +26,7 @@ public class TabulatedDifferentialOperator implements DifferentialOperator<Tabul
 
     @Override
     public TabulatedFunction derive(TabulatedFunction function) {
-        Log.debug("Счёт табулированной производной из {}", function.simpleInfo());
+        Log.debug("Calculating tabulated derivative of {}", function.simpleInfo());
         //Получаем точки
         Point[] points = TabulatedFunctionOperationService.asPoints(function);
         int count = points.length;

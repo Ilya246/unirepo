@@ -22,10 +22,10 @@ public class DatabaseConnection {
             throw new DatabaseConnectionFailedException(e);
         }
 
-        String URL = PROPERTIES.getProperty("url");
-        String user = PROPERTIES.getProperty("user");
-        String password = PROPERTIES.getProperty("password");
-        Log.debug("Connecting to database {} as {}:{}", URL, user, password);
+        String URL = System.getenv(PROPERTIES.getProperty("url"));
+        String user = System.getenv(PROPERTIES.getProperty("user"));
+        String password = System.getenv(PROPERTIES.getProperty("password"));
+        Log.info("Connecting to database {} as {}", URL, user);
         JDBC_URL = URL;
         try {
             Class.forName("org.postgresql.Driver");
