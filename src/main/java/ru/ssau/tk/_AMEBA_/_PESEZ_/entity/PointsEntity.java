@@ -30,16 +30,11 @@ public class PointsEntity {
 
 
     public PointsEntity(FunctionEntity function, Double xValue, Double yValue) {
-        Utility.Log.info("=== PointsEntity constructor ===");
-        Utility.Log.info("Input - functionId: {}, xValue: {}, yValue: {}",
-                function.getFuncId(), xValue, yValue);
 
         this.id = new PointId(function.getFuncId(), xValue);
         this.function = function;
         this.yValue = yValue;
 
-        Utility.Log.info("Result - id.functionId: {}, id.xValue: {}, yValue: {}",
-                this.id.getFunctionId(), this.id.getXValue(), this.yValue);
     }
 
     public String getPointAsString() {

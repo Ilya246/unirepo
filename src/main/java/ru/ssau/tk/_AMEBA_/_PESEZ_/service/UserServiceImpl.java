@@ -8,11 +8,13 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.UserRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
+import ru.ssau.tk._AMEBA_._PESEZ_.utility.HashUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +26,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final FunctionOwnershipRepository ownershipRepository;
     private final FunctionRepository functionRepository;
+    private final HashUtil hashUtil;
 
     @Override
     public UserResponse createUser(UserRequest request) {
         UserEntity user = new UserEntity();
         user.setTypeId(request.getTypeId());
         user.setUserName(request.getUserName());
-        user.setPassword(request.getPassword());
+        user.setPassword(HashUtil.sha256(request.getPassword()));
         userRepository.save(user);
         log.info("User created with id: {}", user.getUserId());
 
@@ -64,7 +67,7 @@ public class UserServiceImpl implements UserService {
             user.setUserName(request.getUserName());
         }
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            user.setPassword(request.getPassword());
+            user.setPassword(HashUtil.sha256(request.getPassword()));
         }
         if (request.getCreatedDate() != null) {
             user.setCreatedDate(request.getCreatedDate());
@@ -127,7 +130,8 @@ public class UserServiceImpl implements UserService {
         return functions;
     }
 
-    private UserResponse convertToResponse(UserEntity user) {
+    @Override
+    public UserResponse convertToResponse(UserEntity user) {
         return UserResponse.builder()
                 .userId(user.getUserId())
                 .typeId(user.getTypeId())
@@ -135,5 +139,45 @@ public class UserServiceImpl implements UserService {
                 .password(user.getPassword()) // Осторожно! Возможно стоит не возвращать пароль
                 .createdDate(user.getCreatedDate())
                 .build();
+    }
+
+
+
+    @Override
+    public UserType toType(int typeId){
+        return switch (typeId) {
+            case 1 -> UserType.Normal;
+            case 2 -> UserType.Admin;
+            default -> throw new IllegalArgumentException("Illegal user type " + typeId);
+        };
+    }
+
+    @Override
+    public UserEntity findByCredentials(String userName, String password) {
+        UserEntity user = userRepository.findByCredentials(userName,HashUtil.sha256(password));
+        if (user == null) {
+            throw new CustomException("User not found with id: " + userName, HttpStatus.NOT_FOUND);
+        }
+        return user;
+    }
+
+
+    /**
+     * Аутентифицирует пользователя и проверяет роль
+     * @param userName - имя пользователя
+     * @param password - пароль в открытом виде
+     * @return UserEntity если аутентификация успешна
+     */
+    @Override
+    public UserEntity authenticateWithRole(String userName, String password) {
+
+        UserEntity user = userRepository.findByCredentials(userName,password);
+        if (user == null) {
+            log.warn("Authentication failed: user not found - {}", userName);
+            throw new CustomException("User not found", HttpStatus.UNAUTHORIZED);
+        }
+
+        log.info("User authenticated successfully: {} with role {}", userName, toType(user.getTypeId()));
+        return user;
     }
 }

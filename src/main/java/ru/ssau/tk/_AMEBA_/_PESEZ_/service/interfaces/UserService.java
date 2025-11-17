@@ -4,6 +4,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.UserRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 
 import java.util.List;
 
@@ -25,4 +26,12 @@ public interface UserService {
     List<UserResponse> getUsersSortedByDate(Boolean descending);
 
     List<FunctionEntity> getUserFunctions(Long userId);
+
+    UserResponse convertToResponse(UserEntity user);
+
+    UserType toType(int typeId);
+
+    UserEntity findByCredentials(String userName, String password);
+
+    UserEntity authenticateWithRole(String userName, String password);
 }

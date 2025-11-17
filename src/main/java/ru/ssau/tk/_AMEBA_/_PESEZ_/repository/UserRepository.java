@@ -9,6 +9,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 
 
 import java.util.List;
+import java.util.Objects;
+
 @Repository
 public class UserRepository {
 
@@ -31,6 +33,16 @@ public class UserRepository {
         try (Session session = sessionFactory.openSession()) {
             return session.find(UserEntity.class, id);
         }
+    }
+
+    public UserEntity findByCredentials(String userName, String password) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("FROM UserEntity WHERE userName=:userName AND password=:password",UserEntity.class)
+                    .setParameter("userName", userName)
+                    .setParameter("password", password)
+                    .uniqueResult();
+        }
+
     }
 
     public List<UserEntity> findAll() {
@@ -72,4 +84,6 @@ public class UserRepository {
                     .list();
         }
     }
+
+
 }

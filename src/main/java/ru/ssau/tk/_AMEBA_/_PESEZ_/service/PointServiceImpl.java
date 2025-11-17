@@ -15,6 +15,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.PointService;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,11 +26,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public PointResponse createPoint(PointRequest request) {
-        Utility.Log.info("=== SERVICE: createPoint called ===");
-        Utility.Log.info("Request functionId: {}", request.getFunctionId());
-        Utility.Log.info("Request xValue: {}", request.getXValue());
-        Utility.Log.info("Request yValue: {}", request.getYValue());
-        Utility.Log.info("Request object class: {}", request.getClass().getName());
+
 
         // Находим функцию и проверяем, что она существует
         FunctionEntity function = functionRepo.findById(request.getFunctionId());
@@ -39,15 +36,15 @@ public class PointServiceImpl implements PointService {
 
         // Проверяем, что поля не null
         if (request.getXValue() == null) {
-            Utility.Log.error("❌ xValue is NULL in service!");
+
             throw new CustomException("xValue cannot be null", HttpStatus.BAD_REQUEST);
         }
         if (request.getYValue() == null) {
-            Utility.Log.error("❌ yValue is NULL in service!");
+
             throw new CustomException("yValue cannot be null", HttpStatus.BAD_REQUEST);
         }
 
-        Utility.Log.info("✅ Values are NOT null in service - creating entity...");
+
 
         // Проверяем, не существует ли уже точка с таким xValue для этой функции
         pointsRepo.findById(function, request.getXValue())
@@ -58,15 +55,12 @@ public class PointServiceImpl implements PointService {
         // Создаем новую точку
         PointsEntity point = new PointsEntity(function, request.getXValue(), request.getYValue());
 
-        Utility.Log.info("Created PointsEntity - functionId: {}, xValue: {}, yValue: {}",
-                point.getFunctionId(), point.getXValue(), point.getYValue());
+
 
         pointsRepo.save(point);
 
-        Utility.Log.info("Point saved successfully");
         return convertToResponse(point);
     }
-
 
     @Override
     public PointResponse getPoint(Long functionId, Double xValue) {
@@ -95,11 +89,12 @@ public class PointServiceImpl implements PointService {
 
         log.info("Point updated for function {}: x={}, new y={}", functionId, xValue, request.getYValue());
 
-        return PointResponse.builder()
-                .functionId(functionId)
-                .xValue(xValue)
-                .yValue(request.getYValue())
-                .build();
+        PointResponse response = new PointResponse();
+        response.setFunctionId(functionId);
+        response.setXValue(xValue);
+        response.setYValue(request.getYValue());
+
+        return response;
     }
 
     @Override
@@ -136,7 +131,7 @@ public class PointServiceImpl implements PointService {
 
         return points.stream()
                 .map(this::convertToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -158,14 +153,14 @@ public class PointServiceImpl implements PointService {
 
         return points.stream()
                 .map(this::convertToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private PointResponse convertToResponse(PointsEntity point) {
-        return PointResponse.builder()
-                .functionId(point.getId().getFunctionId())
-                .xValue(point.getId().getXValue())
-                .yValue(point.getYValue())
-                .build();
+        PointResponse response = new PointResponse();
+        response.setFunctionId(point.getId().getFunctionId());
+        response.setXValue(point.getId().getXValue());
+        response.setYValue(point.getYValue());
+        return response;
     }
 }
