@@ -83,8 +83,14 @@ public class OwnedFunctionController extends Controller {
                 case "/composite" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (CompositeFunctionCreateRequest)request.funcParams;
+                    if (!hasRequiredRole(req, UserType.Admin) && (
+                        userService.getUserFunction(userId, params.innerId) == null
+                        || userService.getUserFunction(userId, params.outerId) == null
+                    )) {
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid function IDs");
+                    }
                     int response = userService.createUserComposite(userId, request.name, params.innerId, params.outerId).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response)    );
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/own?id={id}&name={name}
                 case "/own" -> {
