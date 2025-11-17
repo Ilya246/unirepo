@@ -1,6 +1,12 @@
-FROM maven AS build
+FROM maven AS build-stage
 COPY pom.xml .
 COPY src ./src
+
+RUN mvn package -DskipTests
+
+FROM tomcat:9.0.112-jdk17
+
+COPY --from=build-stage /target/*.war /usr/local/tomcat/webapps/ROOT.war
 
 ARG DB_URL=jdbc:postgresql://localhost:5432/function_db
 ARG DB_URL_TEST=jdbc:postgresql://localhost:5432/function_db_test
@@ -15,10 +21,5 @@ ENV DATABASE_PASSWORD=${DB_PASSWORD}
 ENV DO_TEST_BENCHMARK=${TEST_BENCH}
 
 EXPOSE 8080
-
-RUN mvn package -DskipTests
-
-FROM tomcat
-COPY --from=build /target/_AMEBA_-_PESEZ_-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 
 CMD ["catalina.sh", "run"]

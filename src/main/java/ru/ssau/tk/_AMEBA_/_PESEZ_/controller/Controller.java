@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.UserService;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +35,7 @@ public abstract class Controller extends HttpServlet {
 
         try {
             String base64Credentials = authHeader.substring(BASIC_PREFIX.length());
-            byte[] credDecoded = Base64.getDecoder().decode(base64Credentials);
+            byte[] credDecoded = Base64Decode.decode(base64Credentials);
             String credentials = new String(credDecoded);
 
             final String[] values = credentials.split(":");

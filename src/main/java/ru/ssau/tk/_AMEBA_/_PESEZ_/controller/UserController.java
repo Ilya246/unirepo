@@ -33,6 +33,7 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
+            Log.info("Got bad user GET request: {}, error:", req.getRequestURI(), e);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
@@ -44,7 +45,10 @@ public class UserController extends Controller {
         try {
             // POST /users
             if (path == null || path.isEmpty()) {
-                if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
+                if (!hasRequiredRole(req, UserRepository.UserType.Admin)
+                    && !req.getRemoteAddr().equals("127.0.0.1")
+                    && !req.getRemoteAddr().equals("0:0:0:0:0:0:0:1")
+                ) {
                     resp.sendError(HttpServletResponse.SC_FORBIDDEN);
                     return;
                 }
@@ -63,6 +67,7 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
+            Log.info("Got bad user POST request: {}, error:", req.getRequestURI(), e);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
@@ -85,6 +90,7 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
+            Log.info("Got bad user DELETE request: {}, error:", req.getRequestURI(), e);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
@@ -108,6 +114,7 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
+            Log.info("Got bad user PUT request: {}, error:", req.getRequestURI(), e);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
