@@ -22,7 +22,7 @@ public class AutoController {
     @PostMapping("/login")
     public UserResponse login(@RequestParam String userName,
                               @RequestParam String password) {
-        UserEntity user = userService.authenticateWithRole(userName, password);
+        UserEntity user = userService.authenticate(userName, password);
         UserType role=userService.toType(user.getTypeId());
         return userService.convertToResponse(user);
     }

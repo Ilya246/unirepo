@@ -172,12 +172,34 @@ public class UserServiceImpl implements UserService {
      * @return UserEntity если аутентификация успешна
      */
     @Override
-    public UserEntity authenticateWithRole(String userName, String password) {
+    public UserEntity authenticate(String userName, String password) {
 
         UserEntity user = userRepository.findByCredentials(userName,password);
         if (user == null) {
             log.warn("Authentication failed: user not found - {}", userName);
             throw new CustomException("User not found", HttpStatus.UNAUTHORIZED);
+        }
+
+        log.info("User authenticated successfully: {} with role {}", userName, toType(user.getTypeId()));
+        return user;
+    }
+
+
+    @Override
+    public UserEntity authenticateWithRole(String userName, String password, UserType requiredRole) {
+        UserEntity user = userRepository.findByCredentials(userName,password);
+        if (user == null) {
+            log.warn("Authentication failed: user not found - {}", userName);
+            throw new CustomException("User not found", HttpStatus.UNAUTHORIZED);
+        }
+
+        // Проверяем роль, если нужно
+        if (requiredRole != null) {
+            UserType userRole = toType(user.getTypeId());
+            if (!userRole.equals(requiredRole)) {
+                log.warn("Authorization failed: user {} does not have required role {}", userName, requiredRole);
+                throw new CustomException("Access denied", HttpStatus.NOT_FOUND);
+            }
         }
 
         log.info("User authenticated successfully: {} with role {}", userName, toType(user.getTypeId()));
