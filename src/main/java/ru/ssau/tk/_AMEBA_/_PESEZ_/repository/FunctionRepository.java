@@ -231,7 +231,7 @@ public class FunctionRepository {
     }
 
     // Обновление точки
-    public CompletableFuture<Void> updatePoint(Long funcId, double xValue, double newY) {
+    public CompletableFuture<Void> updatePoint(Long funcId, Double xValue, Double newY) {
         return CompletableFuture.supplyAsync(() -> {
             pointsRepository.updateById(funcId, xValue, newY);
             return null;
@@ -239,7 +239,7 @@ public class FunctionRepository {
     }
 
     // Удаление точки
-    public CompletableFuture<Void> deletePoint(Long funcId, double xValue) {
+    public CompletableFuture<Void> deletePoint(Long funcId, Double xValue) {
         return CompletableFuture.supplyAsync(() -> {
             pointsRepository.deleteById(funcId, xValue);
             return null;

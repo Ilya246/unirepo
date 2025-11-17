@@ -115,7 +115,7 @@ public class PointsRepository {
 
         try {
             for (int i = 0; i < points.size(); i++) {
-                session.merge(points.get(i));
+                session.persist(points.get(i));
                 if (i % 50 == 0) {
                     session.flush();
                     session.clear();

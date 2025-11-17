@@ -78,4 +78,62 @@ class PointServiceImplTest extends BaseRepositoryTest {
         assertEquals("Point already exists for function " + function.getFuncId() + " with x=0.75", exception.getMessage());
     }
 
+    @Test
+    void testGetPoint() {
+        // Given - создаем функцию и точку
+        FunctionEntity function = new FunctionEntity(1,"x^2");
+        functionRepo.save(function);
+        PointRequest r = new PointRequest(function.getFuncId(), 3.0, 9.0);
+        pointService.createPoint(r);
+        // When
+        PointResponse response = pointService.getPoint(function.getFuncId(), 3.0);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(function.getFuncId(), response.getFunctionId());
+        assertEquals(3.0, response.getXValue());
+        assertEquals(9.0, response.getYValue());
+    }
+
+    @Test
+    void testUpdatePoint() {
+        // Given - создаем функцию и точку
+        FunctionEntity function = new FunctionEntity(1,"x^2");
+        functionRepo.save(function);
+        PointRequest r = new PointRequest(function.getFuncId(), 4.0, 16.0);
+        pointService.createPoint(r);
+
+        PointRequest updateRequest = new PointRequest(function.getFuncId(), 4.0, 20.0);
+
+        // When
+        PointResponse response = pointService.updatePoint(function.getFuncId(), 4.0, updateRequest);
+
+        // Then
+        assertNotNull(response);
+        assertEquals(function.getFuncId(), response.getFunctionId());
+        assertEquals(4.0, response.getXValue());
+        assertEquals(20.0, response.getYValue());
+    }
+
+    @Test
+    void testDeletePoint() {
+        // Given - создаем функцию и точку
+        FunctionEntity function = new FunctionEntity(1,"x^2");
+        functionRepo.save(function);
+        PointRequest r = new PointRequest(function.getFuncId(), 5.0, 25.0);
+        pointService.createPoint(r);
+        // When
+        pointService.deletePoint(function.getFuncId(), 5.0);
+
+        // Then - проверяем, что точка удалена
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            pointService.getPoint(function.getFuncId(), 5.0);
+        });
+
+        assertEquals("Point not found for function " + function.getFuncId() + " with x=5.0", exception.getMessage());
+    }
+
+
+
+
 }
