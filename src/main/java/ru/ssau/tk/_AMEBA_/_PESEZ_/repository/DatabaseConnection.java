@@ -22,9 +22,10 @@ public class DatabaseConnection {
             throw new DatabaseConnectionFailedException(e);
         }
 
-        String URL = System.getenv(PROPERTIES.getProperty("url"));
-        String user = System.getenv(PROPERTIES.getProperty("user"));
-        String password = System.getenv(PROPERTIES.getProperty("password"));
+        String URL = getSetupProperty(PROPERTIES, "url");
+        String user = getSetupProperty(PROPERTIES, "user");
+        getSetupProperty(PROPERTIES, "password");
+
         Log.info("Connecting to database {} as {}", URL, user);
         JDBC_URL = URL;
         try {

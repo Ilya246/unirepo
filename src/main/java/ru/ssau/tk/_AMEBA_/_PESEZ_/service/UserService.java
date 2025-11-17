@@ -4,6 +4,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.InvalidLoginException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,21 +24,14 @@ public class UserService {
 
     public CompletableFuture<OwnedFunctionDTO[]> getUserFunctions(int userId, int types) {
         return CompletableFuture.supplyAsync(() -> {
-            FunctionOwnershipDTO[] ownerships = userRepo.getFunctionOwnerships(userId).join();
-            int count = ownerships.length;
-
-            CompletableFuture<FunctionDTO>[] futures = new CompletableFuture[count];
-            for (int i = 0; i < count; i++) {
-                futures[i] = funcRepo.getFunctionData(ownerships[i].funcId);
-            }
-
-            var functions = new ArrayList<OwnedFunctionDTO>();
-            for (int i = 0; i < count; i++) {
-                FunctionDTO func = futures[i].join();
+            OwnedFunctionDTO[] functions = userRepo.getFunctions(userId).join();
+            int to = 0;
+            for (OwnedFunctionDTO function : functions) {
+                FunctionDTO func = function.function;
                 if ((func.funcType & types) != 0)
-                    functions.add(new OwnedFunctionDTO(func, ownerships[i]));
+                    to++;
             }
-            return functions.toArray(new OwnedFunctionDTO[0]);
+            return Arrays.copyOf(functions, to);
         });
     }
 
@@ -83,7 +77,7 @@ public class UserService {
     }
 
     public CompletableFuture<UserDTO> getUserByCredentials(String username, String password) {
-        return userRepo.getUser(username, password);
+        return userRepo.getUser(username, getBase64Hash(password));
     }
 
     public CompletableFuture<Void> deleteUser(int userId) {
@@ -145,7 +139,7 @@ public class UserService {
             if (password.isEmpty())
                 throw new InvalidLoginException("Password cannot be empty.");
 
-            return userRepo.createUser(typeId, username, password).join();
+            return userRepo.createUser(typeId, username, getBase64Hash(password)).join();
         });
     }
 
@@ -158,6 +152,6 @@ public class UserService {
     }
 
     public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword, UserType newType) {
-        return userRepo.updateUser(userId, newUserName, newPassword, newType);
+        return userRepo.updateUser(userId, newUserName, getBase64Hash(newPassword), newType);
     }
 }

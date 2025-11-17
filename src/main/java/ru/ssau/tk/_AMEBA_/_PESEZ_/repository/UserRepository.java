@@ -1,6 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionOwnershipDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.OwnedFunctionDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
@@ -24,6 +26,8 @@ public class UserRepository extends Repository {
     private static final String FUNCTION_OWNERSHIP_DELETE = readCommand("FunctionOwnershipDelete");
     private static final String FUNCTION_OWNERSHIP_SELECT = readCommand("FunctionOwnershipRead");
     private static final String FUNCTION_OWNERSHIP_SELECT_MANY = readCommand("FunctionOwnershipReadMany");
+
+    private static final String OWNED_FUNCTION_SELECT = readCommand("ReadUserFunctions");
 
     public enum UserType {
         Normal(1),
@@ -70,11 +74,11 @@ public class UserRepository extends Repository {
         database.executeUpdate(FUNCTION_OWNERSHIP_ENSURE_TABLE);
     }
 
-    public CompletableFuture<Integer> createUser(UserType typeId, String userName, String password) {
+    public CompletableFuture<Integer> createUser(UserType typeId, String userName, String passwordHash) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                int userId = database.executeUpdateAndGetId(USER_INSERT, typeId.typeId, userName, password);
+                int userId = database.executeUpdateAndGetId(USER_INSERT, typeId.typeId, userName, passwordHash);
                 Log.info("Created user {} with ID {}", userName, userId);
                 return userId;
             } catch (SQLException e) {
@@ -83,11 +87,11 @@ public class UserRepository extends Repository {
         });
     }
 
-    public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword, UserType newType) {
+    public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPasswordHash, UserType newType) {
         return CompletableFuture.runAsync(() -> {
             try {
                 DatabaseConnection database = databaseLocal.get();
-                database.executeUpdate(USER_UPDATE, newUserName, newPassword, newType.typeId, userId);
+                database.executeUpdate(USER_UPDATE, newUserName, newPasswordHash, newType.typeId, userId);
                 Log.info("Updated user ID {}", userId);
             } catch (SQLException e) {
                 throw new CompletionException(e);
@@ -123,9 +127,9 @@ public class UserRepository extends Repository {
         });
     }
 
-    public CompletableFuture<UserDTO> getUser(String username, String password) {
+    public CompletableFuture<UserDTO> getUser(String username, String passwordHash) {
         return CompletableFuture.supplyAsync(() -> {
-            try (ResultSet rs = databaseLocal.get().executeQuery(USER_GET, username, password)) {
+            try (ResultSet rs = databaseLocal.get().executeQuery(USER_GET, username, passwordHash)) {
                 if (!rs.first())
                     return null;
                 return new UserDTO(rs.getInt("user_id"),
@@ -202,6 +206,32 @@ public class UserRepository extends Repository {
                             rs.getInt("func_id"),
                             rs.getTimestamp("created_date"),
                             rs.getString("func_name"));
+                    rs.next();
+                }
+                return result;
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    public CompletableFuture<OwnedFunctionDTO[]> getFunctions(int userId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (ResultSet rs = databaseLocal.get().executeQuery(OWNED_FUNCTION_SELECT, userId)) {
+                rs.last();
+                int count = rs.getRow();
+                var result = new OwnedFunctionDTO[count];
+                rs.first();
+                for (int i = 0; i < count; i++) {
+                    result[i] = new OwnedFunctionDTO(new FunctionDTO(
+                            rs.getInt("func_id"),
+                            rs.getInt("type_id"),
+                            rs.getString("expression")
+                        ), new FunctionOwnershipDTO(
+                            userId,
+                            rs.getInt("func_id"),
+                            rs.getTimestamp("created_date"),
+                            rs.getString("func_name")));
                     rs.next();
                 }
                 return result;

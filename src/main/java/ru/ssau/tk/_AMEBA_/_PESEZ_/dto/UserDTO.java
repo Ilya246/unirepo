@@ -13,14 +13,14 @@ public class UserDTO implements Serializable {
     public final int userId;
     public final UserType userType;
     public final String username;
-    public final String password;
+    public final String passwordHash;
     public final Timestamp createdDate;
 
-    public UserDTO(int userId, UserType type, String username, String password, Timestamp createdDate) {
+    public UserDTO(int userId, UserType type, String username, String passwordHash, Timestamp createdDate) {
         this.userId = userId;
         this.userType = type;
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.createdDate = createdDate;
     }
 }

@@ -16,7 +16,7 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 class UserServiceTest {
     static String databaseConfig = "test_config.properties";
@@ -52,7 +52,7 @@ class UserServiceTest {
         UserDTO user = service.getUser(userId).join();
         assertEquals(UserType.Normal, user.userType);
         assertEquals(userId, user.userId);
-        assertEquals("MyPassword", user.password);
+        assertEquals(getBase64Hash("MyPassword"), user.passwordHash);
         assertEquals("MyUser", user.username);
 
         // Ещё тестируем удаление наших функций
@@ -117,7 +117,7 @@ class UserServiceTest {
 
     @Test
     void benchmarkManyUsers() {
-        if (System.getenv(PROPERTIES.getProperty("bench")).equals("false"))
+        if (getSetupProperty(PROPERTIES, "bench").equals("false"))
             return;
 
         Configurator.setLevel("ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility", Level.WARN);
