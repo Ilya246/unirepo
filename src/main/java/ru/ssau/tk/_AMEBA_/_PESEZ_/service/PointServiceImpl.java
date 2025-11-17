@@ -26,10 +26,17 @@ public class PointServiceImpl implements PointService {
     public PointResponse createPoint(PointRequest request) {
         // Находим функцию и проверяем, что она существует
         FunctionEntity function = functionRepo.findById(request.getFunctionId());
+
         if (function == null) {
             throw new CustomException("Function not found with id: " + request.getFunctionId(), HttpStatus.NOT_FOUND);
         }
-
+        // Проверяем, что поля не null
+        if (request.getXValue() == null) {
+            throw new CustomException("xValue cannot be null", HttpStatus.BAD_REQUEST);
+        }
+        if (request.getYValue() == null) {
+            throw new CustomException("yValue cannot be null", HttpStatus.BAD_REQUEST);
+        }
 
         // Проверяем, не существует ли уже точка с таким xValue для этой функции
         pointsRepo.findById(function, request.getXValue())
