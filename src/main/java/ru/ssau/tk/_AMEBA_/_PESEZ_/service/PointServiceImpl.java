@@ -12,6 +12,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.PointsRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.PointService;
+import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
 import java.util.List;
 
@@ -24,6 +25,12 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public PointResponse createPoint(PointRequest request) {
+        Utility.Log.info("=== SERVICE: createPoint called ===");
+        Utility.Log.info("Request functionId: {}", request.getFunctionId());
+        Utility.Log.info("Request xValue: {}", request.getXValue());
+        Utility.Log.info("Request yValue: {}", request.getYValue());
+        Utility.Log.info("Request object class: {}", request.getClass().getName());
+
         // Находим функцию и проверяем, что она существует
         FunctionEntity function = functionRepo.findById(request.getFunctionId());
         if (function == null) {
@@ -32,11 +39,15 @@ public class PointServiceImpl implements PointService {
 
         // Проверяем, что поля не null
         if (request.getXValue() == null) {
+            Utility.Log.error("❌ xValue is NULL in service!");
             throw new CustomException("xValue cannot be null", HttpStatus.BAD_REQUEST);
         }
         if (request.getYValue() == null) {
+            Utility.Log.error("❌ yValue is NULL in service!");
             throw new CustomException("yValue cannot be null", HttpStatus.BAD_REQUEST);
         }
+
+        Utility.Log.info("✅ Values are NOT null in service - creating entity...");
 
         // Проверяем, не существует ли уже точка с таким xValue для этой функции
         pointsRepo.findById(function, request.getXValue())
@@ -46,9 +57,13 @@ public class PointServiceImpl implements PointService {
 
         // Создаем новую точку
         PointsEntity point = new PointsEntity(function, request.getXValue(), request.getYValue());
+
+        Utility.Log.info("Created PointsEntity - functionId: {}, xValue: {}, yValue: {}",
+                point.getFunctionId(), point.getXValue(), point.getYValue());
+
         pointsRepo.save(point);
 
-        log.info("Point created for function {}: x={}, y={}", request.getFunctionId(), request.getXValue(), request.getYValue());
+        Utility.Log.info("Point saved successfully");
         return convertToResponse(point);
     }
 
