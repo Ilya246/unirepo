@@ -17,7 +17,10 @@ import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.HashUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.getBase64Hash;
 
 @Slf4j
 @Service
@@ -33,7 +36,7 @@ public class UserServiceImpl implements UserService {
         UserEntity user = new UserEntity();
         user.setTypeId(request.getTypeId());
         user.setUserName(request.getUserName());
-        user.setPassword(HashUtil.sha256(request.getPassword()));
+        user.setPassword(getBase64Hash(request.getPassword()));
         userRepository.save(user);
         log.info("User created with id: {}", user.getUserId());
 
@@ -67,7 +70,7 @@ public class UserServiceImpl implements UserService {
             user.setUserName(request.getUserName());
         }
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            user.setPassword(HashUtil.sha256(request.getPassword()));
+            user.setPassword(getBase64Hash(request.getPassword()));
         }
         if (request.getCreatedDate() != null) {
             user.setCreatedDate(request.getCreatedDate());
@@ -123,7 +126,7 @@ public class UserServiceImpl implements UserService {
 
         List<FunctionEntity> functions = ownershipRepository.findByUserId(userId).stream()
                 .map(ownership -> functionRepository.findById(ownership.getId().getFuncId()))
-                .filter(function -> function != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         log.info("Found {} functions for user: {}", functions.size(), userId);
@@ -154,7 +157,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity findByCredentials(String userName, String password) {
-        UserEntity user = userRepository.findByCredentials(userName,HashUtil.sha256(password));
+        UserEntity user = userRepository.findByCredentials(userName,getBase64Hash(password));
         if (user == null) {
             throw new CustomException("User not found with id: " + userName, HttpStatus.NOT_FOUND);
         }
