@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.FunctionOwnershipRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionOwnershipResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipId;
@@ -15,6 +15,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionOwnershipService;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionService;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     private final FunctionOwnershipRepository ownershipRepo;
     private final UserRepository userRepo;
     private final FunctionRepository functionRepo;
+    private final FunctionService functionService;
 
     @Override
     public FunctionOwnershipResponse create(FunctionOwnershipRequest request) {
@@ -138,4 +140,57 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
         response.setFuncName(ownership.getFuncName());
         return response;
     }
+
+    @Override
+    public MathFunctionResponse createOwnedMath(MathFunctionRequest request, Long userId) {
+        MathFunctionResponse function = functionService.createMathFunction(request);
+        addExistingFunctionToUser(userId, function.getFuncId(),function.getExpression());
+        return function;
+    }
+    @Override
+    public TabulatedFunctionResponse createOwnedTabulated(TabulatedFunctionRequest request, Long userId) {
+        TabulatedFunctionResponse function = functionService.createTabulatedFunction(request);
+        addExistingFunctionToUser(userId, function.getFuncId(),function.getExpression());
+        return function;
+    }
+    @Override
+    public FunctionResponse createOwnedPure(PureTabulatedRequest request, Long userId) {
+        FunctionResponse function = functionService.createPureTabulatedFunction(request);
+        addExistingFunctionToUser(userId, function.getFuncId(),function.getExpression());
+        return function;
+    }
+    @Override
+    public CompositeFunctionResponse createOwnedComposite(CompositeFunctionRequest request, Long userId) {
+        CompositeFunctionResponse function = functionService.createCompositeFunction(request);
+        addExistingFunctionToUser(userId, function.getCompositeFunctionId(), functionRepo.findById(function.getCompositeFunctionId()).getExpression());
+        return function;
+    }
+
+    @Override
+    public FunctionOwnershipResponse addExistingFunctionToUser(Long userId, Long functionId, String funcName) {
+        log.info("Adding existing function {} to user: {}", functionId, userId);
+
+        // Проверяем существование функции через FunctionService
+        functionService.getFunction(functionId);
+
+        // Создаем связь с пользователем
+        FunctionOwnershipRequest request = new FunctionOwnershipRequest();
+        request.setUserId(userId);
+        request.setFunctionId(functionId);
+        request.setFuncName(funcName);
+
+        return create(request);
+    }
+
+    // Вспомогательные методы
+    private boolean hasAccessToFunction(Long userId, Long functionId) {
+        try {
+            getOwnership(userId, functionId);
+            return true;
+        } catch (CustomException e) {
+            return false;
+        }
+    }
+
+
 }

@@ -28,7 +28,7 @@ public class FunctionController {
         return functionService.createFunction(request);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("?id={id}")
     @Operation(summary = "Получение функции по ID")
     public FunctionResponse getFunction(@PathVariable Long id) {
         return functionService.getFunction(id);
@@ -54,24 +54,16 @@ public class FunctionController {
         return functionService.createCompositeFunction(request);
     }
 
+    @PostMapping("/pure-tabulated")
+    @Operation(summary = "Создание табулированной функции из готовых массивов значений")
+    public FunctionResponse createPureTabulatedFunction(@RequestBody @Valid PureTabulatedRequest request) {
+        return functionService.createPureTabulatedFunction(request);
+    }
 
-    @GetMapping("/{id}/calculate")
+    @GetMapping("/calculate?id={id}&x={x}")
     @Operation(summary = "Вычисление значения функции в точке")
     public Double calculateFunction(@PathVariable Long id, @RequestParam Double x) {
         return functionService.calculateFunction(id, x);
-    }
-
-    // Операции с точками
-    @PutMapping("/{id}/points")
-    @Operation(summary = "Обновление точки табулированной функции")
-    public void updatePoint(@PathVariable Long id, @RequestParam Double x, @RequestParam Double y) {
-        functionService.updatePoint(id, x, y);
-    }
-
-    @DeleteMapping("/{id}/points")
-    @Operation(summary = "Удаление точки табулированной функции")
-    public void deletePoint(@PathVariable Long id, @RequestParam Double x) {
-        functionService.deletePoint(id, x);
     }
 
 }

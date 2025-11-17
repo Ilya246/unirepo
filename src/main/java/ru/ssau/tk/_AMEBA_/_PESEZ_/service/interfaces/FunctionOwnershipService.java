@@ -1,7 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces;
 
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.FunctionOwnershipRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionOwnershipResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
@@ -27,4 +27,14 @@ public interface FunctionOwnershipService {
     List<FunctionEntity> getUserFunctionsOrderedByDate(Long userId, Boolean descending);
 
     FunctionOwnershipResponse updateOwnership(Long userId, Long functionId, FunctionOwnershipRequest request);
+
+    MathFunctionResponse createOwnedMath(MathFunctionRequest request, Long userId);
+
+    TabulatedFunctionResponse createOwnedTabulated(TabulatedFunctionRequest request, Long userId);
+
+    FunctionResponse createOwnedPure(PureTabulatedRequest request, Long userId);
+
+    CompositeFunctionResponse createOwnedComposite(CompositeFunctionRequest request, Long userId);
+
+    FunctionOwnershipResponse addExistingFunctionToUser(Long userId, Long functionId, String funcName);
 }

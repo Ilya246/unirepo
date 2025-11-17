@@ -16,21 +16,13 @@ import java.util.List;
 public class PointController {
     private final PointService pointsService;
 
-    @PostMapping
+    @PostMapping("?id={id}&x={x}&y={y}")
     @Operation(summary = "Создание точки")
     public PointResponse createPoint(@RequestBody @Valid PointRequest request) {
         return pointsService.createPoint(request);
     }
 
-    @GetMapping("/function/{functionId}/x/{xValue}")
-    @Operation(summary = "Получение точки по ID функции и значению X")
-    public PointResponse getPoint(
-            @PathVariable Long functionId,
-            @PathVariable Double xValue) {
-        return pointsService.getPoint(functionId, xValue);
-    }
-
-    @PutMapping("/function/{functionId}/x/{xValue}")
+    @PutMapping("?id={id}&x={x}&y={y}")
     @Operation(summary = "Обновление точки")
     public PointResponse updatePoint(
             @PathVariable Long functionId,
@@ -39,7 +31,7 @@ public class PointController {
         return pointsService.updatePoint(functionId, xValue, request);
     }
 
-    @DeleteMapping("/function/{functionId}/x/{xValue}")
+    @DeleteMapping("?id={id}&x={x}")
     @Operation(summary = "Удаление точки")
     public void deletePoint(
             @PathVariable Long functionId,
@@ -47,27 +39,11 @@ public class PointController {
         pointsService.deletePoint(functionId, xValue);
     }
 
-    @DeleteMapping("/function/{functionId}")
-    @Operation(summary = "Удаление всех точек функции")
-    public void deletePointsByFunction(@PathVariable Long functionId) {
-        pointsService.deletePointsByFunction(functionId);
-    }
-
-    @GetMapping("/function/{functionId}")
+    @GetMapping("?id={id}")
     @Operation(summary = "Получение всех точек функции")
     public List<PointResponse> getPointsByFunction(@PathVariable Long functionId) {
         return pointsService.getPointsByFunction(functionId);
     }
 
-    @GetMapping("/function/{functionId}/count")
-    @Operation(summary = "Получение количества точек функции")
-    public Long countPointsByFunction(@PathVariable Long functionId) {
-        return pointsService.countPointsByFunction(functionId);
-    }
 
-    @GetMapping
-    @Operation(summary = "Получение всех точек")
-    public List<PointResponse> getAllPoints() {
-        return pointsService.getAllPoints();
-    }
 }

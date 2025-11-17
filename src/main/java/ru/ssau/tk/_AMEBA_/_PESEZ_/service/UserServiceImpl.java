@@ -29,7 +29,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final FunctionOwnershipRepository ownershipRepository;
     private final FunctionRepository functionRepository;
-    private final HashUtil hashUtil;
 
     @Override
     public UserResponse createUser(UserRequest request) {
@@ -198,7 +197,7 @@ public class UserServiceImpl implements UserService {
             UserType userRole = toType(user.getTypeId());
             if (!userRole.equals(requiredRole)) {
                 log.warn("Authorization failed: user {} does not have required role {}", userName, requiredRole);
-                throw new CustomException("Access denied", HttpStatus.NOT_FOUND);
+                throw new CustomException("Access denied", HttpStatus.FORBIDDEN);
             }
         }
 

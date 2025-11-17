@@ -26,13 +26,13 @@ public class UserController {
         return userService.createUser(request);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/user?id={id}")
     @Operation(summary = "Получение пользователя по ID")
     public UserResponse getUser(@PathVariable Long id) {
         return userService.getUser(id);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("?id={id}")
     @Operation(summary = "Обновление пользователя")
     public UserResponse updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request, @RequestParam String adminUserName,
                                    @RequestParam String adminPassword) {
@@ -40,7 +40,7 @@ public class UserController {
         return userService.updateUser(id, request);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("?id={id}")
     @Operation(summary = "Удаление пользователя")
     public void deleteUser(@PathVariable Long id, @RequestBody @Valid UserRequest request, @RequestParam String adminUserName,
                            @RequestParam String adminPassword) {
@@ -56,25 +56,4 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/type/{typeId}")
-    @Operation(summary = "Получение пользователей по типу")
-    public List<UserResponse> getUsersByType(@PathVariable Integer typeId, @RequestParam String adminUserName,
-                                             @RequestParam String adminPassword ) {
-        userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);
-        return userService.getUsersByType(typeId);
-    }
-
-    @GetMapping("/sorted")
-    @Operation(summary = "Получение пользователей с сортировкой по дате")
-    public List<UserResponse> getUsersSorted(@RequestParam(defaultValue = "true") Boolean descending, @RequestParam String adminUserName,
-                                             @RequestParam String adminPassword ) {
-        userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);
-        return userService.getUsersSortedByDate(descending);
-    }
-
-    @GetMapping("/{userId}/functions")
-    @Operation(summary = "Получение функций пользователя")
-    public List<FunctionEntity> getUserFunctions(@PathVariable Long userId) {
-        return userService.getUserFunctions(userId);
-    }
 }

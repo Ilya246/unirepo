@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.FunctionOwnershipRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionOwnershipResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/function-ownership")
+@RequestMapping("/owned-functions")
 @RequiredArgsConstructor
 public class FunctionOwnershipController {
     private final FunctionOwnershipService ownershipService;
@@ -26,7 +26,7 @@ public class FunctionOwnershipController {
         return ownershipService.create(request);
     }
 
-    @GetMapping("/user/{userId}/function/{functionId}")
+    @GetMapping("?id={id}")
     @Operation(summary = "Получение связи по ID пользователя и функции")
     public FunctionOwnershipResponse getOwnership(
             @PathVariable Long userId,
@@ -34,7 +34,7 @@ public class FunctionOwnershipController {
         return ownershipService.getOwnership(userId, functionId);
     }
 
-    @PutMapping("/user/{userId}/function/{functionId}")
+    @PutMapping("?id={id}&name={name}")
     @Operation(summary = "Обновление связи функции и пользователя")
     public FunctionOwnershipResponse updateOwnership(
             @PathVariable Long userId,
@@ -43,7 +43,7 @@ public class FunctionOwnershipController {
         return ownershipService.updateOwnership(userId, functionId, request);
     }
 
-    @DeleteMapping("/user/{userId}/function/{functionId}")
+    @DeleteMapping("?id={id}")
     @Operation(summary = "Удаление связи по ID пользователя и функции")
     public void deleteOwnership(
             @PathVariable Long userId,
@@ -51,30 +51,57 @@ public class FunctionOwnershipController {
         ownershipService.deleteOwnership(userId, functionId);
     }
 
-
-    @GetMapping
-    @Operation(summary = "Получение всех связей")
-    public List<FunctionOwnershipEntity> getAllOwnerships() {
-        return ownershipService.getAllOwnerships();
-    }
-
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user")
     @Operation(summary = "Получение всех связей пользователя")
     public List<FunctionOwnershipEntity> getOwnershipsByUserId(@PathVariable Long userId) {
         return ownershipService.getOwnershipsByUserId(userId);
     }
 
-    @GetMapping("/function/{functionId}/owner")
-    @Operation(summary = "Получение владельца функции")
-    public Optional<UserEntity> getOwnerByFunctionId(@PathVariable Long functionId) {
-        return ownershipService.getOwnerByFunctionId(functionId);
+    @PostMapping("/own?id={id}&name={name}")
+    @Operation(summary = "Добавить существующую функцию пользователю")
+    public FunctionOwnershipResponse add(@PathVariable Long userId,@PathVariable Long functionId,@PathVariable String funcName){
+        return ownershipService.addExistingFunctionToUser(userId,functionId,funcName);
     }
 
-    @GetMapping("/user/{userId}/functions")
-    @Operation(summary = "Получение функций пользователя с сортировкой по дате")
-    public List<FunctionEntity> getUserFunctionsOrdered(
-            @PathVariable Long userId,
-            @RequestParam(defaultValue = "true") Boolean descending) {
-        return ownershipService.getUserFunctionsOrderedByDate(userId, descending);
+    @PostMapping("/math")
+    @Operation(summary = "Создать математическую функцию для пользователя")
+    public MathFunctionResponse createMath(
+            @RequestParam Long userId,
+            @RequestBody MathFunctionRequest request
+    ) {
+        return ownershipService.createOwnedMath(request, userId);
     }
+
+
+    @PostMapping("/tabulated")
+    @Operation(summary = "Создать табулированную функцию для пользователя")
+    public TabulatedFunctionResponse createTabulated(
+            @RequestParam Long userId,
+            @RequestBody TabulatedFunctionRequest request
+    ) {
+        return ownershipService.createOwnedTabulated(request, userId);
+    }
+
+    @PostMapping("/pure-tabulated")
+    @Operation(summary = "Создать табулированную функцию для пользователя из готовых массивов значений")
+    public FunctionResponse createPure(
+            @RequestParam Long userId,
+            @RequestBody PureTabulatedRequest request
+    ) {
+        return ownershipService.createOwnedPure(request, userId);
+    }
+
+    @PostMapping("/composite")
+    @Operation(summary = "Создать композитную функцию")
+    public CompositeFunctionResponse createComposite(
+            @RequestParam Long userId,
+            @RequestBody CompositeFunctionRequest request
+    ) {
+        return ownershipService.createOwnedComposite(request, userId);
+    }
+
+
+
+
+
 }
