@@ -1,6 +1,5 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.CompositeFunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.test.repserver.BaseRepositoryTest;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.BaseRepositoryTest;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import java.util.List;

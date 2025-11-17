@@ -9,7 +9,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.PointsRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.test.repserver.BaseRepositoryTest;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.BaseRepositoryTest;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import static org.junit.jupiter.api.Assertions.*;

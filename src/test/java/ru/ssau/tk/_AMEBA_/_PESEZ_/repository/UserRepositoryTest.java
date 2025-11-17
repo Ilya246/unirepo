@@ -1,26 +1,16 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
+package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 
 class UserRepositoryTest extends BaseRepositoryTest {
     private SessionFactory factory;

@@ -1,4 +1,4 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
+package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;

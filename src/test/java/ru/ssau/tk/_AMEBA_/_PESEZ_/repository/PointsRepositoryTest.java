@@ -1,11 +1,9 @@
-package ru.ssau.tk._AMEBA_._PESEZ_.test.repserver;
+package ru.ssau.tk._AMEBA_._PESEZ_.repository;
 
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.PointsEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.repository.PointsRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import java.util.List;

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.PointsRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.test.repserver.BaseRepositoryTest;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.BaseRepositoryTest;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

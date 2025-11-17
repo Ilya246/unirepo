@@ -13,7 +13,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.test.repserver.BaseRepositoryTest;
+import ru.ssau.tk._AMEBA_._PESEZ_.repository.BaseRepositoryTest;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import java.util.List;
