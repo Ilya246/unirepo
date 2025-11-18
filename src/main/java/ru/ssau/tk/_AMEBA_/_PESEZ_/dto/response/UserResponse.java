@@ -14,7 +14,9 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserResponse extends UserRequest {
-    @JsonProperty
-    Long userId;
+public class UserResponse  {
+    private Long userId;
+    private Long userType;
+    private String userName;
+    private String password;
 }

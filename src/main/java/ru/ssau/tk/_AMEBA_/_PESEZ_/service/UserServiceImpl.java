@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse convertToResponse(UserEntity user) {
         UserResponse response = new UserResponse();
         response.setUserId(user.getUserId());
-        response.setUserType(UserType.fromId(user.getTypeId()));
+        response.setUserType(new Long(user.getTypeId()));
         response.setUserName(user.getUserName());
         response.setPassword(user.getPassword());
         return response;
