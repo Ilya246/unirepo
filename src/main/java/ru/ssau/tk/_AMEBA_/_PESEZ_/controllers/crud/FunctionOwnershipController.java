@@ -67,9 +67,9 @@ public class FunctionOwnershipController {
     @Operation(summary = "Создать математическую функцию для пользователя")
     public MathFunctionResponse createMath(
             @RequestParam Long userId,
-            @RequestBody MathFunctionRequest request
+            @RequestBody OwnedFunctionCreateRequest request
     ) {
-        return ownershipService.createOwnedMath(request, userId);
+        return ownershipService.createOwnedMath((MathFunctionRequest) request.funcParams, userId);
     }
 
 
@@ -77,27 +77,27 @@ public class FunctionOwnershipController {
     @Operation(summary = "Создать табулированную функцию для пользователя")
     public TabulatedFunctionResponse createTabulated(
             @RequestParam Long userId,
-            @RequestBody TabulatedFunctionRequest request
+            @RequestBody OwnedFunctionCreateRequest request
     ) {
-        return ownershipService.createOwnedTabulated(request, userId);
+        return ownershipService.createOwnedTabulated((TabulatedFunctionRequest) request.funcParams, userId);
     }
 
     @PostMapping("/pure-tabulated")
     @Operation(summary = "Создать табулированную функцию для пользователя из готовых массивов значений")
     public FunctionResponse createPure(
             @RequestParam Long userId,
-            @RequestBody PureTabulatedRequest request
+            @RequestBody OwnedFunctionCreateRequest request
     ) {
-        return ownershipService.createOwnedPure(request, userId);
+        return ownershipService.createOwnedPure((PureTabulatedRequest) request.funcParams, userId);
     }
 
     @PostMapping("/composite")
     @Operation(summary = "Создать композитную функцию")
     public CompositeFunctionResponse createComposite(
             @RequestParam Long userId,
-            @RequestBody CompositeFunctionRequest request
+            @RequestBody OwnedFunctionCreateRequest request
     ) {
-        return ownershipService.createOwnedComposite(request, userId);
+        return ownershipService.createOwnedComposite((CompositeFunctionRequest) request.funcParams, userId);
     }
 
 

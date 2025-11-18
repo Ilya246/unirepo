@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FunctionResponse {
-    @JsonProperty
+    @JsonProperty("id")
     Long funcId;
 }
 

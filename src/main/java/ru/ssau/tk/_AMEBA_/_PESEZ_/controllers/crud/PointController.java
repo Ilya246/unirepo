@@ -21,9 +21,8 @@ public class PointController {
     public PointResponse createPoint(
             @RequestParam Long id,
             @RequestParam Double x,
-            @RequestParam Double y,
-            @RequestBody @Valid PointRequest request) {
-        return pointsService.createPoint(request);
+            @RequestParam Double y) {
+        return pointsService.createPoint(new PointRequest(id, x, y));
     }
 
 

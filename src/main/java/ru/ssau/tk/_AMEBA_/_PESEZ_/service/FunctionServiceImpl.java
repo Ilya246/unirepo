@@ -178,6 +178,6 @@ public class FunctionServiceImpl implements FunctionService {
             default -> "UNKNOWN";
         };
 
-        return new FunctionResponse(Long.valueOf(function.getTypeId()));
+        return new FunctionResponse(Long.valueOf(function.getFuncId()));
     }
 }

@@ -21,6 +21,11 @@
       "type": "string"
     },
     {
+      "key": "adminId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "normalUsername",
       "value": "user1",
       "type": "string"
@@ -81,20 +86,7 @@
           "host": ["{{baseUrl}}"],
           "path": ["users"]
         }
-      },
-      "response": [],
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "var jsonData = pm.response.json();",
-              "pm.environment.set('createdUserId', jsonData.userId);"
-            ]
-          }
-        }
-      ]
+      }
     },
     {
       "name": "Authentication Tests",
@@ -123,6 +115,50 @@
               "raw": "{{baseUrl}}/users",
               "host": ["{{baseUrl}}"]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /users/register - Register new user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/register?username=newuser&password=newpass123",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "register"],
+          "query": [
+            {
+              "key": "username",
+              "value": "newuser"
+            },
+            {
+              "key": "password",
+              "value": "newpass123"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set('createdUserId', jsonData.userId);"
+            ]
           }
         }
       ]
@@ -166,38 +202,6 @@
                 {
                   "key": "id",
                   "value": "{{createdUserId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "POST /users/register - Register new user",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": ""
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users/register?username=newuser&password=newpass123",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "register"],
-              "query": [
-                {
-                  "key": "username",
-                  "value": "newuser"
-                },
-                {
-                  "key": "password",
-                  "value": "newpass123"
                 }
               ]
             }
@@ -259,6 +263,50 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "POST /users/register - Recreate user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register?username=newuser&password=newpass123",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "newuser"
+                },
+                {
+                  "key": "password",
+                  "value": "newpass123"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdUserId', jsonData.userId);"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -550,7 +598,7 @@
                 "exec": [
                   "pm.environment.set('responseBody', pm.response.text());",
                   "var jsonData = pm.response.json();",
-                  "pm.environment.set('ownedFunctionId', jsonData.funcId);"
+                  "pm.environment.set('ownedFunctionId', jsonData.id);"
                 ]
               }
             }
@@ -818,7 +866,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=2.5&y=7.0",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=0&y=7.0",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
@@ -828,7 +876,7 @@
                 },
                 {
                   "key": "x",
-                  "value": "2.5"
+                  "value": "0"
                 },
                 {
                   "key": "y",
