@@ -54,8 +54,8 @@ public class OwnedFunctionController extends Controller {
                 return;
             }
             int userId = user.userId;
-            if (hasRequiredRole(user, UserType.Admin) && req.getParameterMap().containsKey("user")) {
-                userId = Integer.parseInt(req.getParameter("user"));
+            if (hasRequiredRole(user, UserType.Admin) && req.getParameterMap().containsKey("userId")) {
+                userId = Integer.parseInt(req.getParameter("userId"));
             }
 
             switch (path) {
