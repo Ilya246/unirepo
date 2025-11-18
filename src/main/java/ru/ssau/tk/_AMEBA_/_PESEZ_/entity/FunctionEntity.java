@@ -31,6 +31,9 @@ public class FunctionEntity {
     @OneToMany(mappedBy = "function", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FunctionOwnershipEntity> functionOwnerships = new ArrayList<>();
 
+    @OneToMany(mappedBy = "compositeFunction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CompositeFunctionEntity> compositeFunctions = new ArrayList<>();
+
     @OneToMany(mappedBy = "innerFunction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CompositeFunctionEntity> innerCompositeFunctions = new ArrayList<>();
 

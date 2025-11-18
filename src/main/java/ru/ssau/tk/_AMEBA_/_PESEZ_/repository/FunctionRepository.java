@@ -163,7 +163,7 @@ public class FunctionRepository {
 
             // Используем CompositeFunctionRepository для сохранения композитной связи
             CompositeFunctionEntity compositeEntity = new CompositeFunctionEntity();
-            compositeEntity.setFuncId(compositeFunction.getFuncId());
+            compositeEntity.setCompositeFunction(compositeFunction);
             compositeEntity.setInnerFunction(innerFunc);
             compositeEntity.setOuterFunction(outerFunc);
             compositeRepository.save(compositeEntity);
