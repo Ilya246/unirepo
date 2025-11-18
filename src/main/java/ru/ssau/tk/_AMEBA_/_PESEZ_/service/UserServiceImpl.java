@@ -71,9 +71,6 @@ public class UserServiceImpl implements UserService {
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(getBase64Hash(request.getPassword()));
         }
-        if (request.getCreatedDate() != null) {
-            user.setCreatedDate(request.getCreatedDate());
-        }
 
         UserEntity updatedUser = userRepository.update(user);
         log.info("User updated with id: {}", id);
@@ -134,13 +131,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse convertToResponse(UserEntity user) {
-        return UserResponse.builder()
-                .userId(user.getUserId())
-                .typeId(user.getTypeId())
-                .userName(user.getUserName())
-                .password(user.getPassword()) // Осторожно! Возможно стоит не возвращать пароль
-                .createdDate(user.getCreatedDate())
-                .build();
+        UserResponse response = new UserResponse();
+        response.setUserId(user.getUserId());
+        response.setTypeId(user.getTypeId());
+        response.setUserName(user.getUserName());
+        response.setPassword(user.getPassword());
+        return response;
     }
 
 

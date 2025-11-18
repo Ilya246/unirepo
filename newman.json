@@ -1,0 +1,833 @@
+{
+  "info": {
+    "name": "API tests",
+    "description": "test function DB",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminUsername",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin123",
+      "type": "string"
+    },
+    {
+      "key": "normalUsername",
+      "value": "user1",
+      "type": "string"
+    },
+    {
+      "key": "normalPassword",
+      "value": "user123",
+      "type": "string"
+    },
+    {
+      "key": "createdFunctionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdCompositeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ownedFunctionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "POST /users - Create admin user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"userType\":\"Admin\",\"username\":\"admin\",\"password\":\"admin123\"}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["users"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Authentication Tests",
+      "item": [
+        {
+          "name": "Get Admin Auth Header",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const credentials = pm.variables.get('adminUsername') + ':' + pm.variables.get('adminPassword');",
+                  "const base64Credentials = btoa(credentials);",
+                  "pm.variables.set('authToken', 'Basic ' + base64Credentials);",
+                  "pm.test(\"Auth token generated\", function() {",
+                  "    pm.expect(pm.variables.get('authToken')).to.include('Basic ');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management Endpoints",
+      "item": [
+        {
+          "name": "GET /users - Get all users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /users/user - Get user by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/user?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "user"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /users/register - Register new user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register?username=newuser&password=newpass123",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "newuser"
+                },
+                {
+                  "key": "password",
+                  "value": "newpass123"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /users - Update user (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userType\":\"Normal\",\"username\":\"updateduser\",\"password\":\"updatedpass\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users?id=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /users - Delete user (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users?id=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Function Endpoints",
+      "item": [
+        {
+          "name": "POST /functions/math - Create math function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"math\",\"expression\":\"x^2 + 2*x + 1\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/math",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "math"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /functions/tabulated - Create tabulated function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"tabulated\",\"expression\":\"sin(x)\",\"xFrom\":0.0,\"xTo\":6.28,\"pointCount\":10}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/tabulated",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "tabulated"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /functions/pure-tabulated - Create pure tabulated function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"pure\",\"xValues\":[1, 2, 3, 4, 5],\"yValues\":[2, 4, 6, 8, 10]}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/pure-tabulated",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "pure-tabulated"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /functions/composite - Create composite function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"composite\",\"innerId\":1,\"outerId\":2}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/functions/composite",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "composite"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /functions - Get function by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /functions/calculate - Calculate function value",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/functions/calculate?id=1&x=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["functions", "calculate"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "x",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Composite Function Endpoints",
+      "item": [
+        {
+          "name": "GET /composite-functions - Get composite function",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/composite-functions?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["composite-functions"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Owned Function Endpoints",
+      "item": [
+        {
+          "name": "POST /owned-functions/math - Create owned math function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"math\",\"expression\":\"3x+5\"},\"name\":\"test\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions/math",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions", "math"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /owned-functions/tabulated - Create owned tabulated function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"tabulated\",\"expression\":\"3x+5\",\"pointCount\":50,\"xFrom\":-5.0,\"xTo\":5.0},\"name\":\"testtab\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions/tabulated",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions", "tabulated"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /owned-functions/pure-tabulated - Create owned pure tabulated",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"pure\",\"xValues\":[1.0,2.0,3.0],\"yValues\":[2.0,4.0,6.0]},\"name\":\"pure\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions/pure-tabulated",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions", "pure-tabulated"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /owned-functions/composite - Create owned composite function",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"composite\",\"innerId\":1,\"outerId\":2},\"name\":\"test\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions/composite",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions", "composite"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /owned-functions/own - Admin assign function to user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions/own?id=1&name=AssignedFunction",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions", "own"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "name",
+                  "value": "AssignedFunction"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /owned-functions - Get owned function by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /owned-functions/user - Get user's functions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions", "user"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /owned-functions - Update function name",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions?id=1&name=UpdatedFunctionName",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "name",
+                  "value": "UpdatedFunctionName"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /owned-functions - Delete function ownership",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/owned-functions?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["owned-functions"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Points Management Endpoints",
+      "item": [
+        {
+          "name": "GET /points - Get points by function ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/points?id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["points"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /points - Create point",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/points?id=1&x=2.5&y=6.25",
+              "host": ["{{baseUrl}}"],
+              "path": ["points"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "x",
+                  "value": "2.5"
+                },
+                {
+                  "key": "y",
+                  "value": "6.25"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /points - Update point",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/points?id=1&x=2.5&y=7.0",
+              "host": ["{{baseUrl}}"],
+              "path": ["points"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "x",
+                  "value": "2.5"
+                },
+                {
+                  "key": "y",
+                  "value": "7.0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /points - Delete point",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/points?id=1&x=2.5",
+              "host": ["{{baseUrl}}"],
+              "path": ["points"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "x",
+                  "value": "2.5"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "console.log('Running test for: ' + pm.request.url);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Status code is 200\", function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test(\"Response time is acceptable\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+          "});"
+        ]
+      }
+    }
+  ]
+}

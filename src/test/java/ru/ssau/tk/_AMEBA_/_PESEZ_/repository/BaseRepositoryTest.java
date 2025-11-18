@@ -58,7 +58,7 @@ public abstract class BaseRepositoryTest {
                                         user_Id SERIAL PRIMARY KEY,
                                         type_Id INTEGER CHECK (type_Id >= 1 AND type_Id <= 2),
                                         user_Name VARCHAR(100),
-                                        password VARCHAR(20),
+                                        password VARCHAR(2000),
                                         created_Date TIMESTAMP
                                     )
         """).executeUpdate();

@@ -13,16 +13,16 @@ import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/users/*")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
     @PostMapping
     @Operation(summary = "Создание пользователя")
-    public UserResponse createUser(@RequestBody @Valid UserRequest request, @RequestParam String adminUserName,
-                                   @RequestParam String adminPassword) {
-        userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);
+    public UserResponse createUser(@RequestBody @Valid UserRequest request/*, @RequestParam String adminUserName,
+                                   @RequestParam String adminPassword*/) {
+        /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.createUser(request);
     }
 
@@ -34,25 +34,25 @@ public class UserController {
 
     @PutMapping("?id={id}")
     @Operation(summary = "Обновление пользователя")
-    public UserResponse updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request, @RequestParam String adminUserName,
-                                   @RequestParam String adminPassword) {
-        userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);
+    public UserResponse updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request/*, @RequestParam String adminUserName,
+                                   @RequestParam String adminPassword*/) {
+        /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.updateUser(id, request);
     }
 
     @DeleteMapping("?id={id}")
     @Operation(summary = "Удаление пользователя")
-    public void deleteUser(@PathVariable Long id, @RequestBody @Valid UserRequest request, @RequestParam String adminUserName,
-                           @RequestParam String adminPassword) {
-        userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);
+    public void deleteUser(@PathVariable Long id, @RequestBody @Valid UserRequest request/*, @RequestParam String adminUserName,
+                           @RequestParam String adminPassword*/) {
+        /* userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         userService.deleteUser(id);
     }
 
     @GetMapping
     @Operation(summary = "Получение всех пользователей")
-    public List<UserResponse> getAllUsers(@RequestParam String adminUserName,
-                                          @RequestParam String adminPassword ){
-        userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);
+    public List<UserResponse> getAllUsers(/*@RequestParam String adminUserName,
+                                          @RequestParam String adminPassword*/ ){
+        /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.getAllUsers();
     }
 

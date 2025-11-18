@@ -16,33 +16,39 @@ import java.util.List;
 public class PointController {
     private final PointService pointsService;
 
-    @PostMapping("?id={id}&x={x}&y={y}")
+    @PostMapping
     @Operation(summary = "Создание точки")
-    public PointResponse createPoint(@RequestBody @Valid PointRequest request) {
+    public PointResponse createPoint(
+            @RequestParam Long id,
+            @RequestParam Double x,
+            @RequestParam Double y,
+            @RequestBody @Valid PointRequest request) {
         return pointsService.createPoint(request);
     }
 
-    @PutMapping("?id={id}&x={x}&y={y}")
+
+    @PutMapping("/function/{functionId}/x/{xValue}/y/{yValue}")
     @Operation(summary = "Обновление точки")
     public PointResponse updatePoint(
-            @PathVariable Long functionId,
-            @PathVariable Double xValue,
+            @RequestParam Long id,
+            @RequestParam Double x,
+            @RequestParam Double y,
             @RequestBody @Valid PointRequest request) {
-        return pointsService.updatePoint(functionId, xValue, request);
+        return pointsService.updatePoint(id, x, request);
     }
 
-    @DeleteMapping("?id={id}&x={x}")
+    @DeleteMapping("/function/{functionId}/x/{xValue}")
     @Operation(summary = "Удаление точки")
     public void deletePoint(
-            @PathVariable Long functionId,
-            @PathVariable Double xValue) {
-        pointsService.deletePoint(functionId, xValue);
+            @RequestParam Long id,
+            @RequestParam Double x) {
+        pointsService.deletePoint(id, x);
     }
 
-    @GetMapping("?id={id}")
+    @GetMapping("/function/{functionId}")
     @Operation(summary = "Получение всех точек функции")
-    public List<PointResponse> getPointsByFunction(@PathVariable Long functionId) {
-        return pointsService.getPointsByFunction(functionId);
+    public List<PointResponse> getPointsByFunction(@RequestParam Long id) {
+        return pointsService.getPointsByFunction(id);
     }
 
 

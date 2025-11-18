@@ -13,6 +13,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.BaseRepositoryTest;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionService;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.TestHibernateSessionFactoryUtil;
 
 import java.util.List;
@@ -26,6 +27,7 @@ class FunctionOwnershipServiceImplTest extends BaseRepositoryTest {
     private FunctionOwnershipRepository ownershipRepo;
     private UserRepository userRepo;
     private FunctionRepository functionRepo;
+    private FunctionService functionService;
 
     @BeforeEach
     void setUp() {
@@ -33,7 +35,7 @@ class FunctionOwnershipServiceImplTest extends BaseRepositoryTest {
         ownershipRepo = new FunctionOwnershipRepository(sessionFactory);
         userRepo = new UserRepository(sessionFactory);
         functionRepo = new FunctionRepository(sessionFactory);
-        ownershipService = new FunctionOwnershipServiceImpl(ownershipRepo, userRepo, functionRepo);
+        ownershipService = new FunctionOwnershipServiceImpl(ownershipRepo, userRepo, functionRepo, functionService);
     }
 
     private FunctionEntity createTestFunction(String expression, int typeId) {
