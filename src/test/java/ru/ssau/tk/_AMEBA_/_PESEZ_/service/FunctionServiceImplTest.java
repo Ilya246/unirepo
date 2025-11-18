@@ -34,7 +34,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         functionService = new FunctionServiceImpl(functionRepository, new ObjectMapper());
     }
 
-/*    @Test
+    @Test
     void testGetFunction() {
         // Given
         FunctionEntity function = new FunctionEntity();
