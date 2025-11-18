@@ -25,12 +25,12 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
     public CompositeFunctionResponse create(CompositeFunctionRequest request) {
         // Ручное создание Entity вместо ObjectMapper
         CompositeFunctionEntity function = new CompositeFunctionEntity();
-        function.setCompositeFunction(functionRepository.findById(request.getCompositeFunctionId()));
+        function.setFuncId(request.getCompositeFunctionId());
         function.setInnerFunction(functionRepository.findById(request.getInnerFunctionId()));
         function.setOuterFunction(functionRepository.findById(request.getOuterFunctionId()));
 
         compositeFunctionRepo.save(function);
-        log.info("Composite function created with id: {}", function.getCompositeFunction().getFuncId());
+        log.info("Composite function created with id: {}", function.getFuncId());
 
         // Ручное создание Response вместо ObjectMapper
         return convertToResponse(function);
@@ -74,7 +74,7 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
     // Ручное преобразование Entity в Response (аналогично FunctionServiceImpl)
     private CompositeFunctionResponse convertToResponse(CompositeFunctionEntity function) {
         CompositeFunctionResponse response = new CompositeFunctionResponse();
-        response.setCompositeFunctionId(function.getCompositeFunction().getFuncId());
+        response.setCompositeFunctionId(function.getFuncId());
         response.setInnerFunctionId(function.getInnerFunction().getFuncId());
         response.setOuterFunctionId(function.getOuterFunction().getFuncId());
         return response;

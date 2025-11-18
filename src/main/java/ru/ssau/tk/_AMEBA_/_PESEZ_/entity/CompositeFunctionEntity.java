@@ -15,9 +15,9 @@ import lombok.*;
 @ToString
 public class CompositeFunctionEntity {
     @Id
-    @OneToOne
-    @JoinColumn(name = "func_Id")
-    private FunctionEntity compositeFunction;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "func_Id")
+    private Long funcId;
 
     @ManyToOne
     @JoinColumn(name = "inner_Func_Id")
