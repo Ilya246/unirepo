@@ -32,29 +32,6 @@ class CompositeFunctionServiceImplTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testCreateCompositeFunction() {
-        // Given - создаем базовые функции
-        FunctionEntity innerFunction = createTestFunction("x^2", 1);
-        FunctionEntity outerFunction = createTestFunction("sin(x)", 1);
-        FunctionEntity compositeFunction = createTestFunction("sin(x^2)", 3);
-
-        CompositeFunctionRequest request = new CompositeFunctionRequest();
-        request.setInnerFunctionId(innerFunction.getFuncId());
-        request.setOuterFunctionId(outerFunction.getFuncId());
-        request.setCompositeFunctionId(compositeFunction.getFuncId());
-
-        // When
-        CompositeFunctionResponse response = compositeFunctionService.create(request);
-
-        // Then
-        assertNotNull(response);
-        assertNotNull(response.getCompositeFunctionId());
-        assertEquals("sin(x^2)", functionRepo.findById(response.getCompositeFunctionId()).getExpression());
-        assertEquals("x^2", functionRepo.findById(response.getInnerFunctionId()).getExpression());
-        assertEquals("sin(x)", functionRepo.findById(response.getOuterFunctionId()).getExpression());
-    }
-
-    @Test
     void testGetAllFunctions() {
         // Given - создаем несколько композитных функций
         createTestCompositeFunction("x^2", "sin(x)", "sin(x^2)");

@@ -8,8 +8,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.CompositeFunctionEntity;
 import java.util.List;
 
 public interface CompositeFunctionService {
-    CompositeFunctionResponse create(CompositeFunctionRequest request);
-
     List<CompositeFunctionEntity> getAllFunctions();
 
     CompositeFunctionResponse getFunction(Long id);

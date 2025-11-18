@@ -22,22 +22,6 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
     private final FunctionRepository functionRepository;
 
     @Override
-    public CompositeFunctionResponse create(CompositeFunctionRequest request) {
-        // Ручное создание Entity вместо ObjectMapper
-        CompositeFunctionEntity function = new CompositeFunctionEntity();
-        
-        function.setFuncId((long) (Math.random()*1e15));
-        function.setInnerFunction(functionRepository.findById(request.getInnerFunctionId()));
-        function.setOuterFunction(functionRepository.findById(request.getOuterFunctionId()));
-
-        compositeFunctionRepo.save(function);
-        log.info("Composite function created with id: {}", function.getCompositeFunction().getFuncId());
-
-        // Ручное создание Response вместо ObjectMapper
-        return convertToResponse(function);
-    }
-
-    @Override
     public List<CompositeFunctionEntity> getAllFunctions() {
         return compositeFunctionRepo.findAll();
     }

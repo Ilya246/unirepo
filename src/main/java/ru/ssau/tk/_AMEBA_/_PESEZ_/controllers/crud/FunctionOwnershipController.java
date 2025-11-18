@@ -29,37 +29,37 @@ public class FunctionOwnershipController {
     @GetMapping
     @Operation(summary = "Получение связи по ID пользователя и функции")
     public FunctionOwnershipResponse getOwnership(
-            @PathVariable Long userId,
-            @PathVariable Long functionId) {
-        return ownershipService.getOwnership(userId, functionId);
+            @RequestParam Long userId,
+            @RequestParam Long id) {
+        return ownershipService.getOwnership(userId, id);
     }
 
     @PutMapping
     @Operation(summary = "Обновление связи функции и пользователя")
     public FunctionOwnershipResponse updateOwnership(
-            @PathVariable Long userId,
-            @PathVariable Long functionId,
-            @RequestBody @Valid FunctionOwnershipRequest request) {
-        return ownershipService.updateOwnership(userId, functionId, request);
+            @RequestParam Long userId,
+            @RequestParam Long id,
+            @RequestParam String name) {
+        return ownershipService.updateOwnership(userId, id, new FunctionOwnershipRequest(userId, id, name));
     }
 
     @DeleteMapping
     @Operation(summary = "Удаление связи по ID пользователя и функции")
     public void deleteOwnership(
-            @PathVariable Long userId,
-            @PathVariable Long functionId) {
-        ownershipService.deleteOwnership(userId, functionId);
+            @RequestParam Long userId,
+            @RequestParam Long id) {
+        ownershipService.deleteOwnership(userId, id);
     }
 
     @GetMapping("/user")
     @Operation(summary = "Получение всех связей пользователя")
-    public List<FunctionOwnershipEntity> getOwnershipsByUserId(@PathVariable Long userId) {
+    public List<FunctionOwnershipEntity> getOwnershipsByUserId(@RequestParam Long userId) {
         return ownershipService.getOwnershipsByUserId(userId);
     }
 
     @PostMapping("/own")
     @Operation(summary = "Добавить существующую функцию пользователю")
-    public FunctionOwnershipResponse add(@PathVariable Long userId,@PathVariable Long functionId,@PathVariable String funcName){
+    public FunctionOwnershipResponse add(@RequestParam Long userId,@RequestParam("id") Long functionId,@RequestParam("name") String funcName){
         return ownershipService.addExistingFunctionToUser(userId,functionId,funcName);
     }
 
