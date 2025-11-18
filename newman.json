@@ -21,6 +21,11 @@
       "type": "string"
     },
     {
+      "key": "adminId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "normalUsername",
       "value": "user1",
       "type": "string"
@@ -32,6 +37,11 @@
     },
     {
       "key": "createdFunctionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "createdPureId",
       "value": "",
       "type": "string"
     },
@@ -77,7 +87,19 @@
           "path": ["users"]
         }
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set('adminId', jsonData.userId);"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Authentication Tests",
@@ -106,6 +128,50 @@
               "raw": "{{baseUrl}}/users",
               "host": ["{{baseUrl}}"]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "POST /users/register - Register new user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users/register?username=newuser&password=newpass123",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "register"],
+          "query": [
+            {
+              "key": "username",
+              "value": "newuser"
+            },
+            {
+              "key": "password",
+              "value": "newpass123"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set('createdUserId', jsonData.userId);"
+            ]
           }
         }
       ]
@@ -142,13 +208,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/users/user?id=1",
+              "raw": "{{baseUrl}}/users/user?id={{createdUserId}}",
               "host": ["{{baseUrl}}"],
               "path": ["users", "user"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdUserId}}"
                 }
               ]
             }
@@ -156,7 +222,63 @@
           "response": []
         },
         {
-          "name": "POST /users/register - Register new user",
+          "name": "PUT /users - Update user (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"userType\":\"Normal\",\"username\":\"updateduser\",\"password\":\"updatedpass\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users?id={{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "{{createdUserId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /users - Delete user (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users?id={{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "{{createdUserId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /users/register - Recreate user",
           "request": {
             "method": "POST",
             "header": [
@@ -185,63 +307,19 @@
               ]
             }
           },
-          "response": []
-        },
-        {
-          "name": "PUT /users - Update user (Admin)",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "{{authToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdUserId', jsonData.userId);"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"userType\":\"Normal\",\"username\":\"updateduser\",\"password\":\"updatedpass\"}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users?id=2",
-              "host": ["{{baseUrl}}"],
-              "path": ["users"],
-              "query": [
-                {
-                  "key": "id",
-                  "value": "2"
-                }
-              ]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "DELETE /users - Delete user (Admin)",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "{{authToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/users?id=3",
-              "host": ["{{baseUrl}}"],
-              "path": ["users"],
-              "query": [
-                {
-                  "key": "id",
-                  "value": "3"
-                }
-              ]
-            }
-          },
-          "response": []
+          ]
         }
       ]
     },
@@ -298,7 +376,19 @@
               "path": ["functions", "tabulated"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdFunctionId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "POST /functions/pure-tabulated - Create pure tabulated function",
@@ -324,7 +414,19 @@
               "path": ["functions", "pure-tabulated"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdPureId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "POST /functions/composite - Create composite function",
@@ -342,7 +444,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"type\":\"composite\",\"innerId\":1,\"outerId\":2}"
+              "raw": "{\"type\":\"composite\",\"innerId\":{{createdFunctionId}},\"outerId\":{{createdPureId}}}"
             },
             "url": {
               "raw": "{{baseUrl}}/functions/composite",
@@ -350,7 +452,19 @@
               "path": ["functions", "composite"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdCompositeId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "GET /functions - Get function by ID",
@@ -363,13 +477,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/functions?id=1",
+              "raw": "{{baseUrl}}/functions?id={{createdFunctionId}}",
               "host": ["{{baseUrl}}"],
               "path": ["functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 }
               ]
             }
@@ -387,46 +501,17 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/functions/calculate?id=1&x=5",
+              "raw": "{{baseUrl}}/functions/calculate?id={{createdFunctionId}}&x=5",
               "host": ["{{baseUrl}}"],
               "path": ["functions", "calculate"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
                   "value": "5"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Composite Function Endpoints",
-      "item": [
-        {
-          "name": "GET /composite-functions - Get composite function",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "{{authToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/composite-functions?id=1",
-              "host": ["{{baseUrl}}"],
-              "path": ["composite-functions"],
-              "query": [
-                {
-                  "key": "id",
-                  "value": "1"
                 }
               ]
             }
@@ -457,9 +542,15 @@
               "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"math\",\"expression\":\"3x+5\"},\"name\":\"test\"}"
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/math",
+              "raw": "{{baseUrl}}/owned-functions/math?userId={{createdUserId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["owned-functions", "math"]
+              "path": ["owned-functions", "math"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
+                }
+              ]
             }
           },
           "response": []
@@ -483,12 +574,31 @@
               "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"tabulated\",\"expression\":\"3x+5\",\"pointCount\":50,\"xFrom\":-5.0,\"xTo\":5.0},\"name\":\"testtab\"}"
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/tabulated",
+              "raw": "{{baseUrl}}/owned-functions/tabulated?userId={{createdUserId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["owned-functions", "tabulated"]
+              "path": ["owned-functions", "tabulated"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
+                }
+              ]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('responseBody', pm.response.text());",
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('ownedFunctionId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "POST /owned-functions/pure-tabulated - Create owned pure tabulated",
@@ -509,9 +619,15 @@
               "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"pure\",\"xValues\":[1.0,2.0,3.0],\"yValues\":[2.0,4.0,6.0]},\"name\":\"pure\"}"
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/pure-tabulated",
+              "raw": "{{baseUrl}}/owned-functions/pure-tabulated?userId={{createdUserId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["owned-functions", "pure-tabulated"]
+              "path": ["owned-functions", "pure-tabulated"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
+                }
+              ]
             }
           },
           "response": []
@@ -532,12 +648,18 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"composite\",\"innerId\":1,\"outerId\":2},\"name\":\"test\"}"
+              "raw": "{\"type\":\"owned\",\"funcParams\":{\"type\":\"composite\",\"innerId\":{{createdFunctionId}},\"outerId\":{{createdPureId}}},\"name\":\"test\"}"
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/composite",
+              "raw": "{{baseUrl}}/owned-functions/composite?userId={{createdUserId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["owned-functions", "composite"]
+              "path": ["owned-functions", "composite"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
+                }
+              ]
             }
           },
           "response": []
@@ -557,17 +679,21 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/own?id=1&name=AssignedFunction",
+              "raw": "{{baseUrl}}/owned-functions/own?id={{ownedFunctionId}}&name=AssignedFunction&userId={{adminId}}",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions", "own"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
                 },
                 {
                   "key": "name",
                   "value": "AssignedFunction"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{adminId}}"
                 }
               ]
             }
@@ -585,13 +711,17 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/owned-functions?id=1",
+              "raw": "{{baseUrl}}/owned-functions?id={{ownedFunctionId}}&userId={{adminId}}",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{adminId}}"
                 }
               ]
             }
@@ -609,9 +739,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/user",
+              "raw": "{{baseUrl}}/owned-functions/user&userId={{adminId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["owned-functions", "user"]
+              "path": ["owned-functions", "user"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
+                }
+              ]
             }
           },
           "response": []
@@ -631,17 +767,21 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions?id=1&name=UpdatedFunctionName",
+              "raw": "{{baseUrl}}/owned-functions?id={{ownedFunctionId}}&name=UpdatedFunctionName&userId={{adminId}}",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
                 },
                 {
                   "key": "name",
                   "value": "UpdatedFunctionName"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
                 }
               ]
             }
@@ -659,13 +799,17 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/owned-functions?id=1",
+              "raw": "{{baseUrl}}/owned-functions?id={{ownedFunctionId}}&userId={{adminId}}",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{createdUserId}}"
                 }
               ]
             }
@@ -688,13 +832,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/points?id=1",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 }
               ]
             }
@@ -716,17 +860,17 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/points?id=1&x=2.5&y=6.25",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=0&y=6.25",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
-                  "value": "2.5"
+                  "value": "0.123"
                 },
                 {
                   "key": "y",
@@ -752,17 +896,17 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/points?id=1&x=2.5&y=7.0",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=0&y=7.0",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
-                  "value": "2.5"
+                  "value": "0.123"
                 },
                 {
                   "key": "y",
@@ -784,17 +928,17 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/points?id=1&x=2.5",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=2.5",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
-                  "value": "2.5"
+                  "value": "0.123"
                 }
               ]
             }
