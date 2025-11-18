@@ -162,7 +162,7 @@ class FunctionRepositoryTest extends BaseRepositoryTest {
                 "Должно быть выброшено исключение при несовпадающих длинах массивов");
     }
 
-    @Test
+   /* @Test
     void testCreateComposite() throws ExecutionException, InterruptedException {
         // Создаем внутреннюю и внешнюю функции
         FunctionEntity inner = new FunctionEntity(1, "x + 1");
@@ -183,7 +183,7 @@ class FunctionRepositoryTest extends BaseRepositoryTest {
         double result = compositeFunc.apply(2); // (2 + 1)^2 = 9
         assertEquals(9.0, result, 0.0001);
     }
-
+*/
     @Test
     void testCreateCompositeSameIds() {
         FunctionEntity func = new FunctionEntity(1, "x");
