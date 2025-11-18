@@ -25,7 +25,6 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
     public CompositeFunctionResponse create(CompositeFunctionRequest request) {
         // Ручное создание Entity вместо ObjectMapper
         CompositeFunctionEntity function = new CompositeFunctionEntity();
-        function.setFuncId(request.getCompositeFunctionId());
         function.setInnerFunction(functionRepository.findById(request.getInnerFunctionId()));
         function.setOuterFunction(functionRepository.findById(request.getOuterFunctionId()));
 

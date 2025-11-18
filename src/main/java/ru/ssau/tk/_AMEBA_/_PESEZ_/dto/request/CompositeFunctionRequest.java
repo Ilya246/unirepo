@@ -16,7 +16,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeFunctionRequest implements FunctionCreateRequest {
 
-    private Long compositeFunctionId;
     private Long innerFunctionId;
     private Long outerFunctionId;
 }
