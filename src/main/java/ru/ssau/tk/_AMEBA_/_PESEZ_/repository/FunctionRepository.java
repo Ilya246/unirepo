@@ -139,7 +139,7 @@ public class FunctionRepository {
     // Создание композитной функции
     public CompletableFuture<Long> createComposite(Long innerId, Long outerId) {
         return CompletableFuture.supplyAsync(() -> {
-            if (innerId == outerId) {
+            if (innerId.equals(outerId)) {
                 throw new IllegalArgumentException("Inner and outer function IDs cannot be the same");
             }
 

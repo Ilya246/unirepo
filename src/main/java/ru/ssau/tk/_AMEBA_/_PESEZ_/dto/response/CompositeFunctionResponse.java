@@ -1,5 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -14,7 +15,10 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeFunctionResponse extends CompositeFunctionRequest {
+    @JsonProperty("id")
     private Long compositeFunctionId;
+    @JsonProperty
     private Long innerFunctionId;
+    @JsonProperty
     private Long outerFunctionId;
 }

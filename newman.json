@@ -36,6 +36,11 @@
       "type": "string"
     },
     {
+      "key": "createdPureId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "createdCompositeId",
       "value": "",
       "type": "string"
@@ -77,7 +82,19 @@
           "path": ["users"]
         }
       },
-      "response": []
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "pm.environment.set('createdUserId', jsonData.userId);"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "Authentication Tests",
@@ -142,13 +159,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/users/user?id=1",
+              "raw": "{{baseUrl}}/users/user?id={{createdUserId}}",
               "host": ["{{baseUrl}}"],
               "path": ["users", "user"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdUserId}}"
                 }
               ]
             }
@@ -206,13 +223,13 @@
               "raw": "{\"userType\":\"Normal\",\"username\":\"updateduser\",\"password\":\"updatedpass\"}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users?id=2",
+              "raw": "{{baseUrl}}/users?id={{createdUserId}}",
               "host": ["{{baseUrl}}"],
               "path": ["users"],
               "query": [
                 {
                   "key": "id",
-                  "value": "2"
+                  "value": "{{createdUserId}}"
                 }
               ]
             }
@@ -230,13 +247,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/users?id=3",
+              "raw": "{{baseUrl}}/users?id={{createdUserId}}",
               "host": ["{{baseUrl}}"],
               "path": ["users"],
               "query": [
                 {
                   "key": "id",
-                  "value": "3"
+                  "value": "{{createdUserId}}"
                 }
               ]
             }
@@ -298,7 +315,19 @@
               "path": ["functions", "tabulated"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdFunctionId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "POST /functions/pure-tabulated - Create pure tabulated function",
@@ -324,7 +353,19 @@
               "path": ["functions", "pure-tabulated"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdPureId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "POST /functions/composite - Create composite function",
@@ -342,7 +383,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"type\":\"composite\",\"innerId\":1,\"outerId\":2}"
+              "raw": "{\"type\":\"composite\",\"innerId\":{{createdFunctionId}},\"outerId\":{{createdPureId}}}"
             },
             "url": {
               "raw": "{{baseUrl}}/functions/composite",
@@ -350,7 +391,19 @@
               "path": ["functions", "composite"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('createdCompositeId', jsonData.id);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "GET /functions - Get function by ID",
@@ -363,13 +416,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/functions?id=1",
+              "raw": "{{baseUrl}}/functions?id={{createdFunctionId}}",
               "host": ["{{baseUrl}}"],
               "path": ["functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 }
               ]
             }
@@ -387,13 +440,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/functions/calculate?id=1&x=5",
+              "raw": "{{baseUrl}}/functions/calculate?id={{createdFunctionId}}&x=5",
               "host": ["{{baseUrl}}"],
               "path": ["functions", "calculate"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
@@ -420,13 +473,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/composite-functions?id=1",
+              "raw": "{{baseUrl}}/composite-functions?id={{createdCompositeId}}",
               "host": ["{{baseUrl}}"],
               "path": ["composite-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdCompositeId}}"
                 }
               ]
             }
@@ -488,7 +541,20 @@
               "path": ["owned-functions", "tabulated"]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('responseBody', pm.response.text());",
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set('ownedFunctionId', jsonData.funcId);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "POST /owned-functions/pure-tabulated - Create owned pure tabulated",
@@ -557,13 +623,13 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions/own?id=1&name=AssignedFunction",
+              "raw": "{{baseUrl}}/owned-functions/own?id={{ownedFunctionId}}&name=AssignedFunction",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions", "own"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
                 },
                 {
                   "key": "name",
@@ -585,13 +651,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/owned-functions?id=1",
+              "raw": "{{baseUrl}}/owned-functions?id={{ownedFunctionId}}",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
                 }
               ]
             }
@@ -631,13 +697,13 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/owned-functions?id=1&name=UpdatedFunctionName",
+              "raw": "{{baseUrl}}/owned-functions?id={{ownedFunctionId}}&name=UpdatedFunctionName",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
                 },
                 {
                   "key": "name",
@@ -659,13 +725,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/owned-functions?id=1",
+              "raw": "{{baseUrl}}/owned-functions?id={{ownedFunctionId}}",
               "host": ["{{baseUrl}}"],
               "path": ["owned-functions"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{ownedFunctionId}}"
                 }
               ]
             }
@@ -688,13 +754,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/points?id=1",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 }
               ]
             }
@@ -716,17 +782,17 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/points?id=1&x=2.5&y=6.25",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=0&y=6.25",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
-                  "value": "2.5"
+                  "value": "0"
                 },
                 {
                   "key": "y",
@@ -752,13 +818,13 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{baseUrl}}/points?id=1&x=2.5&y=7.0",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=2.5&y=7.0",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",
@@ -784,13 +850,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/points?id=1&x=2.5",
+              "raw": "{{baseUrl}}/points?id={{createdFunctionId}}&x=2.5",
               "host": ["{{baseUrl}}"],
               "path": ["points"],
               "query": [
                 {
                   "key": "id",
-                  "value": "1"
+                  "value": "{{createdFunctionId}}"
                 },
                 {
                   "key": "x",

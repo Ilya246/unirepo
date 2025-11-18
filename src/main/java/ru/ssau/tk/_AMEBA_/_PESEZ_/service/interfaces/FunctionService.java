@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface FunctionService {
-    FunctionResponse createFunction(FunctionRequest request);
-
     FunctionResponse getFunction(Long id);
 
     FunctionEntity getFunctionDb(Long id);

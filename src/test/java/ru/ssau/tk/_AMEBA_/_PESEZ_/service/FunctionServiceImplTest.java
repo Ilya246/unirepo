@@ -35,23 +35,6 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testCreateFunction() {
-        // Given
-        FunctionRequest request = new FunctionRequest();
-        request.setExpression("x + 1");
-        request.setTypeId(1);
-
-        // When
-        FunctionResponse response = functionService.createFunction(request);
-
-        // Then
-        assertNotNull(response);
-        assertNotNull(response.getFuncId());
-        assertEquals("x + 1", response.getExpression());
-        assertEquals(1, response.getTypeId());
-    }
-
-    @Test
     void testGetFunction() {
         // Given
         FunctionEntity function = new FunctionEntity();

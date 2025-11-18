@@ -9,7 +9,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = OwnedFunctionCreateRequest.class, name = "owned"),
-        @JsonSubTypes.Type(value = MathFunction.class, name = "math"),
+        @JsonSubTypes.Type(value = MathFunctionRequest.class, name = "math"),
         @JsonSubTypes.Type(value = PureTabulatedRequest.class, name = "pure"),
         @JsonSubTypes.Type(value = TabulatedFunctionRequest.class, name = "tabulated"),
         @JsonSubTypes.Type(value = CompositeFunctionRequest.class, name = "composite"),

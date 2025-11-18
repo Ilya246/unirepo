@@ -30,19 +30,6 @@ public class FunctionServiceImpl implements FunctionService {
     private final ObjectMapper mapper;
 
     @Override
-    public FunctionResponse createFunction(FunctionRequest request) {
-        FunctionEntity function = mapper.convertValue(request, FunctionEntity.class);
-        function.setExpression(request.getExpression());
-        function.setTypeId(request.getTypeId());
-
-        functionRepo.save(function);
-        log.info("Function created with id: {}", function.getFuncId());
-
-        return mapper.convertValue(function, FunctionResponse.class);
-
-    }
-
-    @Override
     public FunctionResponse getFunction(Long id) {
         FunctionEntity function = getFunctionDb(id);
         return convertToResponse(function);
@@ -103,14 +90,7 @@ public class FunctionServiceImpl implements FunctionService {
             ).get();
 
             FunctionEntity function = getFunctionDb(funcId);
-            return TabulatedFunctionResponse.builder()
-                    .funcId(funcId)
-                    .expression(function.getExpression())
-                    .from(request.getFrom())
-                    .to(request.getTo())
-                    .pointCount(request.getPointCount())
-                    .build();
-
+            return new TabulatedFunctionResponse(funcId, request.getExpression());
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error creating tabulated function: {}", e.getMessage());
             throw new CustomException("Failed to create tabulated function: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -198,10 +178,6 @@ public class FunctionServiceImpl implements FunctionService {
             default -> "UNKNOWN";
         };
 
-        return FunctionResponse.builder()
-                .funcId(function.getFuncId())
-                .expression(function.getExpression())
-                .typeId(function.getTypeId())
-                .build();
+        return new FunctionResponse(Long.valueOf(function.getTypeId()));
     }
 }

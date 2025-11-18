@@ -9,7 +9,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 
 @Getter
 @Setter
-
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)

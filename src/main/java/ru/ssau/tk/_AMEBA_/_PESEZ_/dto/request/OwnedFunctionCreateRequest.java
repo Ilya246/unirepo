@@ -1,13 +1,17 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OwnedFunctionCreateRequest implements FunctionCreateRequest {
-    public FunctionCreateRequest funcParams;
-    public String name;
-
-    public OwnedFunctionCreateRequest(FunctionCreateRequest funcParams, String name) {
-        this.funcParams = funcParams;
-        this.name = name;
-    }
-
-    public OwnedFunctionCreateRequest() {}
+    @JsonProperty
+    FunctionCreateRequest funcParams;
+    @JsonProperty
+    String name;
 }

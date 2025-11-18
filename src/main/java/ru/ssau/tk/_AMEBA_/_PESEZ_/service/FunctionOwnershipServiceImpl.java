@@ -156,7 +156,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     @Override
     public FunctionResponse createOwnedPure(PureTabulatedRequest request, Long userId) {
         FunctionResponse function = functionService.createPureTabulatedFunction(request);
-        addExistingFunctionToUser(userId, function.getFuncId(),function.getExpression());
+        addExistingFunctionToUser(userId, function.getFuncId(), "<TABULATED>");
         return function;
     }
     @Override

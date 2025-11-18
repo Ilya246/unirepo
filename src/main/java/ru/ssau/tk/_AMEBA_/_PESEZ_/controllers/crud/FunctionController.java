@@ -22,13 +22,6 @@ import java.util.concurrent.CompletableFuture;
 public class FunctionController {
     private final FunctionService functionService;
 
-    // Базовые CRUD операции
-    @PostMapping
-    @Operation(summary = "Создание функции")
-    public FunctionResponse createFunction(@RequestBody @Valid FunctionRequest request) {
-        return functionService.createFunction(request);
-    }
-
     @GetMapping
     @Operation(summary = "Получение функции по ID")
     public FunctionResponse getFunction(@RequestParam Long id) {

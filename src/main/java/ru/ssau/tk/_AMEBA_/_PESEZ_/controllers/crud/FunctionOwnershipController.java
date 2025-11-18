@@ -26,7 +26,7 @@ public class FunctionOwnershipController {
         return ownershipService.create(request);
     }
 
-    @GetMapping("?id={id}")
+    @GetMapping
     @Operation(summary = "Получение связи по ID пользователя и функции")
     public FunctionOwnershipResponse getOwnership(
             @PathVariable Long userId,
@@ -34,7 +34,7 @@ public class FunctionOwnershipController {
         return ownershipService.getOwnership(userId, functionId);
     }
 
-    @PutMapping("?id={id}&name={name}")
+    @PutMapping
     @Operation(summary = "Обновление связи функции и пользователя")
     public FunctionOwnershipResponse updateOwnership(
             @PathVariable Long userId,
@@ -43,7 +43,7 @@ public class FunctionOwnershipController {
         return ownershipService.updateOwnership(userId, functionId, request);
     }
 
-    @DeleteMapping("?id={id}")
+    @DeleteMapping
     @Operation(summary = "Удаление связи по ID пользователя и функции")
     public void deleteOwnership(
             @PathVariable Long userId,
@@ -57,7 +57,7 @@ public class FunctionOwnershipController {
         return ownershipService.getOwnershipsByUserId(userId);
     }
 
-    @PostMapping("/own?id={id}&name={name}")
+    @PostMapping("/own")
     @Operation(summary = "Добавить существующую функцию пользователю")
     public FunctionOwnershipResponse add(@PathVariable Long userId,@PathVariable Long functionId,@PathVariable String funcName){
         return ownershipService.addExistingFunctionToUser(userId,functionId,funcName);
