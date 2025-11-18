@@ -12,7 +12,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.MathFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.TabulatedFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.CompositeFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionService;
@@ -114,8 +113,11 @@ public class FunctionServiceImpl implements FunctionService {
             Long innerFuncId = request.getInnerFunctionId();
             Long outerFuncId = request.getOuterFunctionId();
 
-            // Сохраняем композитную функцию в БД и получаем её ID
             Long compositeFuncId = functionRepo.createComposite(innerFuncId, outerFuncId).get();
+
+            /*FunctionEntity compositeFunction = getFunctionDb(compositeFuncId);
+            FunctionEntity innerFunction = getFunctionDb(innerFuncId);
+            FunctionEntity outerFunction = getFunctionDb(outerFuncId);*/
 
             CompositeFunctionResponse response = new CompositeFunctionResponse();
             response.setCompositeFunctionId(compositeFuncId);

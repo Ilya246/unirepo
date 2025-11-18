@@ -201,6 +201,9 @@ public class FunctionRepository {
                 case TABULATED_ID:
                     return createTabulatedFunctionFromPoints(function);
 
+                case COMPOSITE_ID:
+                    return createCompositeFunction(funcId);
+
                 default:
                     throw new IllegalArgumentException("Unknown function type: " + typeId);
             }
@@ -267,9 +270,18 @@ public class FunctionRepository {
         return new ArrayTabulatedFunction(xValues, yValues);
     }
 
-    private CompositeFunction createCompositeFunction(Long innerId, Long outerId) {
+    private CompositeFunction createCompositeFunction(Long funcId) {
         // Используем CompositeFunctionRepository для получения композитной связи
-        if (innerId.equals(outerId)) {
+        Optional<CompositeFunctionEntity> compositeOpt = compositeRepository.findById(funcId);
+        if (compositeOpt.isEmpty()) {
+            throw new RuntimeException("Composite function entity not found");
+        }
+
+        CompositeFunctionEntity composite = compositeOpt.get();
+        Long innerId = composite.getInnerFunction().getFuncId();
+        Long outerId = composite.getOuterFunction().getFuncId();
+
+        if (innerId == funcId || outerId == funcId) {
             throw new RuntimeException("Attempt to make self-referential composite function");
         }
 
