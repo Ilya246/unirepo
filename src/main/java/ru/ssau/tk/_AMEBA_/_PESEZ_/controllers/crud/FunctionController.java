@@ -1,6 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controllers.crud;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.persistence.PreUpdate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,9 +29,9 @@ public class FunctionController {
         return functionService.createFunction(request);
     }
 
-    @GetMapping("?id={id}")
+    @GetMapping
     @Operation(summary = "Получение функции по ID")
-    public FunctionResponse getFunction(@PathVariable Long id) {
+    public FunctionResponse getFunction(@RequestParam Long id) {
         return functionService.getFunction(id);
     }
 
@@ -60,9 +61,9 @@ public class FunctionController {
         return functionService.createPureTabulatedFunction(request);
     }
 
-    @GetMapping("/calculate?id={id}&x={x}")
+    @GetMapping("/calculate")
     @Operation(summary = "Вычисление значения функции в точке")
-    public Double calculateFunction(@PathVariable Long id, @RequestParam Double x) {
+    public Double calculateFunction(@RequestParam Long id, @RequestParam Double x) {
         return functionService.calculateFunction(id, x);
     }
 

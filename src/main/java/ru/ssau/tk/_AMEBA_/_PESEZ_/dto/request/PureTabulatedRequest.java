@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PureTabulatedRequest {
+public class PureTabulatedRequest implements FunctionCreateRequest {
     double[] xValues;
     double[] yValues;
 }

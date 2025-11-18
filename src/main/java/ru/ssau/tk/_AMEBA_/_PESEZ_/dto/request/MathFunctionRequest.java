@@ -8,6 +8,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MathFunctionRequest {
+public class MathFunctionRequest implements FunctionCreateRequest {
     String expression;
 }

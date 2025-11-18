@@ -13,37 +13,40 @@ import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users/*")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
     @PostMapping
     @Operation(summary = "Создание пользователя")
-    public UserResponse createUser(@RequestBody @Valid UserRequest request/*, @RequestParam String adminUserName,
-                                   @RequestParam String adminPassword*/) {
+    public UserResponse createUser(@RequestBody @Valid UserRequest request) {
         /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.createUser(request);
     }
 
-    @GetMapping("/user?id={id}")
+    @PostMapping("/register")
+    @Operation(summary = "Создание пользователя")
+    public UserResponse createUser(@RequestParam String username, @RequestParam String password) {
+        return userService.createUser(new UserRequest(UserType.Normal, username, password));
+    }
+
+    @GetMapping("/user")
     @Operation(summary = "Получение пользователя по ID")
-    public UserResponse getUser(@PathVariable Long id) {
+    public UserResponse getUser(@RequestParam Long id) {
         return userService.getUser(id);
     }
 
-    @PutMapping("?id={id}")
+    @PutMapping
     @Operation(summary = "Обновление пользователя")
-    public UserResponse updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request/*, @RequestParam String adminUserName,
-                                   @RequestParam String adminPassword*/) {
+    public UserResponse updateUser(@RequestParam Long id, @RequestBody @Valid UserRequest request) {
         /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.updateUser(id, request);
     }
 
-    @DeleteMapping("?id={id}")
+    @DeleteMapping
     @Operation(summary = "Удаление пользователя")
-    public void deleteUser(@PathVariable Long id, @RequestBody @Valid UserRequest request/*, @RequestParam String adminUserName,
-                           @RequestParam String adminPassword*/) {
+    public void deleteUser(@RequestParam Long id) {
         /* userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         userService.deleteUser(id);
     }

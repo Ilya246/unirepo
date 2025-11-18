@@ -17,9 +17,9 @@ import java.util.List;
 public class CompositeFunctionController {
     private final CompositeFunctionService compositeFunctionService;
 
-    @GetMapping("?id={id}")
+    @GetMapping
     @Operation(summary = "Получение композитной функции по ID")
-    public CompositeFunctionResponse getFunction(@PathVariable Long id) {
+    public CompositeFunctionResponse getFunction(@RequestParam Long id) {
         return compositeFunctionService.getFunction(id);
     }
 

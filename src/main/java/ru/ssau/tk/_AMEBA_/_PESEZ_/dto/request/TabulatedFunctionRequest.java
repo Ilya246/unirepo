@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TabulatedFunctionRequest {
+public class TabulatedFunctionRequest implements FunctionCreateRequest {
     String expression;
     Double from;
     Double to;

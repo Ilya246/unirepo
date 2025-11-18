@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse createUser(UserRequest request) {
         UserEntity user = new UserEntity();
-        user.setTypeId(request.getTypeId());
+        user.setTypeId(request.getUserType().typeId);
         user.setUserName(request.getUserName());
         user.setPassword(getBase64Hash(request.getPassword()));
         userRepository.save(user);
@@ -62,8 +62,8 @@ public class UserServiceImpl implements UserService {
         UserEntity user = getUserDb(id);
 
 
-        if (request.getTypeId() != 0) {
-            user.setTypeId(request.getTypeId());
+        if (request.getUserType() != null) {
+            user.setTypeId(request.getUserType().typeId);
         }
         if (request.getUserName() != null && !request.getUserName().isEmpty()) {
             user.setUserName(request.getUserName());
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse convertToResponse(UserEntity user) {
         UserResponse response = new UserResponse();
         response.setUserId(user.getUserId());
-        response.setTypeId(user.getTypeId());
+        response.setUserType(UserType.fromId(user.getTypeId()));
         response.setUserName(user.getUserName());
         response.setPassword(user.getPassword());
         return response;

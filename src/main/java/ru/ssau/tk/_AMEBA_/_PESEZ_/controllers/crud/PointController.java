@@ -27,17 +27,16 @@ public class PointController {
     }
 
 
-    @PutMapping("/function/{functionId}/x/{xValue}/y/{yValue}")
+    @PutMapping
     @Operation(summary = "Обновление точки")
     public PointResponse updatePoint(
             @RequestParam Long id,
             @RequestParam Double x,
-            @RequestParam Double y,
-            @RequestBody @Valid PointRequest request) {
-        return pointsService.updatePoint(id, x, request);
+            @RequestParam Double y) {
+        return pointsService.updatePoint(id, x, new PointRequest(id, x, y));
     }
 
-    @DeleteMapping("/function/{functionId}/x/{xValue}")
+    @DeleteMapping
     @Operation(summary = "Удаление точки")
     public void deletePoint(
             @RequestParam Long id,
@@ -45,7 +44,7 @@ public class PointController {
         pointsService.deletePoint(id, x);
     }
 
-    @GetMapping("/function/{functionId}")
+    @GetMapping
     @Operation(summary = "Получение всех точек функции")
     public List<PointResponse> getPointsByFunction(@RequestParam Long id) {
         return pointsService.getPointsByFunction(id);

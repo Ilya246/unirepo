@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FunctionRequest {
+public class FunctionRequest implements FunctionCreateRequest {
     int typeId;
     String expression;
 }
