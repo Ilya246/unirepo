@@ -32,7 +32,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         sessionFactory  = TestHibernateSessionFactoryUtil.getSessionFactory();
         functionRepository = new FunctionRepository(sessionFactory);
         functionService = new FunctionServiceImpl(functionRepository, new ObjectMapper());
-    }*/
+    }
 
     @Test
     void testGetFunction() {
