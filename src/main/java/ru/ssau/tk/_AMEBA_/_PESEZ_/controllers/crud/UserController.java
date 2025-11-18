@@ -20,7 +20,8 @@ public class UserController {
 
     @PostMapping
     @Operation(summary = "Создание пользователя")
-    public UserResponse createUser(@RequestBody @Valid UserRequest request) {
+    public UserResponse createUser(@RequestBody @Valid UserRequest request /*@RequestParam String adminUserName,
+                                          @RequestParam String adminPassword*/) {
         /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.createUser(request);
     }
@@ -39,14 +40,16 @@ public class UserController {
 
     @PutMapping
     @Operation(summary = "Обновление пользователя")
-    public UserResponse updateUser(@RequestParam Long id, @RequestBody @Valid UserRequest request) {
+    public UserResponse updateUser(@RequestParam Long id, @RequestBody @Valid UserRequest request /*@RequestParam String adminUserName,
+                                          @RequestParam String adminPassword*/) {
         /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.updateUser(id, request);
     }
 
     @DeleteMapping
     @Operation(summary = "Удаление пользователя")
-    public void deleteUser(@RequestParam Long id) {
+    public void deleteUser(@RequestParam Long id /*@RequestParam String adminUserName,
+                                          @RequestParam String adminPassword*/) {
         /* userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         userService.deleteUser(id);
     }
