@@ -23,7 +23,7 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testConstructorWithDifferentLengths() {
-        DifferentLengthOfArraysException exception = assertThrows(DifferentLengthOfArraysException.class, () -> {
+        assertThrows(DifferentLengthOfArraysException.class, () -> {
             double[] x = {1.0, 2.0};
             double[] y = {1.0};
             new ArrayTabulatedFunction(x, y);
@@ -32,7 +32,7 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testConstructorWithUnsortedX() {
-        ArrayIsNotSortedException exception = assertThrows(ArrayIsNotSortedException.class, () -> {
+        assertThrows(ArrayIsNotSortedException.class, () -> {
             double[] x = {2.0, 1.0, 3.0};
             double[] y = {2.0, 1.0, 3.0};
             new ArrayTabulatedFunction(x, y);
@@ -41,7 +41,7 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testConstructorWithDuplicatedX() {
-        ArrayIsNotSortedException exception = assertThrows(ArrayIsNotSortedException.class, () -> {
+        assertThrows(ArrayIsNotSortedException.class, () -> {
             double[] x = {1.0, 2.0, 2.0, 3.0};
             double[] y = {1.0, 4.0, 4.0, 9.0};
             new ArrayTabulatedFunction(x, y);
@@ -234,9 +234,7 @@ class ArrayTabulatedFunctionTest {
 
         TestArrayTabulatedFunction func = new TestArrayTabulatedFunction(x, y);
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            func.testFloorIndexOfX(0.5);
-        });
+        assertThrows(IllegalArgumentException.class, () -> func.testFloorIndexOfX(0.5));
 
         assertEquals(0, func.testFloorIndexOfX(1.5));
         assertEquals(0, func.testFloorIndexOfX(2.0));
@@ -459,7 +457,7 @@ class ArrayTabulatedFunctionTest {
             assertEquals(point.getY(), val * 10);
             val += 1;
         }
-        assertThrows(NoSuchElementException.class, () -> it.next());
+        assertThrows(NoSuchElementException.class, it::next);
 
         val = 1;
         for (Point point : func) {

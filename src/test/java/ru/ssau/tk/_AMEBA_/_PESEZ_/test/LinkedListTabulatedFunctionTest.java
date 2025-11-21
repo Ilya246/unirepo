@@ -383,7 +383,7 @@ class LinkedListTabulatedFunctionTest {
             assertEquals(point.getY(), val * 10);
             val += 1;
         }
-        assertThrows(NoSuchElementException.class, () -> it.next());
+        assertThrows(NoSuchElementException.class, it::next);
 
         val = 1;
         for (Point point : func) {

@@ -9,7 +9,6 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.util.Enumeration;
 
 @WebServlet("/functions/*")
 public class FunctionController extends Controller {

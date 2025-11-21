@@ -42,7 +42,7 @@ public class TabulatedFunctionOperationService {
     }
 
     public TabulatedFunction add(TabulatedFunction a, TabulatedFunction b) {
-        return doOperation(a, b, (double yA, double yB) -> yA + yB);
+        return doOperation(a, b, Double::sum);
     }
 
     public TabulatedFunction subtract(TabulatedFunction a, TabulatedFunction b) {

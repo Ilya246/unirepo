@@ -9,9 +9,7 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 
 public abstract class Controller extends HttpServlet {
@@ -79,15 +77,6 @@ public abstract class Controller extends HttpServlet {
 
     public boolean checkRequiredRole(HttpServletRequest req, HttpServletResponse resp, UserType requiredRole) throws IOException {
         return checkRequiredRole(authenticate(req), resp, requiredRole);
-    }
-
-    protected static String getPage(String filename) {
-        try (FileInputStream instream = new FileInputStream("src/main/webapp/" + filename)) {
-            return new String(instream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException | NullPointerException e) {
-            Log.error("Failed to read HTML file:", e);
-            return null;
-        }
     }
 
     public static boolean isLocalhost(String addr) {

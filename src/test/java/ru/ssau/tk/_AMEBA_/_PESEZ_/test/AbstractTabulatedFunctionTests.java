@@ -47,7 +47,7 @@ class AbstractTabulatedFunctionTests {
     void testEquals() {
         var function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
 
-        assertNotEquals(function, 0);
+        assertNotEquals(0, function);
         assertEquals(function, function);
 
         // одна функция, разные типы (равны)

@@ -1,7 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.MultiplyingTask;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.SynchronizedTabulatedFunction;
 
@@ -59,14 +58,12 @@ class SynchronizedTabulatedFunctionTest {
 
         int power = 10;
         for (int i = 0; i < power; i++) {
-            var thread = new Thread(() -> {
-                syncFunc.doSynchronously(func -> {
-                    for (int j = 0; j < count; j++) {
-                        func.setY(j, func.getY(j) * 2);
-                    }
-                    return null;
-                });
-            });
+            var thread = new Thread(() -> syncFunc.doSynchronously(func -> {
+                for (int j = 0; j < count; j++) {
+                    func.setY(j, func.getY(j) * 2);
+                }
+                return null;
+            }));
             threads.add(thread);
         }
         for (Thread t : threads) {

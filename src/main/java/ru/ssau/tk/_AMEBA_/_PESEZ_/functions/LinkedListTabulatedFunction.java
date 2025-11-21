@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
 
+@SuppressWarnings("Convert2Diamond")
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Removable, Insertable, Serializable {
 
 
@@ -260,7 +261,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
     @Override
     public Iterator<Point> iterator() {
-        return new Iterator<Point>() {
+        return new Iterator<>() {
             private Node node = head;
             private int i = 0;
 

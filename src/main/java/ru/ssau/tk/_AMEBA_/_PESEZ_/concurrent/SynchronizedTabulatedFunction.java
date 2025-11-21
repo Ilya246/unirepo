@@ -7,6 +7,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+@SuppressWarnings("Convert2Diamond")
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
     private final TabulatedFunction function;
 
@@ -81,7 +82,7 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     public Iterator<Point> iterator() {
         synchronized (function) {
             Point[] points = TabulatedFunctionOperationService.asPoints(function);
-            return new Iterator<Point>() {
+            return new Iterator<>() {
                 private int currentIndex = 0;
 
                 @Override

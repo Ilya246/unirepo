@@ -1,7 +1,5 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.io;
 
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.LinkedListTabulatedFunctionFactory;
@@ -12,7 +10,7 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 public class TabulatedFunctionFileInputStream {
     public static void main(String[] args) {
-        try(var _binaryStream= new FileInputStream("input/binary function.bin");
+        try(var _binaryStream= new FileInputStream("input/binary function.bin")
         ){
             var bufferedInputStream = new BufferedInputStream(_binaryStream);
             var arrayFactory = new ArrayTabulatedFunctionFactory();

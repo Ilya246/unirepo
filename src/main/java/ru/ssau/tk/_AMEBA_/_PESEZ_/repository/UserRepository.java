@@ -4,7 +4,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionOwnershipDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.OwnedFunctionDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 
 import java.sql.*;
 import java.util.concurrent.*;

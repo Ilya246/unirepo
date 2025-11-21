@@ -19,9 +19,7 @@ public class DeBoor implements MathFunction {
         double[] tempPoints = new double[degree + 1];
 
         // Инициализация массива начальными контрольными точками для данного сегмента
-        for (int i = 0; i <= degree; i++) {
-            tempPoints[i] = controlPoints[i + segmentIndex - degree];
-        }
+        System.arraycopy(controlPoints, segmentIndex - degree, tempPoints, 0, degree + 1);
 
         // Основной алгоритм де Бура
         for (int r = 1; r <= degree; r++) {

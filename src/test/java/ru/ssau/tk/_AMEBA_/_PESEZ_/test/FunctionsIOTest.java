@@ -154,7 +154,7 @@ class FunctionsIOTest {
     }
 
     @Test
-    void readWriteArrayTabulatedFunction() throws IOException, ClassNotFoundException {
+    void readWriteArrayTabulatedFunction() throws IOException {
         // Подготовка тестовых данных
         double[] xValues = {0.5, 1.5, 2.5};
         double[] yValues = {1.5, 2.5, 3.5};
@@ -174,7 +174,7 @@ class FunctionsIOTest {
     }
 
     @Test
-    void readWriteLinkedListTabulatedFunction() throws IOException, ClassNotFoundException {
+    void readWriteLinkedListTabulatedFunction() throws IOException {
         // Подготовка тестовых данных
         double[] xValues = {0.5, 1.5, 2.5};
         double[] yValues = {1.5, 2.5, 3.5};
