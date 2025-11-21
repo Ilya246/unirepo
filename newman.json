@@ -64,6 +64,11 @@
       "key": "authToken",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "localhostToken",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -79,10 +84,41 @@
       }
     },
     {
+      "name": "Get Localhost Auth Header",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const credentials = \"localhost:localhost\"",
+              "const base64Credentials = btoa(credentials);",
+              "pm.variables.set('localhostToken', 'Basic ' + base64Credentials);",
+              "pm.test(\"Localhost auth token generated\", function() {",
+              "    pm.expect(pm.variables.get('localhostToken')).to.include('Basic ');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/heartbeat",
+          "host": ["{{baseUrl}}"],
+          "path": ["heartbeat"]
+        }
+      }
+    },
+    {
       "name": "POST /users - Create admin user",
       "request": {
         "method": "POST",
         "header": [
+          {
+            "key": "Authorization",
+            "value": "{{localhostToken}}"
+          },
           {
             "key": "Content-Type",
             "value": "application/json"
