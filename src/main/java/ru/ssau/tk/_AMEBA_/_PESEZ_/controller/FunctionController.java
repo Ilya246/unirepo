@@ -9,7 +9,6 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.util.regex.*;
 
 @WebServlet("/functions/*")
 public class FunctionController extends Controller {
@@ -26,8 +25,7 @@ public class FunctionController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserType.Admin)) {
                 return;
             }
             // GET /functions?id={id}
@@ -54,8 +52,7 @@ public class FunctionController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserType.Admin)) {
                 return;
             }
             switch (path) {

@@ -95,8 +95,7 @@ public class OwnedFunctionController extends Controller {
                 }
                 // POST /owned-functions/own?id={id}&name={name}
                 case "/own" -> {
-                    if (!hasRequiredRole(user, UserType.Admin)) {
-                        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    if (!checkRequiredRole(user, resp, UserType.Admin)) {
                         return;
                     }
                     int id = Integer.parseInt(req.getParameter("id"));

@@ -8,8 +8,8 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Base64;
 
 public abstract class Controller extends HttpServlet {
     protected ObjectMapper objectMapper;
@@ -57,5 +57,22 @@ public abstract class Controller extends HttpServlet {
 
     public boolean hasRequiredRole(HttpServletRequest req, UserType requiredRole) {
         return hasRequiredRole(authenticate(req), requiredRole);
+    }
+
+    public boolean checkRequiredRole(UserDTO user, HttpServletResponse resp, UserType requiredRole) throws IOException {
+        if (user == null) {
+            resp.setHeader("WWW-Authenticate", "Basic realm=\"Restricted Area\"");
+            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        }
+        if (!hasRequiredRole(user, requiredRole)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean checkRequiredRole(HttpServletRequest req, HttpServletResponse resp, UserType requiredRole) throws IOException {
+        return checkRequiredRole(authenticate(req), resp, requiredRole);
     }
 }

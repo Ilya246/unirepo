@@ -23,8 +23,7 @@ public class PointsController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserRepository.UserType.Admin)) {
                 return;
             }
             // GET /points?id={id}
@@ -45,8 +44,7 @@ public class PointsController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserRepository.UserType.Admin)) {
                 return;
             }
             // POST /points?id={id}&x={x}&y={y}
@@ -68,8 +66,7 @@ public class PointsController extends Controller {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserRepository.UserType.Admin)) {
                 return;
             }
             // PUT /points?id={id}&x={x}&y={y}
@@ -91,8 +88,7 @@ public class PointsController extends Controller {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserRepository.UserType.Admin)) {
                 return;
             }
             // DELETE /points?id={id}&x={x}

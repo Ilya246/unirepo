@@ -5,6 +5,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -17,8 +18,7 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserType.Admin)) {
                 return;
             }
             // GET /users
@@ -46,11 +46,10 @@ public class UserController extends Controller {
         try {
             // POST /users
             if (path == null || path.isEmpty()) {
-                if (!hasRequiredRole(req, UserRepository.UserType.Admin)
-                    && !req.getRemoteAddr().equals("127.0.0.1")
+                if (!req.getRemoteAddr().equals("127.0.0.1")
                     && !req.getRemoteAddr().equals("0:0:0:0:0:0:0:1")
+                    && !checkRequiredRole(req, resp, UserRepository.UserType.Admin)
                 ) {
-                    resp.sendError(HttpServletResponse.SC_FORBIDDEN);
                     return;
                 }
                 UserCreateRequest request = parseBody(req, UserCreateRequest.class);
@@ -78,8 +77,7 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserType.Admin)) {
                 return;
             }
             // DELETE /users?id={id}
@@ -101,8 +99,7 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!hasRequiredRole(req, UserRepository.UserType.Admin)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(req, resp, UserType.Admin)) {
                 return;
             }
             // PUT /users?id={id}
