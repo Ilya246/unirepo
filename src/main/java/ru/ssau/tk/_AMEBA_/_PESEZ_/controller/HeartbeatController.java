@@ -5,11 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/")
-public class RootController extends Controller {
+@WebServlet("/heartbeat")
+public class HeartbeatController extends Controller {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.setContentType("text/html");
-        resp.getWriter().println("Welcome!");
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 }

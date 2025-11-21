@@ -46,10 +46,7 @@ public class UserController extends Controller {
         try {
             // POST /users
             if (path == null || path.isEmpty()) {
-                if (!req.getRemoteAddr().equals("127.0.0.1")
-                    && !req.getRemoteAddr().equals("0:0:0:0:0:0:0:1")
-                    && !checkRequiredRole(req, resp, UserRepository.UserType.Admin)
-                ) {
+                if (!checkRequiredRole(req, resp, UserRepository.UserType.Admin)) {
                     return;
                 }
                 UserCreateRequest request = parseBody(req, UserCreateRequest.class);

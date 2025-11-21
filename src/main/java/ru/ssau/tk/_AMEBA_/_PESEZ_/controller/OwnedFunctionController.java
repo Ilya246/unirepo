@@ -18,12 +18,11 @@ public class OwnedFunctionController extends Controller {
         resp.setContentType("application/json");
         try {
             UserDTO user = authenticate(req);
-            if (user == null) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(user, resp, UserType.Normal)) {
                 return;
             }
             int userId = user.userId;
-            if (hasRequiredRole(user, UserType.Admin) && req.getParameterMap().containsKey("user")) {
+            if (hasRequiredRole(req, UserType.Admin) && req.getParameterMap().containsKey("user")) {
                 userId = Integer.parseInt(req.getParameter("user"));
             }
 
@@ -50,12 +49,11 @@ public class OwnedFunctionController extends Controller {
         resp.setContentType("application/json");
         try {
             UserDTO user = authenticate(req);
-            if (user == null) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(user, resp, UserType.Normal)) {
                 return;
             }
             int userId = user.userId;
-            if (hasRequiredRole(user, UserType.Admin) && req.getParameterMap().containsKey("userId")) {
+            if (hasRequiredRole(req, UserType.Admin) && req.getParameterMap().containsKey("userId")) {
                 userId = Integer.parseInt(req.getParameter("userId"));
             }
 
@@ -115,12 +113,11 @@ public class OwnedFunctionController extends Controller {
         String path = req.getPathInfo();
         try {
             UserDTO user = authenticate(req);
-            if (user == null) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(user, resp, UserType.Normal)) {
                 return;
             }
             int userId = user.userId;
-            if (hasRequiredRole(user, UserType.Admin) && req.getParameterMap().containsKey("user")) {
+            if (hasRequiredRole(req, UserType.Admin) && req.getParameterMap().containsKey("user")) {
                 userId = Integer.parseInt(req.getParameter("user"));
             }
 
@@ -143,8 +140,7 @@ public class OwnedFunctionController extends Controller {
         String path = req.getPathInfo();
         try {
             UserDTO user = authenticate(req);
-            if (user == null) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            if (!checkRequiredRole(user, resp, UserType.Normal)) {
                 return;
             }
             int userId = user.userId;

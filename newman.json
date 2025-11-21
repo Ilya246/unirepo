@@ -68,6 +68,17 @@
   ],
   "item": [
     {
+      "name": "GET /heartbeat - Ensure heartbeat",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/heartbeat",
+          "host": ["{{baseUrl}}"],
+          "path": ["heartbeat"]
+        }
+      }
+    },
+    {
       "name": "POST /users - Create admin user",
       "request": {
         "method": "POST",
@@ -939,6 +950,59 @@
                 {
                   "key": "x",
                   "value": "0.123"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "DELETE /users - Cleanup normal user",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users?id={{createdUserId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "{{createdUserId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /users - Delete admin user",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users?id={{adminId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "{{adminId}}"
                 }
               ]
             }

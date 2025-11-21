@@ -6,6 +6,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 
 import java.util.concurrent.CompletableFuture;
 
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.Log;
+
 public class FunctionService {
     private final FunctionRepository funcRepo;
 
@@ -31,14 +33,17 @@ public class FunctionService {
     }
 
     public CompletableFuture<Integer> createMathFunction(String expression) {
+        Log.info("Creating math function ({})", expression);
         return funcRepo.createMathFunction(expression);
     }
 
     public CompletableFuture<Integer> createTabulated(String expression, double from, double to, int pointCount) {
+        Log.info("Creating tabulated function ({}) with {} pts", expression, pointCount);
         return funcRepo.createTabulated(expression, from, to, pointCount);
     }
 
     public CompletableFuture<Integer> createPureTabulated(double[] xValues, double[] yValues) {
+        Log.info("Creating pure tabulated function with {} pts", xValues.length);
         return funcRepo.createPureTabulated(xValues, yValues);
     }
 
@@ -47,6 +52,7 @@ public class FunctionService {
     }
 
     public CompletableFuture<Integer> createComposite(int innerId, int outerId) {
+        Log.info("Creating composite function {}({})", outerId, innerId);
         return funcRepo.createComposite(innerId, outerId);
     }
 
@@ -55,6 +61,7 @@ public class FunctionService {
     }
 
     public CompletableFuture<Void> deleteFunction(int funcId) {
+        Log.info("Deleting function {}", funcId);
         return funcRepo.deleteFunction(funcId);
     }
 
@@ -67,6 +74,7 @@ public class FunctionService {
     }
 
     public CompletableFuture<Void> updateComposite(int funcId, Integer newInner, Integer newOuter) {
+        Log.info("Updating composite function {} to {}({})", funcId, newOuter, newInner);
         return funcRepo.updateComposite(funcId, newInner, newOuter);
     }
 

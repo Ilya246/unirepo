@@ -9,7 +9,10 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 
 public abstract class Controller extends HttpServlet {
     protected ObjectMapper objectMapper;
@@ -44,7 +47,9 @@ public abstract class Controller extends HttpServlet {
 
             String username = values[0];
             String password = values[1];
-            // Get all users and find matching credentials
+            if (isLocalhost(req.getRemoteAddr()) && username.equals("localhost") && password.equals("localhost")) {
+                return new UserDTO(0, UserType.Admin, "localhost", "localhost", new Timestamp(0));
+            }
             return userService.getUserByCredentials(username, password).join();
         } catch (Exception e) {
             return null;
@@ -52,7 +57,7 @@ public abstract class Controller extends HttpServlet {
     }
 
     public boolean hasRequiredRole(UserDTO user, UserType requiredRole) {
-        return user != null && user.userType == requiredRole;
+        return user != null && (requiredRole == UserType.Normal || user.userType == requiredRole);
     }
 
     public boolean hasRequiredRole(HttpServletRequest req, UserType requiredRole) {
@@ -74,5 +79,18 @@ public abstract class Controller extends HttpServlet {
 
     public boolean checkRequiredRole(HttpServletRequest req, HttpServletResponse resp, UserType requiredRole) throws IOException {
         return checkRequiredRole(authenticate(req), resp, requiredRole);
+    }
+
+    protected static String getPage(String filename) {
+        try (FileInputStream instream = new FileInputStream("src/main/webapp/" + filename)) {
+            return new String(instream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException | NullPointerException e) {
+            Log.error("Failed to read HTML file:", e);
+            return null;
+        }
+    }
+
+    public static boolean isLocalhost(String addr) {
+        return addr.equals("127.0.0.1") || addr.equals("0:0:0:0:0:0:0:1");
     }
 }

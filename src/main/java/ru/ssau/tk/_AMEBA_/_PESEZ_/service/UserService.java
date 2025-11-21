@@ -89,6 +89,7 @@ public class UserService {
             }
             CompletableFuture.allOf(futures).join();
             userRepo.deleteUser(userId).join();
+            Log.info("Deleted user ID {}", userId);
         });
     }
 
@@ -96,6 +97,7 @@ public class UserService {
         return CompletableFuture.supplyAsync(() -> {
             int funcId = funcRepo.createMathFunction(expression).join();
             userRepo.addFunctionOwnership(userId, funcId, name).join();
+            Log.info("Created owned function ('{}': {}) for user {}", name, expression, userId);
             return funcId;
         });
     }
@@ -104,6 +106,7 @@ public class UserService {
         return CompletableFuture.supplyAsync(() -> {
             int funcId = funcRepo.createTabulated(expression, from, to, pointCount).join();
             userRepo.addFunctionOwnership(userId, funcId, name).join();
+            Log.info("Created owned tabulated ('{}': {}, {} pts) for user {}", name, expression, pointCount, userId);
             return funcId;
         });
     }
@@ -112,6 +115,7 @@ public class UserService {
         return CompletableFuture.supplyAsync(() -> {
             int funcId = funcRepo.createPureTabulated(xValues, yValues).join();
             userRepo.addFunctionOwnership(userId, funcId, name).join();
+            Log.info("Created owned pure tabulated ('{}', {} pts) for user {}", name, xValues.length, userId);
             return funcId;
         });
     }
@@ -120,6 +124,7 @@ public class UserService {
         return CompletableFuture.supplyAsync(() -> {
             int funcId = funcRepo.createComposite(innerId, outerId).join();
             userRepo.addFunctionOwnership(userId, funcId, name).join();
+            Log.info("Created owned composite ('{}', {}({})) for user {}", name, outerId, innerId, userId);
             return funcId;
         });
     }
@@ -132,13 +137,14 @@ public class UserService {
         return userRepo.updateFunctionOwnership(userId, funcId, newName);
     }
 
-    public CompletableFuture<Integer> createUser(UserRepository.UserType typeId, String username, String password) {
+    public CompletableFuture<Integer> createUser(UserType typeId, String username, String password) {
         return CompletableFuture.supplyAsync(() -> {
             if (username.isEmpty())
                 throw new InvalidLoginException("Username cannot be empty.");
             if (password.isEmpty())
                 throw new InvalidLoginException("Password cannot be empty.");
 
+            Log.info("Creating user '{}' of type {}", username, typeId);
             return userRepo.createUser(typeId, username, getBase64Hash(password)).join();
         });
     }
@@ -152,6 +158,7 @@ public class UserService {
     }
 
     public CompletableFuture<Void> updateUser(int userId, String newUserName, String newPassword, UserType newType) {
+        Log.info("Updating user {} to: name '{}', type {}", userId, newUserName, newType);
         return userRepo.updateUser(userId, newUserName, getBase64Hash(newPassword), newType);
     }
 }
