@@ -15,6 +15,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.HashUtil;
+import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
 import java.util.List;
 import java.util.Objects;
@@ -168,14 +169,30 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserEntity authenticate(String userName, String password) {
+        System.out.println("=== USER SERVICE AUTH ===");
+        System.out.println("Input username: '" + userName + "'");
+        System.out.println("Input password: '" + password + "'");
 
-        UserEntity user = userRepository.findByCredentials(userName,password);
+        // Хешируем пароль для поиска в БД
+        String hashedPassword = Utility.getBase64Hash(password);
+        System.out.println("Hashed password: " + hashedPassword);
+
+        System.out.println("Searching in database...");
+        UserEntity user = userRepository.findByCredentials(userName, hashedPassword);
+
         if (user == null) {
-            log.warn("Authentication failed: user not found - {}", userName);
-            throw new CustomException("User not found", HttpStatus.UNAUTHORIZED);
+            System.out.println("USER NOT FOUND in database");
+            // Давайте посмотрим, что вообще есть в базе
+            List<UserEntity> allUsers = userRepository.findAll();
+            System.out.println("Total users in DB: " + allUsers.size());
+            for (UserEntity u : allUsers) {
+                System.out.println("DB User: " + u.getUserName() + ", ID: " + u.getUserId());
+            }
+
+            throw new CustomException("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
 
-        log.info("User authenticated successfully: {} with role {}", userName, toType(user.getTypeId()));
+        System.out.println("USER FOUND: " + user.getUserName() + ", ID: " + user.getUserId());
         return user;
     }
 
