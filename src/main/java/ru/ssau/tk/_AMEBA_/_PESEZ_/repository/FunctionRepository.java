@@ -18,6 +18,7 @@ public class FunctionRepository extends Repository {
     private static final String FUNCTION_INSERT = readCommand("FunctionCreate");
     private static final String FUNCTION_DELETE = readCommand("FunctionDelete");
     private static final String FUNCTION_SELECT = readCommand("FunctionRead");
+    private static final String FUNCTION_SELECT_ALL = readCommand("FunctionReadAll");
 
     private static final String COMPOSITE_ENSURE_TABLE = readCommand("CompositeFunctionCreateTable");
     private static final String COMPOSITE_INSERT = readCommand("CompositeFunctionCreate");
@@ -166,6 +167,31 @@ public class FunctionRepository extends Repository {
                             results.getInt("type_id"),
                             results.getString("expression")
                     );
+                }
+            } catch (SQLException e) {
+                throw new CompletionException(e);
+            }
+        });
+    }
+
+    public CompletableFuture<FunctionDTO[]> getAllFunctionData() {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                DatabaseConnection database = databaseLocal.get();
+                try (ResultSet results = database.executeQuery(FUNCTION_SELECT_ALL)) {
+                    results.last();
+                    int count = results.getRow();
+                    var result = new FunctionDTO[count];
+                    results.first();
+                    for (int i = 0; i < count; i++) {
+                        result[i] = new FunctionDTO(
+                                results.getInt("func_id"),
+                                results.getInt("type_id"),
+                                results.getString("expression")
+                        );
+                        results.next();
+                    }
+                    return result;
                 }
             } catch (SQLException e) {
                 throw new CompletionException(e);

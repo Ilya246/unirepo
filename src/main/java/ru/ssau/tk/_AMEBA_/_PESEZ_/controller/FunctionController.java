@@ -9,6 +9,7 @@ import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.Enumeration;
 
 @WebServlet("/functions/*")
 public class FunctionController extends Controller {
@@ -30,6 +31,11 @@ public class FunctionController extends Controller {
             }
             // GET /functions?id={id}
             if (path == null || path.isEmpty()) {
+                if (!req.getParameterMap().containsKey("id")) {
+                    FunctionDTO[] funcs = functionService.getAllFunctions().join();
+                    resp.getWriter().write(objectMapper.writeValueAsString(funcs));
+                    return;
+                }
                 int id = Integer.parseInt(req.getParameter("id"));
                 FunctionDTO function = functionService.getFunction(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(function));

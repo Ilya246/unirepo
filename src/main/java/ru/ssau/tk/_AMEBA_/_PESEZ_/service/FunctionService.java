@@ -26,6 +26,10 @@ public class FunctionService {
         return funcRepo.getFunctionData(funcId);
     }
 
+    public CompletableFuture<FunctionDTO[]> getAllFunctions() {
+        return funcRepo.getAllFunctionData();
+    }
+
     public CompletableFuture<Integer> createMathFunction(String expression) {
         return funcRepo.createMathFunction(expression);
     }
