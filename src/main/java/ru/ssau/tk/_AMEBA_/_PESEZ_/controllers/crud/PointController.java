@@ -7,6 +7,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.PointRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.PointService;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/points")
 @RequiredArgsConstructor
@@ -15,11 +17,18 @@ public class PointController {
 
     @PostMapping
     @Operation(summary = "Создание точки")
-    public void createPoint(
+    public Map<String, Object> createPoint(
             @RequestParam Long id,
             @RequestParam Double x,
             @RequestParam Double y) {
         pointsService.createPoint(new PointRequest(id, x, y));
+        return Map.of(
+                "success", true,
+                "message", "Point created successfully",
+                "functionId", id,
+                "x", x,
+                "y", y
+        );
     }
 
 
