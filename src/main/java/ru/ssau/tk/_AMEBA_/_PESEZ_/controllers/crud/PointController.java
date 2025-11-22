@@ -1,14 +1,11 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controllers.crud;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.PointRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.PointService;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/points")
@@ -18,21 +15,21 @@ public class PointController {
 
     @PostMapping
     @Operation(summary = "Создание точки")
-    public PointResponse createPoint(
+    public void createPoint(
             @RequestParam Long id,
             @RequestParam Double x,
             @RequestParam Double y) {
-        return pointsService.createPoint(new PointRequest(id, x, y));
+        pointsService.createPoint(new PointRequest(id, x, y));
     }
 
 
     @PutMapping
     @Operation(summary = "Обновление точки")
-    public PointResponse updatePoint(
+    public void updatePoint(
             @RequestParam Long id,
             @RequestParam Double x,
             @RequestParam Double y) {
-        return pointsService.updatePoint(id, x, new PointRequest(id, x, y));
+        pointsService.updatePoint(id, x, new PointRequest(id, x, y));
     }
 
     @DeleteMapping
@@ -45,7 +42,7 @@ public class PointController {
 
     @GetMapping
     @Operation(summary = "Получение всех точек функции")
-    public List<PointResponse> getPointsByFunction(@RequestParam Long id) {
+    public PointsResponse getPointsByFunction(@RequestParam Long id) {
         return pointsService.getPointsByFunction(id);
     }
 
