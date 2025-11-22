@@ -14,7 +14,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
-import ru.ssau.tk._AMEBA_._PESEZ_.utility.HashUtil;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
 import java.sql.Timestamp;
@@ -217,6 +216,19 @@ public class UserServiceImpl implements UserService {
         }
 
         log.info("User authenticated successfully: {} with role {}", userName, toType(user.getTypeId()));
+        return user;
+    }
+
+    @Override
+    public UserEntity findByUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new CustomException("Username cannot be empty", HttpStatus.BAD_REQUEST);
+        }
+
+        UserEntity user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new CustomException("User not found with username: " + username, HttpStatus.NOT_FOUND);
+        }
         return user;
     }
 }

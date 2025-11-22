@@ -86,4 +86,9 @@ public class UserRepository {
     }
 
 
+    public UserEntity findByUsername(String username) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.find(UserEntity.class, username);
+        }
+    }
 }

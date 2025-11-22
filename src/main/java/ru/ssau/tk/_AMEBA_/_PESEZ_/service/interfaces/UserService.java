@@ -36,4 +36,6 @@ public interface UserService {
     UserEntity authenticate(String userName, String password);
 
     UserEntity authenticateWithRole(String userName, String password, UserType requiredRole);
+
+    UserEntity findByUsername(String username);
 }
