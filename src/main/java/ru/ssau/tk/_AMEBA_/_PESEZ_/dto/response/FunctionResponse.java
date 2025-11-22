@@ -14,5 +14,8 @@ import lombok.experimental.SuperBuilder;
 public class FunctionResponse {
     @JsonProperty("id")
     Long funcId;
+    int typeId;
+    String expression;
+
 }
 

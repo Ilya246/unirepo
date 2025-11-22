@@ -23,10 +23,11 @@ public class FunctionController {
     private final FunctionService functionService;
 
     @GetMapping
-    @Operation(summary = "Получение функции по ID")
-    public FunctionResponse getFunction(@RequestParam Long id) {
-        return functionService.getFunction(id);
+    @Operation(summary = "Получение функции по ID или всех функций")
+    public Object getFunction(@RequestParam(required = false) Long id) {
+        return functionService.getFunction1(id);
     }
+
 
     // Специализированные операции
     @PostMapping("/math")

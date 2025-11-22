@@ -12,9 +12,15 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface FunctionService {
-    FunctionResponse getFunction(Long id);
+    Object getFunction(Long id);
 
     FunctionEntity getFunctionDb(Long id);
+
+/*    List<FunctionResponse> getAllFunctions();*/
+
+    Object getFunction1(Long id);
+
+    FunctionEntity getFunctionDb1(Long id);
 
     List<FunctionResponse> getAllFunctions();
 

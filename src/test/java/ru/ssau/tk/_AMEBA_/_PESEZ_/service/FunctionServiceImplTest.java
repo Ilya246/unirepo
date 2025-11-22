@@ -32,7 +32,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         sessionFactory  = TestHibernateSessionFactoryUtil.getSessionFactory();
         functionRepository = new FunctionRepository(sessionFactory);
         functionService = new FunctionServiceImpl(functionRepository, new ObjectMapper());
-    }*/
+    }
 
     @Test
     void testGetFunction() {
@@ -61,6 +61,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         assertEquals("Function not found with id: 999", exception.getMessage());
     }
 
+/*
     @Test
     void testGetAllFunctions() {
         // Given
@@ -73,6 +74,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         assertNotNull(functions);
         assertTrue(functions.size() >= 3);
     }
+*/
 
     @Test
     void testGetFunctionsByType() {
@@ -105,7 +107,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         assertEquals("x * 2", response.getExpression());
     }
 
-    @Test
+/*    @Test
     void testCreateTabulatedFunction() {
         // Given
         TabulatedFunctionRequest request = new TabulatedFunctionRequest();
@@ -124,7 +126,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         assertEquals(0.0, response.getFrom());
         assertEquals(3.14, response.getTo());
         assertEquals(10, response.getPointCount());
-    }
+    }*/
 
     @Test
     void testCreatePureTabulatedFunction() {

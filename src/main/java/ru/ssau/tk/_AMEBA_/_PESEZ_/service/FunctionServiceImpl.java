@@ -43,6 +43,23 @@ public class FunctionServiceImpl implements FunctionService {
         return function;
     }
 
+    @Override
+    public Object getFunction1(Long id) {
+        if (id == null) {
+            return getAllFunctions();
+        }
+        FunctionEntity function = getFunctionDb(id);
+        return convertToResponse(function);
+    }
+
+    @Override
+    public FunctionEntity getFunctionDb1(Long id) {
+        FunctionEntity function = functionRepo.findById(id);
+        if (function == null) {
+            throw new CustomException("Function not found with id: " + id, HttpStatus.NOT_FOUND);
+        }
+        return function;
+    }
 
     @Override
     public List<FunctionResponse> getAllFunctions() {
@@ -51,6 +68,15 @@ public class FunctionServiceImpl implements FunctionService {
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
+
+
+/*    @Override
+    public FunctionResponse getAllFunctions() {
+        List<FunctionEntity> functions = functionRepo.findAll();
+        return (FunctionResponse) functions.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }*/
 
     @Override
     public List<FunctionResponse> getFunctionsByType(Integer typeId) {
@@ -180,6 +206,6 @@ public class FunctionServiceImpl implements FunctionService {
             default -> "UNKNOWN";
         };
 
-        return new FunctionResponse(Long.valueOf(function.getFuncId()));
+        return new FunctionResponse(Long.valueOf(function.getFuncId()), function.getTypeId(), function.getExpression());
     }
 }
