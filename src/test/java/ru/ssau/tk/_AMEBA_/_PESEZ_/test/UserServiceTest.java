@@ -27,7 +27,7 @@ class UserServiceTest {
     static void setup() {
         service = new UserService(databaseConfig);
 
-        String filepath = DatabaseConnection.class.getClassLoader().getResource("config/" + databaseConfig).getPath();
+        String filepath = UserServiceTest.class.getClassLoader().getResource("config/" + databaseConfig).getPath();
         try (var propertiesReader = new FileReader(filepath)) {
             PROPERTIES.load(propertiesReader);
         } catch (IOException e) {

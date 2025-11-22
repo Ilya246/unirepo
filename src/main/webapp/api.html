@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing Interface</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .auth-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.success {
+            background: var(--success);
+        }
+
+        button.success:hover {
+            background: #27ae60;
+        }
+
+        button.warning {
+            background: var(--warning);
+        }
+
+        button.warning:hover {
+            background: #d35400;
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            border-bottom: 3px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .endpoint-group {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .endpoint-group h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .method.get { background: var(--success); }
+        .method.post { background: var(--primary); }
+        .method.put { background: var(--warning); }
+        .method.delete { background: var(--danger); }
+
+        .endpoint-url {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .endpoint-body {
+            margin-top: 10px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .form-row .input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .output {
+            margin-top: 20px;
+        }
+
+        .output h4 {
+            margin-bottom: 10px;
+        }
+
+        #responseOutput {
+            width: 100%;
+            height: 300px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>API Testing Interface</h1>
+        <p>Test all endpoints from the Java servlet controllers</p>
+    </header>
+
+    <section class="auth-section">
+        <h2>Authentication</h2>
+        <div class="form-row">
+            <div class="input-group">
+                <label for="baseUrl">Base URL</label>
+                <input type="text" id="baseUrl" value="http://localhost:8080">
+            </div>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+        </div>
+        <button id="setAuth" class="success">Set Credentials</button>
+        <button id="testAuth" class="warning">Test Connection</button>
+    </section>
+
+    <div class="tabs">
+        <div class="tab active" data-tab="users">Users</div>
+        <div class="tab" data-tab="functions">Functions</div>
+        <div class="tab" data-tab="owned-functions">Owned Functions</div>
+        <div class="tab" data-tab="points">Points</div>
+        <div class="tab" data-tab="heartbeat">Heartbeat</div>
+    </div>
+
+    <div class="tab-content active" id="users-tab">
+        <div class="endpoint-group">
+            <h3>User Management (Admin Only)</h3>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/users</span>
+                </div>
+                <p>Get all users</p>
+                <button class="send-request" data-endpoint="getUsers">Send Request</button>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/users/user?id={id}</span>
+                </div>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getUserById">User ID</label>
+                            <input type="number" id="getUserById" placeholder="User ID">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getUser">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/users</span>
+                </div>
+                <p>Create a new user (Admin only)</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createUserUsername">Username</label>
+                            <input type="text" id="createUserUsername" placeholder="Username">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserPassword">Password</label>
+                            <input type="password" id="createUserPassword" placeholder="Password">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserType">User Type</label>
+                            <select id="createUserType">
+                                <option value="Normal">Normal</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createUser">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/users/register?username={u}&password={p}</span>
+                </div>
+                <p>Register a new normal user</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="registerUsername">Username</label>
+                            <input type="text" id="registerUsername" placeholder="Username">
+                        </div>
+                        <div class="input-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" placeholder="Password">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="register">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-url">/users?id={id}</span>
+                </div>
+                <p>Update user information</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="updateUserId">User ID</label>
+                            <input type="number" id="updateUserId" placeholder="User ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="updateUserUsername">Username</label>
+                            <input type="text" id="updateUserUsername" placeholder="Username">
+                        </div>
+                        <div class="input-group">
+                            <label for="updateUserPassword">Password</label>
+                            <input type="password" id="updateUserPassword" placeholder="Password">
+                        </div>
+                        <div class="input-group">
+                            <label for="updateUserType">User Type</label>
+                            <select id="updateUserType">
+                                <option value="Normal">Normal</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="updateUser">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-url">/users?id={id}</span>
+                </div>
+                <p>Delete a user</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="deleteUserId">User ID</label>
+                            <input type="number" id="deleteUserId" placeholder="User ID">
+                        </div>
+                    </div>
+                    <button class="send-request danger" data-endpoint="deleteUser">Send Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="functions-tab">
+        <div class="endpoint-group">
+            <h3>Function Management (Admin Only)</h3>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/functions</span>
+                </div>
+                <p>Get all functions or specific function by ID</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getFunctionId">Function ID (leave empty for all)</label>
+                            <input type="number" id="getFunctionId" placeholder="Function ID">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/functions/calculate?id={id}&x={x}</span>
+                </div>
+                <p>Calculate function value at point x</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="calculateFunctionId">Function ID</label>
+                            <input type="number" id="calculateFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="calculateX">X value</label>
+                            <input type="number" id="calculateX" placeholder="X value" step="any">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="calculateFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/functions/math</span>
+                </div>
+                <p>Create a math function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createMathExpression">Expression</label>
+                            <input type="text" id="createMathExpression" placeholder="e.g., x^2 + 2*x + 1">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createMathFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/functions/tabulated</span>
+                </div>
+                <p>Create a tabulated function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createTabulatedExpression">Expression</label>
+                            <input type="text" id="createTabulatedExpression" placeholder="e.g., sin(x)">
+                        </div>
+                        <div class="input-group">
+                            <label for="createTabulatedXFrom">X From</label>
+                            <input type="number" id="createTabulatedXFrom" placeholder="0" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="createTabulatedXTo">X To</label>
+                            <input type="number" id="createTabulatedXTo" placeholder="6.28" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="createTabulatedPointCount">Point Count</label>
+                            <input type="number" id="createTabulatedPointCount" placeholder="100">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createTabulatedFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/functions/pure-tabulated</span>
+                </div>
+                <p>Create a pure tabulated function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createPureTabulatedXValues">X Values (comma separated)</label>
+                            <input type="text" id="createPureTabulatedXValues" placeholder="0, 1, 2, 3">
+                        </div>
+                        <div class="input-group">
+                            <label for="createPureTabulatedYValues">Y Values (comma separated)</label>
+                            <input type="text" id="createPureTabulatedYValues" placeholder="1, 2, 4, 8">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createPureTabulatedFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/functions/composite</span>
+                </div>
+                <p>Create a composite function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createCompositeInnerId">Inner Function ID</label>
+                            <input type="number" id="createCompositeInnerId" placeholder="Inner Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="createCompositeOuterId">Outer Function ID</label>
+                            <input type="number" id="createCompositeOuterId" placeholder="Outer Function ID">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createCompositeFunction">Send Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="owned-functions-tab">
+        <div class="endpoint-group">
+            <h3>Owned Functions (User-specific)</h3>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/owned-functions?id={id}</span>
+                </div>
+                <p>Get a specific owned function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getOwnedFunctionId">Function ID</label>
+                            <input type="number" id="getOwnedFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="getOwnedFunctionUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="getOwnedFunctionUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getOwnedFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/owned-functions/user</span>
+                </div>
+                <p>Get all functions owned by user</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getUserFunctionsUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="getUserFunctionsUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getUserFunctions">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/owned-functions/math</span>
+                </div>
+                <p>Create a user-owned math function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createUserMathName">Function Name</label>
+                            <input type="text" id="createUserMathName" placeholder="Function name">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserMathExpression">Expression</label>
+                            <input type="text" id="createUserMathExpression" placeholder="e.g., x^2 + 2*x + 1">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserMathUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="createUserMathUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createUserMathFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/owned-functions/tabulated</span>
+                </div>
+                <p>Create a user-owned tabulated function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createUserTabulatedName">Function Name</label>
+                            <input type="text" id="createUserTabulatedName" placeholder="Function name">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserTabulatedExpression">Expression</label>
+                            <input type="text" id="createUserTabulatedExpression" placeholder="e.g., sin(x)">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserTabulatedXFrom">X From</label>
+                            <input type="number" id="createUserTabulatedXFrom" placeholder="0" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserTabulatedXTo">X To</label>
+                            <input type="number" id="createUserTabulatedXTo" placeholder="6.28" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserTabulatedPointCount">Point Count</label>
+                            <input type="number" id="createUserTabulatedPointCount" placeholder="100">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserTabulatedUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="createUserTabulatedUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createUserTabulatedFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/owned-functions/pure-tabulated</span>
+                </div>
+                <p>Create a user-owned pure tabulated function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createUserPureTabulatedName">Function Name</label>
+                            <input type="text" id="createUserPureTabulatedName" placeholder="Function name">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserPureTabulatedXValues">X Values (comma separated)</label>
+                            <input type="text" id="createUserPureTabulatedXValues" placeholder="0, 1, 2, 3">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserPureTabulatedYValues">Y Values (comma separated)</label>
+                            <input type="text" id="createUserPureTabulatedYValues" placeholder="1, 2, 4, 8">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserPureTabulatedUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="createUserPureTabulatedUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createUserPureTabulatedFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/owned-functions/composite</span>
+                </div>
+                <p>Create a user-owned composite function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createUserCompositeName">Function Name</label>
+                            <input type="text" id="createUserCompositeName" placeholder="Function name">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserCompositeInnerId">Inner Function ID</label>
+                            <input type="number" id="createUserCompositeInnerId" placeholder="Inner Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserCompositeOuterId">Outer Function ID</label>
+                            <input type="number" id="createUserCompositeOuterId" placeholder="Outer Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="createUserCompositeUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="createUserCompositeUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createUserCompositeFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/owned-functions/own?id={id}&name={name}</span>
+                </div>
+                <p>Assign ownership of a function to a user (Admin only)</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="assignOwnershipFunctionId">Function ID</label>
+                            <input type="number" id="assignOwnershipFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="assignOwnershipName">Function Name</label>
+                            <input type="text" id="assignOwnershipName" placeholder="Function name">
+                        </div>
+                        <div class="input-group">
+                            <label for="assignOwnershipUserId">Target User ID</label>
+                            <input type="number" id="assignOwnershipUserId" placeholder="Target User ID">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="assignOwnership">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-url">/owned-functions?id={id}&name={name}</span>
+                </div>
+                <p>Update owned function name</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="updateOwnedFunctionId">Function ID</label>
+                            <input type="number" id="updateOwnedFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="updateOwnedFunctionName">New Function Name</label>
+                            <input type="text" id="updateOwnedFunctionName" placeholder="New function name">
+                        </div>
+                        <div class="input-group">
+                            <label for="updateOwnedFunctionUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="updateOwnedFunctionUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="updateOwnedFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-url">/owned-functions?id={id}</span>
+                </div>
+                <p>Delete owned function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="deleteOwnedFunctionId">Function ID</label>
+                            <input type="number" id="deleteOwnedFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="deleteOwnedFunctionUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="deleteOwnedFunctionUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request danger" data-endpoint="deleteOwnedFunction">Send Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="points-tab">
+        <div class="endpoint-group">
+            <h3>Points Management (Admin Only)</h3>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/points?id={id}</span>
+                </div>
+                <p>Get all points for a function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getPointsFunctionId">Function ID</label>
+                            <input type="number" id="getPointsFunctionId" placeholder="Function ID">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getPoints">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-url">/points?id={id}&x={x}&y={y}</span>
+                </div>
+                <p>Add a point to a function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="createPointFunctionId">Function ID</label>
+                            <input type="number" id="createPointFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="createPointX">X value</label>
+                            <input type="number" id="createPointX" placeholder="X value" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="createPointY">Y value</label>
+                            <input type="number" id="createPointY" placeholder="Y value" step="any">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="createPoint">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method put">PUT</span>
+                    <span class="endpoint-url">/points?id={id}&x={x}&y={y}</span>
+                </div>
+                <p>Update a point in a function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="updatePointFunctionId">Function ID</label>
+                            <input type="number" id="updatePointFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="updatePointX">X value</label>
+                            <input type="number" id="updatePointX" placeholder="X value" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="updatePointY">New Y value</label>
+                            <input type="number" id="updatePointY" placeholder="New Y value" step="any">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="updatePoint">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method delete">DELETE</span>
+                    <span class="endpoint-url">/points?id={id}&x={x}</span>
+                </div>
+                <p>Delete a point from a function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="deletePointFunctionId">Function ID</label>
+                            <input type="number" id="deletePointFunctionId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="deletePointX">X value</label>
+                            <input type="number" id="deletePointX" placeholder="X value" step="any">
+                        </div>
+                    </div>
+                    <button class="send-request danger" data-endpoint="deletePoint">Send Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="heartbeat-tab">
+        <div class="endpoint-group">
+            <h3>Heartbeat</h3>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/heartbeat</span>
+                </div>
+                <p>Check if the server is responding</p>
+                <button class="send-request" data-endpoint="checkHeartbeat">Send Request</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="output">
+        <h4>Response Output</h4>
+        <div id="statusMessage" class="status hidden"></div>
+        <textarea id="responseOutput" readonly></textarea>
+    </section>
+</div>
+
+<script src="api.js"></script>
+<script>
+    // UI Logic
+    const api = new APIClient();
+    const responseOutput = document.getElementById('responseOutput');
+    const statusMessage = document.getElementById('statusMessage');
+
+    // Set up tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+        });
+    });
+
+    // Set credentials
+    document.getElementById('setAuth').addEventListener('click', () => {
+        const baseUrl = document.getElementById('baseUrl').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        api.baseURL = baseUrl;
+        api.setCredentials(username, password);
+
+        showStatus('Credentials set successfully!', 'success');
+    });
+
+    // Test connection
+    document.getElementById('testAuth').addEventListener('click', async () => {
+        try {
+            await api.checkHeartbeat();
+            showStatus('Connection successful!', 'success');
+        } catch (error) {
+            showStatus(`Connection failed: ${error.message}`, 'error');
+        }
+    });
+
+    // Handle all send request buttons
+    document.querySelectorAll('.send-request').forEach(button => {
+        button.addEventListener('click', async () => {
+            const endpoint = button.dataset.endpoint;
+
+            try {
+                let result;
+
+                switch(endpoint) {
+                    case 'getUsers':
+                        result = await api.getUsers();
+                        break;
+
+                    case 'getUser':
+                        const userId = document.getElementById('getUserById').value;
+                        if (!userId) {
+                            throw new Error('User ID is required');
+                        }
+                        result = await api.getUser(parseInt(userId));
+                        break;
+
+                    case 'createUser':
+                        const createUsername = document.getElementById('createUserUsername').value;
+                        const createPassword = document.getElementById('createUserPassword').value;
+                        const createUserType = document.getElementById('createUserType').value;
+
+                        if (!createUsername || !createPassword) {
+                            throw new Error('Username and password are required');
+                        }
+
+                        result = await api.createUser({
+                            userType: createUserType,
+                            username: createUsername,
+                            password: createPassword
+                        });
+                        break;
+
+                    case 'register':
+                        const registerUsername = document.getElementById('registerUsername').value;
+                        const registerPassword = document.getElementById('registerPassword').value;
+
+                        if (!registerUsername || !registerPassword) {
+                            throw new Error('Username and password are required');
+                        }
+
+                        result = await api.register(registerUsername, registerPassword);
+                        break;
+
+                    case 'updateUser':
+                        const updateUserId = document.getElementById('updateUserId').value;
+                        const updateUsername = document.getElementById('updateUserUsername').value;
+                        const updatePassword = document.getElementById('updateUserPassword').value;
+                        const updateUserType = document.getElementById('updateUserType').value;
+
+                        if (!updateUserId) {
+                            throw new Error('User ID is required');
+                        }
+
+                        result = await api.updateUser(parseInt(updateUserId), {
+                            username: updateUsername,
+                            password: updatePassword,
+                            userType: updateUserType
+                        });
+                        break;
+
+                    case 'deleteUser':
+                        const deleteUserId = document.getElementById('deleteUserId').value;
+                        if (!deleteUserId) {
+                            throw new Error('User ID is required');
+                        }
+                        result = await api.deleteUser(parseInt(deleteUserId));
+                        break;
+
+                    case 'getFunction':
+                        const functionId = document.getElementById('getFunctionId').value;
+                        if (functionId) {
+                            result = await api.getFunction(parseInt(functionId));
+                        } else {
+                            result = await api.getAllFunctions();
+                        }
+                        break;
+
+                    case 'calculateFunction':
+                        const calcFunctionId = document.getElementById('calculateFunctionId').value;
+                        const calcX = document.getElementById('calculateX').value;
+
+                        if (!calcFunctionId || !calcX) {
+                            throw new Error('Function ID and X value are required');
+                        }
+
+                        result = await api.calculateFunction(
+                            parseInt(calcFunctionId),
+                            parseFloat(calcX)
+                        );
+                        break;
+
+                    case 'createMathFunction':
+                        const mathExpression = document.getElementById('createMathExpression').value;
+                        if (!mathExpression) {
+                            throw new Error('Expression is required');
+                        }
+                        result = await api.createMathFunction(mathExpression);
+                        break;
+
+                    case 'createTabulatedFunction':
+                        const tabExpression = document.getElementById('createTabulatedExpression').value;
+                        const xFrom = document.getElementById('createTabulatedXFrom').value;
+                        const xTo = document.getElementById('createTabulatedXTo').value;
+                        const pointCount = document.getElementById('createTabulatedPointCount').value;
+
+                        if (!tabExpression || !xFrom || !xTo || !pointCount) {
+                            throw new Error('All fields are required');
+                        }
+
+                        result = await api.createTabulatedFunction(
+                            tabExpression,
+                            parseFloat(xFrom),
+                            parseFloat(xTo),
+                            parseInt(pointCount)
+                        );
+                        break;
+
+                    case 'createPureTabulatedFunction':
+                        const xValues = document.getElementById('createPureTabulatedXValues').value;
+                        const yValues = document.getElementById('createPureTabulatedYValues').value;
+
+                        if (!xValues || !yValues) {
+                            throw new Error('X and Y values are required');
+                        }
+
+                        // Convert comma-separated strings to arrays of numbers
+                        const xArray = xValues.split(',').map(val => parseFloat(val.trim()));
+                        const yArray = yValues.split(',').map(val => parseFloat(val.trim()));
+
+                        result = await api.createPureTabulatedFunction(xArray, yArray);
+                        break;
+
+                    case 'createCompositeFunction':
+                        const innerId = document.getElementById('createCompositeInnerId').value;
+                        const outerId = document.getElementById('createCompositeOuterId').value;
+
+                        if (!innerId || !outerId) {
+                            throw new Error('Both function IDs are required');
+                        }
+
+                        result = await api.createCompositeFunction(
+                            parseInt(innerId),
+                            parseInt(outerId)
+                        );
+                        break;
+
+                    case 'getOwnedFunction':
+                        const ownedFunctionId = document.getElementById('getOwnedFunctionId').value;
+                        const ownedFunctionUserId = document.getElementById('getOwnedFunctionUserId').value;
+
+                        if (!ownedFunctionId) {
+                            throw new Error('Function ID is required');
+                        }
+
+                        result = await api.getOwnedFunction(
+                            parseInt(ownedFunctionId),
+                            ownedFunctionUserId ? parseInt(ownedFunctionUserId) : null
+                        );
+                        break;
+
+                    case 'getUserFunctions':
+                        const userFunctionsUserId = document.getElementById('getUserFunctionsUserId').value;
+                        result = await api.getUserFunctions(
+                            userFunctionsUserId ? parseInt(userFunctionsUserId) : null
+                        );
+                        break;
+
+                    case 'createUserMathFunction':
+                        const userMathName = document.getElementById('createUserMathName').value;
+                        const userMathExpression = document.getElementById('createUserMathExpression').value;
+                        const userMathUserId = document.getElementById('createUserMathUserId').value;
+
+                        if (!userMathName || !userMathExpression) {
+                            throw new Error('Function name and expression are required');
+                        }
+
+                        result = await api.createUserMathFunction(
+                            userMathName,
+                            userMathExpression,
+                            userMathUserId ? parseInt(userMathUserId) : null
+                        );
+                        break;
+
+                    case 'createUserTabulatedFunction':
+                        const userTabName = document.getElementById('createUserTabulatedName').value;
+                        const userTabExpression = document.getElementById('createUserTabulatedExpression').value;
+                        const userTabXFrom = document.getElementById('createUserTabulatedXFrom').value;
+                        const userTabXTo = document.getElementById('createUserTabulatedXTo').value;
+                        const userTabPointCount = document.getElementById('createUserTabulatedPointCount').value;
+                        const userTabUserId = document.getElementById('createUserTabulatedUserId').value;
+
+                        if (!userTabName || !userTabExpression || !userTabXFrom || !userTabXTo || !userTabPointCount) {
+                            throw new Error('All fields are required');
+                        }
+
+                        result = await api.createUserTabulatedFunction(
+                            userTabName,
+                            userTabExpression,
+                            parseFloat(userTabXFrom),
+                            parseFloat(userTabXTo),
+                            parseInt(userTabPointCount),
+                            userTabUserId ? parseInt(userTabUserId) : null
+                        );
+                        break;
+
+                    case 'createUserPureTabulatedFunction':
+                        const userPureName = document.getElementById('createUserPureTabulatedName').value;
+                        const userPureXValues = document.getElementById('createUserPureTabulatedXValues').value;
+                        const userPureYValues = document.getElementById('createUserPureTabulatedYValues').value;
+                        const userPureUserId = document.getElementById('createUserPureTabulatedUserId').value;
+
+                        if (!userPureName || !userPureXValues || !userPureYValues) {
+                            throw new Error('All fields are required');
+                        }
+
+                        // Convert comma-separated strings to arrays of numbers
+                        const userPureXArray = userPureXValues.split(',').map(val => parseFloat(val.trim()));
+                        const userPureYArray = userPureYValues.split(',').map(val => parseFloat(val.trim()));
+
+                        result = await api.createUserPureTabulatedFunction(
+                            userPureName,
+                            userPureXArray,
+                            userPureYArray,
+                            userPureUserId ? parseInt(userPureUserId) : null
+                        );
+                        break;
+
+                    case 'createUserCompositeFunction':
+                        const userCompName = document.getElementById('createUserCompositeName').value;
+                        const userCompInnerId = document.getElementById('createUserCompositeInnerId').value;
+                        const userCompOuterId = document.getElementById('createUserCompositeOuterId').value;
+                        const userCompUserId = document.getElementById('createUserCompositeUserId').value;
+
+                        if (!userCompName || !userCompInnerId || !userCompOuterId) {
+                            throw new Error('All fields are required');
+                        }
+
+                        result = await api.createUserCompositeFunction(
+                            userCompName,
+                            parseInt(userCompInnerId),
+                            parseInt(userCompOuterId),
+                            userCompUserId ? parseInt(userCompUserId) : null
+                        );
+                        break;
+
+                    case 'assignOwnership':
+                        const assignFuncId = document.getElementById('assignOwnershipFunctionId').value;
+                        const assignName = document.getElementById('assignOwnershipName').value;
+                        const assignUserId = document.getElementById('assignOwnershipUserId').value;
+
+                        if (!assignFuncId || !assignName || !assignUserId) {
+                            throw new Error('All fields are required');
+                        }
+
+                        result = await api.assignOwnership(
+                            parseInt(assignFuncId),
+                            assignName,
+                            parseInt(assignUserId)
+                        );
+                        break;
+
+                    case 'updateOwnedFunction':
+                        const updateFuncId = document.getElementById('updateOwnedFunctionId').value;
+                        const updateFuncName = document.getElementById('updateOwnedFunctionName').value;
+                        const updateFuncUserId = document.getElementById('updateOwnedFunctionUserId').value;
+
+                        if (!updateFuncId || !updateFuncName) {
+                            throw new Error('Function ID and name are required');
+                        }
+
+                        result = await api.updateOwnedFunction(
+                            parseInt(updateFuncId),
+                            updateFuncName,
+                            updateFuncUserId ? parseInt(updateFuncUserId) : null
+                        );
+                        break;
+
+                    case 'deleteOwnedFunction':
+                        const deleteFuncId = document.getElementById('deleteOwnedFunctionId').value;
+                        const deleteFuncUserId = document.getElementById('deleteOwnedFunctionUserId').value;
+
+                        if (!deleteFuncId) {
+                            throw new Error('Function ID is required');
+                        }
+
+                        result = await api.deleteOwnedFunction(
+                            parseInt(deleteFuncId),
+                            deleteFuncUserId ? parseInt(deleteFuncUserId) : null
+                        );
+                        break;
+
+                    case 'getPoints':
+                        const pointsFuncId = document.getElementById('getPointsFunctionId').value;
+                        if (!pointsFuncId) {
+                            throw new Error('Function ID is required');
+                        }
+                        result = await api.getPoints(parseInt(pointsFuncId));
+                        break;
+
+                    case 'createPoint':
+                        const createPointFuncId = document.getElementById('createPointFunctionId').value;
+                        const createPointX = document.getElementById('createPointX').value;
+                        const createPointY = document.getElementById('createPointY').value;
+
+                        if (!createPointFuncId || !createPointX || !createPointY) {
+                            throw new Error('All fields are required');
+                        }
+
+                        result = await api.createPoint(
+                            parseInt(createPointFuncId),
+                            parseFloat(createPointX),
+                            parseFloat(createPointY)
+                        );
+                        break;
+
+                    case 'updatePoint':
+                        const updatePointFuncId = document.getElementById('updatePointFunctionId').value;
+                        const updatePointX = document.getElementById('updatePointX').value;
+                        const updatePointY = document.getElementById('updatePointY').value;
+
+                        if (!updatePointFuncId || !updatePointX || !updatePointY) {
+                            throw new Error('All fields are required');
+                        }
+
+                        result = await api.updatePoint(
+                            parseInt(updatePointFuncId),
+                            parseFloat(updatePointX),
+                            parseFloat(updatePointY)
+                        );
+                        break;
+
+                    case 'deletePoint':
+                        const deletePointFuncId = document.getElementById('deletePointFunctionId').value;
+                        const deletePointX = document.getElementById('deletePointX').value;
+
+                        if (!deletePointFuncId || !deletePointX) {
+                            throw new Error('Function ID and X value are required');
+                        }
+
+                        result = await api.deletePoint(
+                            parseInt(deletePointFuncId),
+                            parseFloat(deletePointX)
+                        );
+                        break;
+
+                    case 'checkHeartbeat':
+                        result = await api.checkHeartbeat();
+                        break;
+
+                    default:
+                        throw new Error(`Unknown endpoint: ${endpoint}`);
+                }
+
+                showStatus('Request successful!', 'success');
+                responseOutput.value = JSON.stringify(result, null, 2);
+            } catch (error) {
+                showStatus(`Request failed: ${error.message}`, 'error');
+                responseOutput.value = error.message;
+            }
+        });
+    });
+
+    function showStatus(message, type) {
+        statusMessage.textContent = message;
+        statusMessage.className = `status ${type}`;
+        statusMessage.classList.remove('hidden');
+
+        // Auto-hide success messages after 3 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 3000);
+        }
+    }
+</script>
+</body>
+</html>

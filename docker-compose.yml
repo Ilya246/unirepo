@@ -11,4 +11,10 @@ services:
       - "8080:8080"
     expose:
       - "8080"
+    secrets:
+      - main.properties
     network_mode: host
+
+secrets:
+  main.properties:
+    file: ./src/main/resources/secrets/main.properties

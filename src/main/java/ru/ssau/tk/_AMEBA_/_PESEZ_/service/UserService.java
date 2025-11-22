@@ -89,7 +89,6 @@ public class UserService {
             }
             CompletableFuture.allOf(futures).join();
             userRepo.deleteUser(userId).join();
-            Log.info("Deleted user ID {}", userId);
         });
     }
 

@@ -30,7 +30,7 @@ class FunctionRepositoryTest {
         repository = new FunctionRepository(databaseConfig);
         repository.ensureTables();
 
-        String filepath = DatabaseConnection.class.getClassLoader().getResource("config/" + databaseConfig).getPath();
+        String filepath = FunctionRepositoryTest.class.getClassLoader().getResource("config/" + databaseConfig).getPath();
         try (var propertiesReader = new FileReader(filepath)) {
             PROPERTIES.load(propertiesReader);
         } catch (IOException e) {
