@@ -1,4 +1,5 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,7 @@ public class UserEntity {
     private Date createdDate;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<FunctionOwnershipEntity> functionOwnerships = new ArrayList<>();
 
     public UserEntity(int typeId, String userName, String password, Date createdDate) {

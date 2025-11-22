@@ -212,9 +212,13 @@ class APIClient {
     }
 
     async assignOwnership(functionId, name, targetUserId) {
-        return this.request(`/owned-functions/own?id=${functionId}&name=${encodeURIComponent(name)}`, {
-            method: 'POST'
-        });
+        let url = `/owned-functions/own?id=${functionId}&name=${encodeURIComponent(name)}`;
+            if (targetUserId) {
+                url += `&user=${targetUserId}`;
+            }
+            return this.request(url, {
+                method: 'POST'
+            });
     }
 
     async updateOwnedFunction(id, name, targetUserId = null) {

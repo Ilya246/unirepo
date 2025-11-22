@@ -1,5 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,7 @@ public class FunctionEntity {
     private String expression;
 
     @OneToMany(mappedBy = "function", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<FunctionOwnershipEntity> functionOwnerships = new ArrayList<>();
 
     @OneToMany(mappedBy = "compositeFunction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
