@@ -17,6 +17,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.HashUtil;
 import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -135,8 +136,9 @@ public class UserServiceImpl implements UserService {
         UserResponse response = new UserResponse();
         response.setUserId(user.getUserId());
         response.setUserType(new Long(user.getTypeId()));
-        response.setUserName(user.getUserName());
-        response.setPassword(user.getPassword());
+        response.setUsername(user.getUserName());
+        response.setPasswordHash(user.getPassword());
+        response.setCreatedDate(Timestamp.from(user.getCreatedDate().toInstant()));
         return response;
     }
 
