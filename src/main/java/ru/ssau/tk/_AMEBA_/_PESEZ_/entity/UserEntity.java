@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(exclude = "password") // исключаем пароль из toString
+@ToString(exclude = {"password", "functionOwnerships"}) // исключаем пароль из toString
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,4 +61,5 @@ public class UserEntity {
             createdDate = new Date();
         }
     }
+
 }

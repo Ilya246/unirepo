@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Стили для левой панели профиля */
+        .profile-sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-role {
+            font-size: 14px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .logout-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: auto;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Стили для основной области контента */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-header {
+            margin-bottom: 30px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .welcome-subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Стили для меню функций */
+        .functions-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .function-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .function-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .function-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .function-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .function-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Стили для футера */
+        .footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .profile-sidebar {
+                width: 100%;
+                padding: 20px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .functions-menu {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Дополнительные стили для улучшения UX */
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .info-item {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- Левая панель с профилем -->
+    <div class="profile-sidebar">
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-name" id="userName">Загрузка...</div>
+            <div class="profile-role" id="userRole">Пользователь</div>
+        </div>
+
+        <div class="user-info">
+            <div class="info-item"><strong>Статус:</strong> <span id="userStatus">Активен</span></div>
+            <div class="info-item"><strong>Последний вход:</strong> <span id="lastLogin">Только что</span></div>
+        </div>
+
+        <button class="logout-btn" onclick="forceLogout()">
+            🔄 Перезайти
+        </button>
+    </div>
+
+    <!-- Основная область контента -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1 class="welcome-title">Добро пожаловать в систему!</h1>
+            <p class="welcome-subtitle">Управляйте функциями и настройками вашего аккаунта</p>
+        </div>
+
+        <!-- Меню функций -->
+        <div class="functions-menu">
+            <div class="function-card" onclick="createFunction()">
+                <div class="function-icon">✨</div>
+                <h3 class="function-title">Создать функцию</h3>
+                <p class="function-description">Создайте новую математическую функцию для анализа и построения графиков</p>
+            </div>
+
+            <div class="function-card" onclick="updateFunction()">
+                <div class="function-icon">🔄</div>
+                <h3 class="function-title">Обновить функцию</h3>
+                <p class="function-description">Редактируйте существующие функции и их параметры</p>
+            </div>
+
+            <div class="function-card" onclick="showGraph()">
+                <div class="function-icon">📊</div>
+                <h3 class="function-title">График функции</h3>
+                <p class="function-description">Визуализируйте математические функции в виде графиков и диаграмм</p>
+            </div>
+
+            <div class="function-card" onclick="manageFunctions()">
+                <div class="function-icon">📋</div>
+                <h3 class="function-title">Мои функции</h3>
+                <p class="function-description">Просматривайте и управляйте всеми созданными функциями</p>
+            </div>
+
+            <div class="function-card" onclick="openSettings()">
+                <div class="function-icon">⚙️</div>
+                <h3 class="function-title">Настройки</h3>
+                <p class="function-description">Настройте параметры системы и персонализируйте интерфейс</p>
+            </div>
+
+            <div class="function-card" onclick="showHelp()">
+                <div class="function-icon">❓</div>
+                <h3 class="function-title">Помощь</h3>
+                <p class="function-description">Получите справку по использованию системы и решению проблем</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Футер -->
+<footer class="footer">
+    <div class="footer-content">
+        <p class="footer-text">© 2024 Математическая система анализа функций. Все права защищены.</p>
+        <p class="footer-text">Разработано с ❤️ для удобной работы с математическими функциями</p>
+    </div>
+</footer>
+
+<script>
+    // Загружаем данные пользователя
+    fetch('/api/current-user')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки данных пользователя');
+            }
+            return response.json();
+        })
+        .then(user => {
+            document.getElementById('userName').textContent = user.userName || 'Пользователь';
+            document.getElementById('userRole').textContent = user.userType || 'Пользователь';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('userName').textContent = 'Гость';
+            document.getElementById('userRole').textContent = 'Неавторизован';
+        });
+
+    function forceLogout() {
+        if (confirm('Вы уверены, что хотите перезайти? Текущая сессия будет завершена.')) {
+            localStorage.clear();
+            sessionStorage.clear();
+            fetch('/force-new-auth', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Basic ' + btoa('logout:logout')
+                },
+                credentials: 'include'
+            }).then(() => {
+                window.location.href = '/';
+            }).catch(error => {
+                console.error('Logout error:', error);
+                window.location.href = '/';
+            });
+        }
+    }
+
+    // Функции для меню
+    function createFunction() {
+        alert('Функция "Создать функцию" будет реализована в ближайшее время');
+        // Здесь будет логика создания функции
+    }
+
+    function updateFunction() {
+        alert('Функция "Обновить функцию" будет реализована в ближайшее время');
+        // Здесь будет логика обновления функции
+    }
+
+    function showGraph() {
+        alert('Функция "График функции" будет реализована в ближайшее время');
+        // Здесь будет логика отображения графика
+    }
+
+    function manageFunctions() {
+        alert('Функция "Мои функции" будет реализована в ближайшее время');
+        // Здесь будет логика управления функциями
+    }
+
+    function openSettings() {
+        alert('Функция "Настройки" будет реализована в ближайшее время');
+        // Здесь будет логика настроек
+    }
+
+    function showHelp() {
+        alert('Функция "Помощь" будет реализована в ближайшее время');
+        // Здесь будет логика помощи
+    }
+
+    // Обновляем время последнего входа
+    document.getElementById('lastLogin').textContent = new Date().toLocaleString('ru-RU');
+</script>
+</body>
+</html>
