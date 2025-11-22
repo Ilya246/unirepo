@@ -95,7 +95,7 @@ class APIClient {
 
     // Function endpoints (Admin only)
     async getAllFunctions() {
-        return this.request('/functions', { method: 'GET' }, false);
+        return this.request('/functions', { method: 'GET' });
     }
 
     async getFunction(id) {
@@ -109,28 +109,28 @@ class APIClient {
     async createMathFunction(expression) {
         return this.request('/functions/math', {
             method: 'POST',
-            body: JSON.stringify({ expression })
+            body: JSON.stringify({ type: 'math', expression })
         });
     }
 
     async createTabulatedFunction(expression, xFrom, xTo, pointCount) {
         return this.request('/functions/tabulated', {
             method: 'POST',
-            body: JSON.stringify({ expression, xFrom, xTo, pointCount })
+            body: JSON.stringify({ type: 'tabulated', expression, xFrom, xTo, pointCount })
         });
     }
 
     async createPureTabulatedFunction(xValues, yValues) {
         return this.request('/functions/pure-tabulated', {
             method: 'POST',
-            body: JSON.stringify({ xValues, yValues })
+            body: JSON.stringify({ type: 'pure', xValues, yValues })
         });
     }
 
     async createCompositeFunction(innerId, outerId) {
         return this.request('/functions/composite', {
             method: 'POST',
-            body: JSON.stringify({ innerId, outerId })
+            body: JSON.stringify({ type: 'composite', innerId, outerId })
         });
     }
 
@@ -159,8 +159,9 @@ class APIClient {
         return this.request(url, {
             method: 'POST',
             body: JSON.stringify({
+                type: "owned",
                 name,
-                funcParams: { expression }
+                funcParams: { type: 'math', expression }
             })
         });
     }
@@ -173,8 +174,9 @@ class APIClient {
         return this.request(url, {
             method: 'POST',
             body: JSON.stringify({
+                type: "owned",
                 name,
-                funcParams: { expression, xFrom, xTo, pointCount }
+                funcParams: { type: 'tabulated', expression, xFrom, xTo, pointCount }
             })
         });
     }
@@ -187,8 +189,9 @@ class APIClient {
         return this.request(url, {
             method: 'POST',
             body: JSON.stringify({
+                type: "owned",
                 name,
-                funcParams: { xValues, yValues }
+                funcParams: { type: 'pure', xValues, yValues }
             })
         });
     }
@@ -201,8 +204,9 @@ class APIClient {
         return this.request(url, {
             method: 'POST',
             body: JSON.stringify({
+                type: "owned",
                 name,
-                funcParams: { innerId, outerId }
+                funcParams: { type: 'composite', innerId, outerId }
             })
         });
     }
