@@ -1,23 +1,21 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.cors.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 @EnableWebSecurity
@@ -30,6 +28,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
                 .authorizeHttpRequests(authz -> authz
                         // Разрешаем доступ ко всем статическим ресурсам
                         .requestMatchers("/", "/index.html", "/api", "/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
@@ -48,10 +47,27 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*")); // Use patterns instead of specific origins
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     private class BasicAuthEntryPoint implements AuthenticationEntryPoint {
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response,
                              AuthenticationException authException) throws IOException {
+
+            // Add CORS headers to authentication responses too
+            addCorsHeaders(response);
 
             response.addHeader("WWW-Authenticate", "Basic realm=\"RESTRICTED-AREA\"");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -74,22 +90,30 @@ public class SecurityConfig {
             }
         }
 
+        private void addCorsHeaders(HttpServletResponse response) {
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+            response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setHeader("Access-Control-Max-Age", "3600");
+        }
+
         private boolean isStaticResourceRequest(HttpServletRequest request) {
             String uri = request.getRequestURI();
             return uri.startsWith("/js/") ||
-                   uri.startsWith("/css/") ||
-                   uri.startsWith("/images/") ||
-                   uri.endsWith(".js") ||
-                   uri.endsWith(".css") ||
-                   uri.endsWith(".png") ||
-                   uri.endsWith(".jpg") ||
-                   uri.endsWith(".ico");
+                    uri.startsWith("/css/") ||
+                    uri.startsWith("/images/") ||
+                    uri.endsWith(".js") ||
+                    uri.endsWith(".css") ||
+                    uri.endsWith(".png") ||
+                    uri.endsWith(".jpg") ||
+                    uri.endsWith(".ico");
         }
 
         private boolean isApiRequest(HttpServletRequest request) {
             return request.getRequestURI().startsWith("/api/") ||
-                   "application/json".equals(request.getHeader("Accept")) ||
-                   request.getRequestURI().endsWith(".json");
+                    "application/json".equals(request.getHeader("Accept")) ||
+                    request.getRequestURI().endsWith(".json");
         }
 
         private String loadApiTestingInterface() throws IOException {
