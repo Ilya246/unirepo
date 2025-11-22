@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.PointsEntity;
-
 
 @Getter
 @Setter
@@ -14,8 +12,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.PointsEntity;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PointResponse extends PointRequest {
+public class PointsResponse extends PointRequest {
     Long functionId;
-    Double xValue;
-
+    double[] xValues;
+    double[] yValues;
 }

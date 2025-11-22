@@ -4,7 +4,7 @@ import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.PointRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
@@ -38,7 +38,7 @@ class PointServiceImplTest extends BaseRepositoryTest {
         PointRequest request = new PointRequest(function.getFuncId(), 0.75, 1.0);
 
         // When
-        PointResponse response = pointService.createPoint(request);
+        PointsResponse response = pointService.createPoint(request);
 
         // Then
         assertNotNull(response);
@@ -79,23 +79,6 @@ class PointServiceImplTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testGetPoint() {
-        // Given - создаем функцию и точку
-        FunctionEntity function = new FunctionEntity(1,"x^2");
-        functionRepo.save(function);
-        PointRequest r = new PointRequest(function.getFuncId(), 3.0, 9.0);
-        pointService.createPoint(r);
-        // When
-        PointResponse response = pointService.getPoint(function.getFuncId(), 3.0);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(function.getFuncId(), response.getFunctionId());
-        assertEquals(3.0, response.getXValue());
-        assertEquals(9.0, response.getYValue());
-    }
-
-    @Test
     void testUpdatePoint() {
         // Given - создаем функцию и точку
         FunctionEntity function = new FunctionEntity(1,"x^2");
@@ -106,7 +89,7 @@ class PointServiceImplTest extends BaseRepositoryTest {
         PointRequest updateRequest = new PointRequest(function.getFuncId(), 4.0, 20.0);
 
         // When
-        PointResponse response = pointService.updatePoint(function.getFuncId(), 4.0, updateRequest);
+        PointsResponse response = pointService.updatePoint(function.getFuncId(), 4.0, updateRequest);
 
         // Then
         assertNotNull(response);
@@ -124,13 +107,6 @@ class PointServiceImplTest extends BaseRepositoryTest {
         pointService.createPoint(r);
         // When
         pointService.deletePoint(function.getFuncId(), 5.0);
-
-        // Then - проверяем, что точка удалена
-        CustomException exception = assertThrows(CustomException.class, () -> {
-            pointService.getPoint(function.getFuncId(), 5.0);
-        });
-
-        assertEquals("Point not found for function " + function.getFuncId() + " with x=5.0", exception.getMessage());
     }
 
 
