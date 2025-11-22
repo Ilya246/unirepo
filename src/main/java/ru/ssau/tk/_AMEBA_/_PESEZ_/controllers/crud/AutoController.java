@@ -41,7 +41,8 @@ public class AutoController {
                             "username", user.getUserName(),
                             "role", userType.toString(),
                             "userName", user.getUserName(), // Дублируем для JavaScript
-                            "userRole", userType.toString()  // Дублируем для JavaScript
+                            "userRole", userType.toString(),  // Дублируем для JavaScript
+                            "contextPath", request.getContextPath() // Добавляем contextPath для корректных ссылок
                     ));
 
             return ResponseEntity.ok()
@@ -51,6 +52,7 @@ public class AutoController {
                     .body(html);
         } catch (Exception e) {
             // Fallback на старый код если файл не найден
+            Log.error("Error loading template: " + e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error loading template: " + e.getMessage());
         }
@@ -75,7 +77,7 @@ public class AutoController {
     private String determineTemplateByUserType(UserType userType) {
         switch (userType) {
             case Admin:
-                return "admin.html";
+                return "api.html";
             case Normal:
             default:
                 return "user.html";
