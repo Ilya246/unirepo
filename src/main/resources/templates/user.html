@@ -217,12 +217,12 @@
     <div class="profile-sidebar">
         <div class="profile-header">
             <div class="profile-avatar">👤</div>
-            <div class="profile-name" id="userName">Загрузка...</div>
-            <div class="profile-role" id="userRole">Пользователь</div>
+            <div class="profile-name" id="userName">{{username}}</div>
+            <div class="profile-role" id="userRole">{{role}}</div>
         </div>
 
         <div class="user-info">
-            <div class="info-item"><strong>Статус:</strong> <span id="userStatus">Активен</span></div>
+            <div class="info-item"><strong>Статус:</strong> <span>Активен</span></div>
             <div class="info-item"><strong>Последний вход:</strong> <span id="lastLogin">Только что</span></div>
         </div>
 
@@ -234,7 +234,7 @@
     <!-- Основная область контента -->
     <div class="main-content">
         <div class="content-header">
-            <h1 class="welcome-title">Добро пожаловать в систему!</h1>
+            <h1 class="welcome-title">Добро пожаловать, {{username}}!</h1>
             <p class="welcome-subtitle">Управляйте функциями и настройками вашего аккаунта</p>
         </div>
 
@@ -258,22 +258,10 @@
                 <p class="function-description">Визуализируйте математические функции в виде графиков и диаграмм</p>
             </div>
 
-            <div class="function-card" onclick="manageFunctions()">
-                <div class="function-icon">📋</div>
-                <h3 class="function-title">Мои функции</h3>
-                <p class="function-description">Просматривайте и управляйте всеми созданными функциями</p>
-            </div>
-
             <div class="function-card" onclick="openSettings()">
                 <div class="function-icon">⚙️</div>
                 <h3 class="function-title">Настройки</h3>
                 <p class="function-description">Настройте параметры системы и персонализируйте интерфейс</p>
-            </div>
-
-            <div class="function-card" onclick="showHelp()">
-                <div class="function-icon">❓</div>
-                <h3 class="function-title">Помощь</h3>
-                <p class="function-description">Получите справку по использованию системы и решению проблем</p>
             </div>
         </div>
     </div>
@@ -288,23 +276,8 @@
 </footer>
 
 <script>
-    // Загружаем данные пользователя
-    fetch('/api/current-user')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка загрузки данных пользователя');
-            }
-            return response.json();
-        })
-        .then(user => {
-            document.getElementById('userName').textContent = user.userName || 'Пользователь';
-            document.getElementById('userRole').textContent = user.userType || 'Пользователь';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('userName').textContent = 'Гость';
-            document.getElementById('userRole').textContent = 'Неавторизован';
-        });
+    // Данные пользователя уже переданы через переменные {{username}} и {{role}}
+    // Убираем fetch запрос и используем переданные данные
 
     function forceLogout() {
         if (confirm('Вы уверены, что хотите перезайти? Текущая сессия будет завершена.')) {
@@ -328,32 +301,18 @@
     // Функции для меню
     function createFunction() {
         alert('Функция "Создать функцию" будет реализована в ближайшее время');
-        // Здесь будет логика создания функции
     }
 
     function updateFunction() {
         alert('Функция "Обновить функцию" будет реализована в ближайшее время');
-        // Здесь будет логика обновления функции
     }
 
     function showGraph() {
         alert('Функция "График функции" будет реализована в ближайшее время');
-        // Здесь будет логика отображения графика
-    }
-
-    function manageFunctions() {
-        alert('Функция "Мои функции" будет реализована в ближайшее время');
-        // Здесь будет логика управления функциями
     }
 
     function openSettings() {
         alert('Функция "Настройки" будет реализована в ближайшее время');
-        // Здесь будет логика настроек
-    }
-
-    function showHelp() {
-        alert('Функция "Помощь" будет реализована в ближайшее время');
-        // Здесь будет логика помощи
     }
 
     // Обновляем время последнего входа

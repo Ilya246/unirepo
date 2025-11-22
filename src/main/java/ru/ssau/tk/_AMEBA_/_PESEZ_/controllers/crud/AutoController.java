@@ -39,7 +39,9 @@ public class AutoController {
             String html = HtmlTemplateLoader.loadTemplate(templateName,
                     Map.of(
                             "username", user.getUserName(),
-                            "role", userType.toString()
+                            "role", userType.toString(),
+                            "userName", user.getUserName(), // Дублируем для JavaScript
+                            "userRole", userType.toString()  // Дублируем для JavaScript
                     ));
 
             return ResponseEntity.ok()

@@ -278,14 +278,14 @@
     <div class="admin-header">
       <div class="admin-avatar">👑</div>
       <div class="admin-title">Панель Администратора</div>
-      <div class="admin-subtitle" id="adminRole">Администратор системы</div>
+      <div class="admin-subtitle" id="adminRole">{{role}}</div>
     </div>
 
     <div class="admin-info">
-      <div class="info-item"><strong>Текущий пользователь:</strong> <span id="adminName">Загрузка...</span></div>
-      <div class="info-item"><strong>Уровень доступа:</strong> <span id="accessLevel">Полный</span></div>
+      <div class="info-item"><strong>Текущий пользователь:</strong> <span id="adminName">{{username}}</span></div>
+      <div class="info-item"><strong>Уровень доступа:</strong> <span>Полный</span></div>
       <div class="info-item"><strong>Последняя активность:</strong> <span id="lastActivity">Только что</span></div>
-      <div class="info-item"><strong>Активных сессий:</strong> <span id="activeSessions">1</span></div>
+      <div class="info-item"><strong>Активных сессий:</strong> <span>1</span></div>
     </div>
 
     <div class="danger-zone">
@@ -306,65 +306,29 @@
     <!-- Меню админских функций -->
     <div class="admin-functions">
       <div class="admin-card" onclick="manageUsers()">
-        <div class="notification-badge">3 новых</div>
         <div class="admin-icon">👥</div>
-        <h3 class="admin-card-title">Редактирование пользователей</h3>
-        <p class="admin-card-description">Управление учетными записями пользователей, правами доступа, блокировка и разблокировка аккаунтов</p>
-        <div class="admin-stats">
-          <div class="stat-item">📊 Всего пользователей: 156</div>
-          <div class="stat-item">🔄 Активных: 142</div>
-        </div>
+        <h3 class="admin-card-title">Управление пользователями</h3>
       </div>
 
       <div class="admin-card" onclick="manageFunctions()">
         <div class="admin-icon">⚙️</div>
-        <h3 class="admin-card-title">Редактирование функций</h3>
-        <p class="admin-card-description">Управление математическими функциями, настройка параметров, мониторинг использования</p>
-        <div class="admin-stats">
-          <div class="stat-item">📊 Всего функций: 89</div>
-          <div class="stat-item">🔥 Популярных: 23</div>
-        </div>
+        <h3 class="admin-card-title">Управление функциями</h3>
       </div>
 
       <div class="admin-card danger" onclick="systemControl()">
         <div class="admin-icon">🚨</div>
         <h3 class="admin-card-title">Красная кнопка</h3>
-        <p class="admin-card-description">Экстренное управление системой: перезагрузка сервисов, очистка кэша, аварийные операции</p>
         <div class="admin-stats">
-          <div class="stat-item">⚠️ Требуется подтверждение</div>
           <div class="stat-item">🔒 Высокий уровень доступа</div>
         </div>
       </div>
 
-      <div class="admin-card" onclick="viewLogs()">
-        <div class="admin-icon">📋</div>
-        <h3 class="admin-card-title">Системные логи</h3>
-        <p class="admin-card-description">Просмотр журналов событий, мониторинг ошибок, анализ активности пользователей</p>
-        <div class="admin-stats">
-          <div class="stat-item">📊 Логов сегодня: 1,247</div>
-          <div class="stat-item">❌ Ошибок: 3</div>
-        </div>
-      </div>
 
       <div class="admin-card" onclick="systemSettings()">
         <div class="admin-icon">🔧</div>
         <h3 class="admin-card-title">Настройки системы</h3>
-        <p class="admin-card-description">Конфигурация сервера, настройки безопасности, параметры базы данных, резервное копирование</p>
-        <div class="admin-stats">
-          <div class="stat-item">⚡ Статус: Online</div>
-          <div class="stat-item">💾 Использование: 68%</div>
-        </div>
       </div>
 
-      <div class="admin-card" onclick="backupManagement()">
-        <div class="admin-icon">💾</div>
-        <h3 class="admin-card-title">Резервные копии</h3>
-        <p class="admin-card-description">Управление резервными копиями данных, восстановление системы, планирование бекапов</p>
-        <div class="admin-stats">
-          <div class="stat-item">📅 Последний бэкап: сегодня</div>
-          <div class="stat-item">✅ Статус: Успешно</div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -372,28 +336,12 @@
 <!-- Футер -->
 <footer class="footer">
   <div class="footer-content">
-    <p class="footer-text">© 2024 Система управления математическими функциями | Административная панель</p>
-    <p class="footer-text">Версия 2.1.4 | Сервер: production | Время работы: <span id="uptime">24д 16ч 32м</span></p>
-  </div>
+    <p class="footer-text">© 2024 Система управления математическими функциями | Административная панель</p></div>
 </footer>
 
 <script>
-  // Загружаем данные администратора
-  fetch('/api/current-user')
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Ошибка загрузки данных администратора');
-          }
-          return response.json();
-      })
-      .then(user => {
-          document.getElementById('adminName').textContent = user.userName || 'Администратор';
-          document.getElementById('adminRole').textContent = user.userType === 'Admin' ? 'Администратор системы' : user.userType || 'Администратор';
-      })
-      .catch(error => {
-          console.error('Error:', error);
-          document.getElementById('adminName').textContent = 'Системный администратор';
-      });
+  // Убираем fetch запрос - данные уже переданы через переменные
+  // Используем переданные {{username}} и {{role}}
 
   function forceLogout() {
       if (confirm('ВНИМАНИЕ! Вы собираетесь выполнить принудительный перезапуск сессии. Все несохраненные данные будут потеряны. Продолжить?')) {
@@ -414,57 +362,49 @@
       }
   }
 
-  // Функции для админского меню
-  function manageUsers() {
-      if (confirm('Перейти в раздел управления пользователями?')) {
-          alert('Раздел "Редактирование пользователей" будет открыт в новой версии');
-          // Здесь будет логика управления пользователями
-      }
-  }
+// Функции для админского меню
+function manageUsers() {
+if (confirm('Перейти в раздел управления пользователями?')) {
+    alert('Раздел "Редактирование пользователей" будет открыт в новой версии');
+    // Здесь будет логика управления пользователями
+}
+}
 
-  function manageFunctions() {
-      if (confirm('Перейти в раздел управления функциями?')) {
-          alert('Раздел "Редактирование функций" будет открыт в новой версии');
-          // Здесь будет логика управления функциями
-      }
-  }
+function manageFunctions() {
+if (confirm('Перейти в раздел управления функциями?')) {
+    alert('Раздел "Редактирование функций" будет открыт в новой версии');
+    // Здесь будет логика управления функциями
+}
+}
 
-  function systemControl() {
-      if (confirm('🚨 ВНИМАНИЕ! Вы пытаетесь получить доступ к критическим функциям системы. Для продолжения требуется подтверждение безопасности. Продолжить?')) {
-          const code = prompt('Введите код безопасности для доступа к красной кнопке:');
-          if (code === 'ADMIN123') {
-              alert('Доступ разрешен. Функции красной кнопки активированы.');
-              // Здесь будет логика красной кнопки
-          } else {
-              alert('❌ Неверный код безопасности! Доступ запрещен.');
-          }
-      }
-  }
+function systemControl() {
+if (confirm('🚨 ВНИМАНИЕ! Вы пытаетесь получить доступ к критическим функциям системы. Для продолжения требуется подтверждение безопасности. Продолжить?')) {
+    const code = prompt('Введите код безопасности для доступа к красной кнопке:');
+    if (code === 'kupriyanov') {
+        alert('Доступ разрешен. Функции красной кнопки активированы.');
+        // Здесь будет логика красной кнопки
+    } else {
+        alert('❌ Неверный код безопасности! Доступ запрещен.');
+    }
+}
+}
 
-  function viewLogs() {
-      alert('Раздел "Системные логи" будет открыт в новой версии');
-      // Здесь будет логика просмотра логов
-  }
 
-  function systemSettings() {
-      alert('Раздел "Настройки системы" будет открыт в новой версии');
-      // Здесь будет логика настроек системы
-  }
+function systemSettings() {
+alert('Раздел "Настройки системы" будет открыт в новой версии');
+// Здесь будет логика настроек системы
+}
 
-  function backupManagement() {
-      alert('Раздел "Резервные копии" будет открыт в новой версии');
-      // Здесь будет логика управления бэкапами
-  }
 
-  // Обновляем информацию о системе
-  document.getElementById('lastActivity').textContent = new Date().toLocaleString('ru-RU');
+// Обновляем информацию о системе
+document.getElementById('lastActivity').textContent = new Date().toLocaleString('ru-RU');
 
-  // Имитация времени работы системы
-  setInterval(() => {
-      const uptimeElement = document.getElementById('uptime');
-      const currentUptime = uptimeElement.textContent;
-      // Простая имитация обновления времени работы
-  }, 60000);
+// Имитация времени работы системы
+setInterval(() => {
+const uptimeElement = document.getElementById('uptime');
+const currentUptime = uptimeElement.textContent;
+// Простая имитация обновления времени работы
+}, 60000);
 </script>
 </body>
 </html>
