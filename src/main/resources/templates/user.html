@@ -1421,11 +1421,11 @@ async function loadFunctionPoints(functionId) {
 }
 
 // Отрисовка списка точек
-function renderPointsList(points) {
+function renderPointsList(gotPoints) {
     const pointsList = document.getElementById('pointsList');
 
-    const xValues = points.xValues;
-    const yValues = points.yValues;
+    const xValues = gotPoints.xValues;
+    const yValues = gotPoints.yValues;
 
     if (!xValues || xValues.length === 0) {
         pointsList.innerHTML = `
