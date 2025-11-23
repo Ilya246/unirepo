@@ -38,22 +38,11 @@ public class FunctionOwnershipController {
     @Operation(summary = "Обновление связи функции и пользователя")
     public void updateOwnership(
             @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "user", required = false) Long user,
-            @RequestParam(value = "id", required = false) Long id, // добавил required = false
-            @RequestParam(value = "functionId", required = false) Long functionId, // добавил альтернативный параметр
+            @RequestParam(value = "id", required = false) Long id,
             @RequestParam String name) {
 
-        Long actualUserId = userId != null ? userId : user;
-        Long actualFunctionId = id != null ? id : functionId; // поддержка обоих параметров
-
-        if (actualUserId == null) {
-            actualUserId = getCurrentUserId(actualUserId);
-            Log.info("Using current user ID: {}", actualUserId);
-        }
-
-        if (actualFunctionId == null) {
-            throw new CustomException("Function ID is required (use 'id' or 'functionId' parameter)", HttpStatus.BAD_REQUEST);
-        }
+        Long actualUserId = getCurrentUserId(userId);
+        ownershipService.updateOwnership(actualUserId, id, new FunctionOwnershipRequest(actualUserId, id, name));
     }
 
     @DeleteMapping
