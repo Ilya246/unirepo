@@ -140,7 +140,7 @@ public class FunctionServiceImpl implements FunctionService {
 
     @Override
     public CompletableFuture<MathFunction> getMathFunction(Long funcId) {
-        return functionRepo.getFunction(funcId, true);
+        return functionRepo.getFunction(funcId);
     }
 
     @Override

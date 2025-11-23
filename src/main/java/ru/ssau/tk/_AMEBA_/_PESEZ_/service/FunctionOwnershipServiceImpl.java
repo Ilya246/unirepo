@@ -53,16 +53,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
         }
 
         // Создаем entity вручную
-        FunctionOwnershipEntity ownership = new FunctionOwnershipEntity();
-        ownership.setUser(user);
-        ownership.setFunction(function);
-        ownership.setFuncName(request.getFuncName());
-        ownership.setCreatedDate(new Date()); // устанавливаем текущую дату
-
-        // Создаем и устанавливаем composite ID
-        FunctionOwnershipId id = new FunctionOwnershipId(request.getUserId(), request.getFunctionId());
-        ownership.setId(id);
-
+        FunctionOwnershipEntity ownership = new FunctionOwnershipEntity(user, function, new Date(), request.getFuncName());
         ownershipRepo.save(ownership);
         log.info("Function ownership created for user: {}, function: {}",
                 request.getUserId(), request.getFunctionId());
