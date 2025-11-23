@@ -28,7 +28,7 @@ public class UserService {
             int to = 0;
             for (OwnedFunctionDTO function : functions) {
                 FunctionDTO func = function.function;
-                if ((func.funcType & types) != 0)
+                if ((func.funcType.typeId & types) != 0)
                     to++;
             }
             return Arrays.copyOf(functions, to);

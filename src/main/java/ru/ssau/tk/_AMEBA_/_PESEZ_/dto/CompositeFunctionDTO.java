@@ -1,12 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-public class CompositeFunctionDTO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -1376499663154818864L;
-
+public class CompositeFunctionDTO {
     public final int funcId;
     public final int innerFuncId;
     public final int outerFuncId;

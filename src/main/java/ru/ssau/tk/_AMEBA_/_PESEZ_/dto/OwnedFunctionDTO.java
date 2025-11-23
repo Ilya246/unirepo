@@ -1,11 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto;
 
-import java.io.*;
-
-public class OwnedFunctionDTO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 6522333532647672030L;
-
+public class OwnedFunctionDTO {
     public FunctionDTO function;
     public FunctionOwnershipDTO ownership;
 

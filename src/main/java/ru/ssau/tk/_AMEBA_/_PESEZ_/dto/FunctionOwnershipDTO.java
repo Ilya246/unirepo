@@ -1,13 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class FunctionOwnershipDTO implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -5871923335808124847L;
-
+public class FunctionOwnershipDTO {
     public final int userId;
     public final int funcId;
     public final Timestamp createdDate;

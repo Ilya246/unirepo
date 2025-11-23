@@ -38,6 +38,28 @@ public class FunctionRepository extends Repository {
     public static final int CompositeID = 1 << 2;
     public static final int PureTabulatedID = 1 << 3;
 
+    public enum FunctionType {
+        math(1),
+        tabulated(1 << 1),
+        composite(1 << 2),
+        pure(1 << 3);
+
+        public final int typeId;
+        FunctionType(int type) {
+            typeId = type;
+        }
+
+        public static FunctionType fromInt(int type) {
+            return switch(type) {
+                case 1 -> math;
+                case 2 -> tabulated;
+                case 4 -> composite;
+                case 8 -> pure;
+                default -> throw new IllegalArgumentException("Illegal function type " + type);
+            };
+        }
+    }
+
     public FunctionRepository(String config) {
         super(config);
     }
@@ -271,20 +293,20 @@ public class FunctionRepository extends Repository {
         return CompletableFuture.supplyAsync(() -> {
             FunctionDTO func = getFunctionData(funcId).join();
             if (asMath) {
-                if (func.funcType == PureTabulatedID)
+                if (func.funcType == FunctionType.pure)
                     throw new RuntimeException("Can't return pure tabulated functions as a pure math function.");
                 return parseFunction(func.expression);
             }
             switch (func.funcType) {
-                case MathFunctionID: {
+                case math: {
                     return parseFunction(func.expression);
                 }
-                case PureTabulatedID:
-                case TabulatedID: {
+                case pure:
+                case tabulated: {
                     PointsDTO pts = getPointsData(funcId).join();
                     return new ArrayTabulatedFunction(pts.xValues, pts.yValues);
                 }
-                case CompositeID: {
+                case composite: {
                     CompositeFunctionDTO composite = getCompositeData(funcId).join();
                     CompletableFuture<MathFunction> innerFunc = getFunction(composite.innerFuncId);
                     CompletableFuture<MathFunction> outerFunc = getFunction(composite.outerFuncId);
