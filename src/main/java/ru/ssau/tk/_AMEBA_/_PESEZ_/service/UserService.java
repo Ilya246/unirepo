@@ -142,6 +142,8 @@ public class UserService {
                 throw new InvalidLoginException("Username cannot be empty.");
             if (password.isEmpty())
                 throw new InvalidLoginException("Password cannot be empty.");
+            if (userRepo.getUser(username).join() != null)
+                throw new InvalidLoginException("User with this username already exists.");
 
             Log.info("Creating user '{}' of type {}", username, typeId);
             return userRepo.createUser(typeId, username, getBase64Hash(password)).join();

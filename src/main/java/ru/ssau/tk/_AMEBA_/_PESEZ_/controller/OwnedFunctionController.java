@@ -7,6 +7,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.IdResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -56,7 +57,8 @@ public class OwnedFunctionController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -121,7 +123,8 @@ public class OwnedFunctionController extends Controller {
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -148,7 +151,8 @@ public class OwnedFunctionController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -173,7 +177,8 @@ public class OwnedFunctionController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 }

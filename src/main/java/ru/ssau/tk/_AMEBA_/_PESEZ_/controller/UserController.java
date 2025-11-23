@@ -42,8 +42,8 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            Log.info("Got bad user GET request: {}, error:", req.getRequestURI(), e);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -72,8 +72,8 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            Log.info("Got bad user POST request: {}, error:", req.getRequestURI(), e);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -94,8 +94,8 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            Log.info("Got bad user DELETE request: {}, error:", req.getRequestURI(), e);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -117,8 +117,8 @@ public class UserController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            Log.info("Got bad user PUT request: {}, error:", req.getRequestURI(), e);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 }

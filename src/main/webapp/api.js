@@ -41,7 +41,7 @@ class APIClient {
             const response = await fetch(url, config);
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${await response.text()}`);
             }
 
             if (response.status === 204) {

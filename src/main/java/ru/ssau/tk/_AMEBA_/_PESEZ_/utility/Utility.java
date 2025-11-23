@@ -31,4 +31,13 @@ public class Utility {
         properties.setProperty(key, envValue);
         return envValue;
     }
+
+    public static String getErrorInitMessage(Throwable error) {
+        while (true) {
+            Throwable cause = error.getCause();
+            if (cause == null)
+                return error.getMessage();
+            error = cause;
+        }
+    }
 }

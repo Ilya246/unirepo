@@ -4,6 +4,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.PointsDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
+
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.*;
@@ -35,7 +37,8 @@ public class PointsController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -58,7 +61,8 @@ public class PointsController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -80,7 +84,8 @@ public class PointsController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 
@@ -101,7 +106,8 @@ public class PointsController extends Controller {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(getErrorInitMessage(e));
         }
     }
 }
