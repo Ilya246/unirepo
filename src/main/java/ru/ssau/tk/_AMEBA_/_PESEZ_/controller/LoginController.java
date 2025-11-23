@@ -33,6 +33,6 @@ public class LoginController extends Controller {
                 cleanupTimeout * 1000
         );
         resp.setHeader("WWW-Authenticate", "Basic realm=\"Restricted Area\"");
-        resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

@@ -65,11 +65,13 @@ public abstract class Controller extends HttpServlet {
     public boolean checkRequiredRole(UserDTO user, HttpServletResponse resp, UserType requiredRole) throws IOException {
         if (user == null) {
             resp.setHeader("WWW-Authenticate", "Basic realm=\"Restricted Area\"");
-            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.getWriter().write("User is not authenticated.");
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
         if (!hasRequiredRole(user, requiredRole)) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write("User permissions are not sufficient.");
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return false;
         }
         return true;

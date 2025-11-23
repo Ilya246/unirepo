@@ -105,7 +105,9 @@ public class OwnedFunctionController extends Controller {
                         userService.getUserFunction(userId, params.innerId) == null
                         || userService.getUserFunction(userId, params.outerId) == null
                     )) {
-                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid function IDs");
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        resp.getWriter().write("Invalid function IDs");
+                        return;
                     }
                     int response = userService.createUserComposite(userId, request.name, params.innerId, params.outerId).join();
                     resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
