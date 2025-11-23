@@ -1349,34 +1349,36 @@ function selectFunctionType(type) {
     }
 // Открытие модального окна редактирования
 function openEditModal(func) {
+    console.log('Opening edit modal for function:', func);
+
     document.getElementById('editFunctionName').value = func.ownership.funcName || '';
 
     // Настраиваем интерфейс в зависимости от типа функции
     const functionType = func.function.funcType;
+    console.log('Function type:', functionType);
 
-    // Скрываем все параметры
-    document.getElementById('editMathParams').classList.add('hidden');
+    // Скрываем все параметры (только points management теперь)
     document.getElementById('editPointsManagement').classList.add('hidden');
 
     if (functionType === 'math') {
         // Для математических функций показываем только название
-        document.getElementById('editMathParams').classList.add('hidden');
+        console.log('Math function - showing only name');
+        // Ничего дополнительного не показываем для математических функций
     } else if (functionType === 'tabulated' || functionType === 'pure') {
+        console.log('Tabulated/pure function - loading points');
         document.getElementById('editPointsManagement').classList.remove('hidden');
         loadFunctionPoints(func.function.funcId);
     }
 
     document.getElementById('editFunctionModal').style.display = 'block';
 }
-    // Закрытие модального окна редактирования
-    function closeEditModal() {
-        document.getElementById('editFunctionModal').style.display = 'none';
-        currentEditingFunction = null;
-        currentPoints = [];
-    }
+
 // Сохранение изменений функции
 async function saveFunctionChanges() {
-    if (!currentEditingFunction) return;
+    if (!currentEditingFunction) {
+        console.error('No function to save');
+        return;
+    }
 
     const newName = document.getElementById('editFunctionName').value.trim();
     if (!newName) {
@@ -1384,13 +1386,35 @@ async function saveFunctionChanges() {
         return;
     }
 
+    console.log('Saving function changes:', {
+        id: currentEditingFunction.function.funcId,
+        currentName: currentEditingFunction.ownership.funcName,
+        newName: newName
+    });
+
     try {
+        // Проверяем, действительно ли имя изменилось
+        if (newName === currentEditingFunction.ownership.funcName) {
+            console.log('Name unchanged, skipping update');
+            showStatus('Название не изменилось', 'info');
+            closeEditModal();
+            closeModal();
+            return;
+        }
+
         // Обновляем название функции
-        await api.updateOwnedFunction(
+        console.log('Calling api.updateOwnedFunction with:', {
+            id: currentEditingFunction.function.funcId,
+            name: newName
+        });
+
+        const result = await api.updateOwnedFunction(
             currentEditingFunction.function.funcId,
             newName,
             null
         );
+
+        console.log('Update API call completed, result:', result);
 
         showStatus('Функция успешно обновлена!', 'success');
         closeEditModal();
@@ -1405,8 +1429,11 @@ async function saveFunctionChanges() {
 
 // Загрузка точек функции
 async function loadFunctionPoints(functionId) {
+    console.log('Loading points for function ID:', functionId);
+
     try {
         const points = await api.getPoints(functionId);
+        console.log('Points loaded:', points);
         currentPoints = points;
         renderPointsList(points);
     } catch (error) {
@@ -1414,18 +1441,19 @@ async function loadFunctionPoints(functionId) {
         // Если точки не загружаются, показываем пустой список
         currentPoints = [];
         renderPointsList([]);
-        showStatus('Не удалось загрузить точки функции', 'error');
+        showStatus('Не удалось загрузить точки функции: ' + error.message, 'error');
     }
 }
 
 // Отрисовка списка точек
-function renderPointsList(gotPoints) {
+function renderPointsList(points) {
     const pointsList = document.getElementById('pointsList');
 
-    const xValues = gotPoints.xValues;
-    const yValues = gotPoints.yValues;
+    // Проверяем структуру данных
+    console.log('Points data:', points);
 
-    if (!xValues || xValues.length === 0) {
+    if (!points || (Array.isArray(points) && points.length === 0) ||
+        (points.xValues && points.xValues.length === 0)) {
         pointsList.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📊</div>
@@ -1435,12 +1463,36 @@ function renderPointsList(gotPoints) {
         return;
     }
 
-    const points = [];
-    for (var i = 0; i < xValues.length; i++) {
-        points.push({x: xValues[i], y: yValues[i]});
+    let pointsArray = [];
+
+    // Обрабатываем разные форматы данных
+    if (Array.isArray(points)) {
+        // Если points - это массив объектов {x, y}
+        pointsArray = points;
+    } else if (points.xValues && points.yValues) {
+        // Если points - это объект с массивами xValues и yValues
+        for (let i = 0; i < points.xValues.length; i++) {
+            pointsArray.push({
+                x: points.xValues[i],
+                y: points.yValues[i]
+            });
+        }
+    } else if (points.points) {
+        // Если points имеет вложенную структуру
+        pointsArray = points.points;
     }
 
-    pointsList.innerHTML = points.map(point => `
+    if (pointsArray.length === 0) {
+        pointsList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📊</div>
+                <p>Нет точек для отображения</p>
+            </div>
+        `;
+        return;
+    }
+
+    pointsList.innerHTML = pointsArray.map(point => `
         <div class="point-item">
             <div class="point-coordinates">x = ${point.x}, y = ${point.y}</div>
             <div class="point-actions">
@@ -1463,34 +1515,39 @@ function renderPointsList(gotPoints) {
         document.getElementById('addPointForm').classList.add('hidden');
     }
 
-    // Добавление новой точки
-    async function addNewPoint() {
-        if (!currentEditingFunction) return;
-
-        const x = document.getElementById('newPointX').value;
-        const y = document.getElementById('newPointY').value;
-
-        if (!x || !y) {
-            showStatus('Заполните значения X и Y', 'error');
-            return;
-        }
-
-        try {
-            await api.createPoint(
-                currentEditingFunction.function.funcId,
-                x,
-                y
-            );
-
-            showStatus('Точка успешно добавлена!', 'success');
-            hideAddPointForm();
-            await loadFunctionPoints(currentEditingFunction.function.funcId);
-
-        } catch (error) {
-            console.error('Failed to add point:', error);
-            showStatus('Ошибка при добавлении точки: ' + error.message, 'error');
-        }
+// Добавление новой точки
+async function addNewPoint() {
+    if (!currentEditingFunction) {
+        console.error('No current editing function');
+        return;
     }
+
+    const x = document.getElementById('newPointX').value;
+    const y = document.getElementById('newPointY').value;
+
+    console.log('Adding point:', { x, y });
+
+    if (!x || !y) {
+        showStatus('Заполните значения X и Y', 'error');
+        return;
+    }
+
+    try {
+        await api.createPoint(
+            currentEditingFunction.function.funcId,
+            parseFloat(x),
+            parseFloat(y)
+        );
+
+        showStatus('Точка успешно добавлена!', 'success');
+        hideAddPointForm();
+        await loadFunctionPoints(currentEditingFunction.function.funcId);
+
+    } catch (error) {
+        console.error('Failed to add point:', error);
+        showStatus('Ошибка при добавлении точки: ' + error.message, 'error');
+    }
+}
 
     // Удаление точки
     async function deletePoint(x) {
@@ -1515,26 +1572,19 @@ function renderPointsList(gotPoints) {
     }
 }
 
-    // Редактирование точки
-    async function editPoint(currentX) {
-    if (!currentEditingFunction) return;
-
-    const newY = prompt(`Введите новое значение Y для точки x = ${currentX}:`);
-    if (newY === null) return;
+  // Редактирование функции
+async function editFunction() {
+    const functionId = document.getElementById('modalFunctionId').textContent;
+    console.log('Editing function ID:', functionId);
 
     try {
-        await api.updatePoint(
-            currentEditingFunction.function.funcId,
-            parseFloat(currentX),
-            parseFloat(newY)
-        );
-
-        showStatus('Точка успешно обновлена!', 'success');
-        await loadFunctionPoints(currentEditingFunction.function.funcId);
-
+        const func = await api.getOwnedFunction(parseInt(functionId));
+        console.log('Function data:', func);
+        currentEditingFunction = func;
+        openEditModal(func);
     } catch (error) {
-        console.error('Failed to update point:', error);
-        showStatus('Ошибка при обновлении точки: ' + error.message, 'error');
+        console.error('Failed to load function for editing:', error);
+        showStatus('Ошибка при загрузке данных функции: ' + error.message, 'error');
     }
 }
 
@@ -1625,6 +1675,12 @@ function renderPointsList(gotPoints) {
             });
         });
     });
+
+    function closeEditModal() {
+    document.getElementById('editFunctionModal').style.display = 'none';
+    currentEditingFunction = null;
+    currentPoints = [];
+}
 </script>
 </body>
 </html>
