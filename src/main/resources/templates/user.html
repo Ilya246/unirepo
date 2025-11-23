@@ -1251,8 +1251,6 @@ function selectFunctionType(type) {
                 return;
             }
 
-            emptyState.style.display = 'none';
-
             grid.innerHTML = functions.map(func => `
                 <div class="function-card" data-function-id="${func.function.funcId}">
                     <div class="function-header">
