@@ -919,6 +919,16 @@
                 <input type="text" id="functionName" placeholder="Введите название функции">
             </div>
 
+            <!-- Параметры для математической функции -->
+            <div class="function-params" id="mathParams">
+                <h4>Параметры математической функции</h4>
+                <div class="form-group">
+                    <label for="mathExpression">Математическое выражение:</label>
+                    <input type="text" id="mathExpression" placeholder="например: x^2 + 2*x + 1">
+                    <small style="color: #7f8c8d; font-size: 12px;">Используйте x как переменную</small>
+                </div>
+            </div>
+
 
             <!-- Параметры для табулированной функции -->
             <div class="function-params hidden" id="tabulatedParams">
@@ -1031,15 +1041,7 @@
                 <input type="text" id="editFunctionName" placeholder="Введите название функции">
             </div>
 
-            <!-- Параметры для математической функции -->
-            <div class="function-params" id="editMathParams">
-                <h4>Параметры математической функции</h4>
-                <div class="form-group">
-                    <label for="editMathExpression">Математическое выражение:</label>
-                    <input type="text" id="editMathExpression" placeholder="например: x^2 + 2*x + 1">
-                    <small style="color: #7f8c8d; font-size: 12px;">Используйте x как переменную</small>
-                </div>
-            </div>
+
 
             <!-- Управление точками для табулированных функций -->
             <div class="points-management hidden" id="editPointsManagement">
@@ -1102,22 +1104,30 @@
     let currentEditingFunction = null;
     let currentPoints = [];
 
-    // Выбор типа функции
-    function selectFunctionType(type) {
-        currentFunctionType = type;
+  // Выбор типа функции
+function selectFunctionType(type) {
+    currentFunctionType = type;
 
-        // Обновляем активные кнопки
-        document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[data-type="${type}"]`).classList.add('active');
+    // Обновляем активные кнопки
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-type="${type}"]`).classList.add('active');
 
-        // Показываем соответствующие параметры
-        document.getElementById('mathParams').classList.add('hidden');
-        document.getElementById('tabulatedParams').classList.add('hidden');
-        document.getElementById('pureParams').classList.add('hidden');
-        document.getElementById(`${type}Params`).classList.remove('hidden');
+    // Показываем соответствующие параметры
+    document.getElementById('mathParams').classList.add('hidden');
+    document.getElementById('tabulatedParams').classList.add('hidden');
+    document.getElementById('pureParams').classList.add('hidden');
+
+    // Показываем выбранные параметры
+    if (type === 'math') {
+        document.getElementById('mathParams').classList.remove('hidden');
+    } else if (type === 'tabulated') {
+        document.getElementById('tabulatedParams').classList.remove('hidden');
+    } else if (type === 'pure') {
+        document.getElementById('pureParams').classList.remove('hidden');
     }
+}
 
     // Открытие модального окна создания функции
     function openCreateFunctionModal() {
