@@ -328,6 +328,15 @@
 
             <div class="endpoint">
                 <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/users/self</span>
+                </div>
+                <p>Get own user ID</p>
+                <button class="send-request" data-endpoint="getSelf">Send Request</button>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-url">/users</span>
                 </div>
@@ -444,6 +453,23 @@
                         </div>
                     </div>
                     <button class="send-request" data-endpoint="getFunction">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/functions/composite</span>
+                </div>
+                <p>Get composite data by ID</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getCompositeId">Function ID</label>
+                            <input type="number" id="getCompositeId" placeholder="Composite ID">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getComposite">Send Request</button>
                 </div>
             </div>
 
@@ -597,6 +623,27 @@
                         </div>
                     </div>
                     <button class="send-request" data-endpoint="getUserFunctions">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/owned-functions/composite?id={id}</span>
+                </div>
+                <p>Get the composite function data of an owned function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getOwnedCompositeId">Function ID</label>
+                            <input type="number" id="getOwnedCompositeId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="getOwnedCompositeUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="getOwnedCompositeUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getOwnedComposite">Send Request</button>
                 </div>
             </div>
 
@@ -972,6 +1019,10 @@
                         result = await api.getUser(parseInt(userId));
                         break;
 
+                    case 'getSelf':
+                        result = await api.getSelf();
+                        break;
+
                     case 'createUser':
                         const createUsername = document.getElementById('createUserUsername').value;
                         const createPassword = document.getElementById('createUserPassword').value;
@@ -1031,6 +1082,11 @@
                         } else {
                             result = await api.getAllFunctions();
                         }
+                        break;
+
+                    case 'getComposite':
+                        const compositeId = document.getElementById('getCompositeId').value;
+                        result = await api.getComposite(parseInt(compositeId));
                         break;
 
                     case 'calculateFunction':
@@ -1113,6 +1169,15 @@
                         result = await api.getOwnedFunction(
                             parseInt(ownedFunctionId),
                             ownedFunctionUserId ? parseInt(ownedFunctionUserId) : null
+                        );
+                        break;
+
+                    case 'getOwnedComposite':
+                        const ownedCompositeId = document.getElementById('getOwnedCompositeId').value;
+                        const ownedCompositeUserId = document.getElementById('getOwnedCompositeUserId').value;
+                        result = await api.getOwnedComposite(
+                            parseInt(ownedCompositeId),
+                            ownedCompositeUserId ? parseInt(ownedCompositeUserId) : null
                         );
                         break;
 

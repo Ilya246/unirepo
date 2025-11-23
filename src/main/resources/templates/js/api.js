@@ -69,6 +69,10 @@ class APIClient {
         return this.request(`/users/user?id=${id}`, { method: 'GET' });
     }
 
+    async getSelf() {
+        return this.request('/users/self', { method: 'GET' });
+    }
+
     async createUser(userData) {
         return this.request('/users', {
             method: 'POST',
@@ -100,6 +104,10 @@ class APIClient {
 
     async getFunction(id) {
         return this.request(`/functions?id=${id}`, { method: 'GET' });
+    }
+
+    async getComposite(id) {
+        return this.request(`/functions/composite?id=${id}`, { method: 'GET' });
     }
 
     async calculateFunction(id, x) {
@@ -137,6 +145,14 @@ class APIClient {
     // Owned Function endpoints
     async getOwnedFunction(id, targetUserId = null) {
         let url = `/owned-functions?id=${id}`;
+        if (targetUserId) {
+            url += `&user=${targetUserId}`;
+        }
+        return this.request(url, { method: 'GET' });
+    }
+
+    async getOwnedComposite(id, targetUserId = null) {
+        let url = `/owned-functions/composite?id=${id}`;
         if (targetUserId) {
             url += `&user=${targetUserId}`;
         }
@@ -212,13 +228,9 @@ class APIClient {
     }
 
     async assignOwnership(functionId, name, targetUserId) {
-        let url = `/owned-functions/own?id=${functionId}&name=${encodeURIComponent(name)}`;
-            if (targetUserId) {
-                url += `&user=${targetUserId}`;
-            }
-            return this.request(url, {
-                method: 'POST'
-            });
+        return this.request(`/owned-functions/own?id=${functionId}&name=${encodeURIComponent(name)}`, {
+            method: 'POST'
+        });
     }
 
     async updateOwnedFunction(id, name, targetUserId = null) {
