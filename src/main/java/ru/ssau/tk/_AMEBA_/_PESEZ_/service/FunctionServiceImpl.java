@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.enums.FunctionType;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
@@ -178,6 +179,6 @@ public class FunctionServiceImpl implements FunctionService {
 
 
     private FunctionResponse convertToResponse(FunctionEntity function) {
-        return new FunctionResponse(function.getFuncId(), function.getTypeId(), function.getExpression());
+        return new FunctionResponse(function.getFuncId(), FunctionType.fromEntity(function), function.getExpression());
     }
 }

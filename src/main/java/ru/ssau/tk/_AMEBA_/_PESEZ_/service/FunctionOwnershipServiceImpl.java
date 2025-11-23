@@ -8,8 +8,8 @@ import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipId;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.enums.FunctionType;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
@@ -124,7 +124,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
         FunctionEntity owned = ownership.getFunction();
         return new OwnedFunctionResponse(
                 new FunctionResponse(owned.getFuncId(),
-                        owned.getTypeId(),
+                        FunctionType.fromEntity(owned),
                         owned.getExpression()),
                 new FunctionOwnershipResponse(ownership.getUser().getUserId(),
                         owned.getFuncId(),

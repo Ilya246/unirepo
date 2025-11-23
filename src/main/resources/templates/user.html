@@ -896,14 +896,6 @@
                         <span class="info-label">Выражение:</span>
                         <span class="info-value" id="modalFunctionExpression">-</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Диапазон X:</span>
-                        <span class="info-value" id="modalFunctionRange">-</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Точек:</span>
-                        <span class="info-value" id="modalFunctionPoints">-</span>
-                    </div>
                 </div>
             </div>
 
@@ -1080,13 +1072,13 @@
             emptyState.style.display = 'none';
 
             grid.innerHTML = functions.map(func => `
-                <div class="function-card" data-function-id="${func.id}">
+                <div class="function-card" data-function-id="${func.function.funcId}">
                     <div class="function-header">
                         <div>
-                            <div class="function-name">${func.name || 'Без названия'}</div>
-                            <div class="function-type">${getFunctionTypeLabel(func.type)}</div>
+                            <div class="function-name">${func.ownership.funcName || 'Без названия'}</div>
+                            <div class="function-type">${getFunctionTypeLabel(func.function.funcType)}</div>
                         </div>
-                        <div class="function-id">#${func.id}</div>
+                        <div class="function-id">#${func.function.funcId}</div>
                     </div>
 
                     <div class="function-description">
@@ -1094,17 +1086,16 @@
                     </div>
 
                     <div class="function-details">
-                        <div class="detail-item">🆔 ID: ${func.id}</div>
-                        <div class="detail-item">📊 Точек: ${func.pointCount || 'N/A'}</div>
-                        <div class="detail-item">🕒 Создана: ${formatDate(func.createdDate)}</div>
+                        <div class="detail-item">🆔 ID: ${func.function.funcId}</div>
+                        <div class="detail-item">🕒 Создана: ${formatDate(func.ownership.createdDate)}</div>
                         <div class="detail-item">👤 Владелец: Вы</div>
                     </div>
 
                     <div class="function-actions">
-                        <button class="view-btn" onclick="viewFunction(${func.id})">
+                        <button class="view-btn" onclick="viewFunction(${func.function.funcId})">
                             👁️ Просмотреть
                         </button>
-                        <button class="delete-btn" onclick="deleteFunction(${func.id})">
+                        <button class="delete-btn" onclick="deleteFunction(${func.function.funcId})">
                             🗑️ Удалить
                         </button>
                     </div>
@@ -1148,14 +1139,12 @@
 
     // Открытие модального окна просмотра
     function openFunctionModal(func) {
-        document.getElementById('modalFunctionName').textContent = func.name || 'Без названия';
-        document.getElementById('modalFunctionId').textContent = func.id;
-        document.getElementById('modalFunctionType').textContent = getFunctionTypeLabel(func.type);
+        document.getElementById('modalFunctionName').textContent = func.ownership.funcName || 'Без названия';
+        document.getElementById('modalFunctionId').textContent = func.function.funcId;
+        document.getElementById('modalFunctionType').textContent = getFunctionTypeLabel(func.function.funcType);
         document.getElementById('modalFunctionStatus').textContent = 'Активна';
-        document.getElementById('modalFunctionCreated').textContent = formatDate(func.createdDate);
-        document.getElementById('modalFunctionExpression').textContent = func.expression || 'Не указано';
-        document.getElementById('modalFunctionRange').textContent = func.xRange || 'Не указано';
-        document.getElementById('modalFunctionPoints').textContent = func.pointCount || 'Не указано';
+        document.getElementById('modalFunctionCreated').textContent = formatDate(func.ownership.createdDate);
+        document.getElementById('modalFunctionExpression').textContent = func.function.expression || 'Не указано';
 
         document.getElementById('functionModal').style.display = 'block';
     }
@@ -1190,20 +1179,17 @@
             'math': 'Математическая',
             'tabulated': 'Табулированная',
             'pure': 'Чистая таблица',
-            'composite': 'Композитная',
-            'owned': 'Пользовательская'
+            'composite': 'Композитная'
         };
         return types[type] || type;
     }
 
     function getFunctionDescription(func) {
-        if (func.expression) {
-            return `Функция: ${func.expression}`;
+        if (func.function.expression != "<TABULATED>") {
+            return `Функция: ${func.function.expression}`;
         }
-        if (func.xValues && func.yValues) {
-            return `Табличная функция с ${func.xValues.length} точками`;
-        }
-        return 'Описание недоступно';
+        const descPoints = api.getPoints(func.function.funcId);
+        return `Табличная функция с ${descPoints.length} точками`;
     }
 
     function formatDate(dateString) {
