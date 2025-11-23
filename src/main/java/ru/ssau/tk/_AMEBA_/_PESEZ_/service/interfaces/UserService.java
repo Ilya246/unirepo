@@ -9,13 +9,13 @@ import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 import java.util.List;
 
 public interface UserService {
-    UserResponse createUser(UserRequest request);
+    Long createUser(UserRequest request);
 
     UserResponse getUser(Long id);
 
     UserEntity getUserDb(Long id);
 
-    UserResponse updateUser(Long id, UserRequest request);
+    void updateUser(Long id, UserRequest request);
 
     void deleteUser(Long id);
 

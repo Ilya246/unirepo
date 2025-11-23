@@ -6,7 +6,6 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.utility.HibernateSessionFactoryUtil;
 
 import java.util.List;
 import java.util.Optional;

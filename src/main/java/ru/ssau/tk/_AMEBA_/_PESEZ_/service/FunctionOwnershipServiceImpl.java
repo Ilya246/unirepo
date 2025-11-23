@@ -17,6 +17,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionOwnershipService;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionService;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +32,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     private final FunctionService functionService;
 
     @Override
-    public FunctionOwnershipResponse create(FunctionOwnershipRequest request) {
+    public void create(FunctionOwnershipRequest request) {
         // Валидация входных данных
         if (request.getUserId() == null) {
             throw new CustomException("User ID is required", HttpStatus.BAD_REQUEST);
@@ -65,12 +66,10 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
         ownershipRepo.save(ownership);
         log.info("Function ownership created for user: {}, function: {}",
                 request.getUserId(), request.getFunctionId());
-
-        return convertToResponse(ownership);
     }
 
     @Override
-    public FunctionOwnershipResponse getOwnership(Long userId, Long functionId) {
+    public OwnedFunctionResponse getOwnership(Long userId, Long functionId) {
         return convertToResponse(getOwnershipDb(userId, functionId));
     }
 
@@ -85,7 +84,6 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
 
     @Override
     public void deleteOwnership(Long userId, Long functionId) {
-        FunctionOwnershipEntity ownership = getOwnershipDb(userId, functionId);
         ownershipRepo.deleteById(userId, functionId);
         log.info("Function ownership deleted for user: {}, function: {}", userId, functionId);
     }
@@ -96,10 +94,10 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     }
 
     @Override
-    public List<FunctionOwnershipEntity> getOwnershipsByUserId(Long userId) {
+    public List<OwnedFunctionResponse> getOwnershipsByUserId(Long userId) {
         List<FunctionOwnershipEntity> ownerships = ownershipRepo.findByUserId(userId);
         log.info("Found {} function ownerships for user: {}", ownerships.size(), userId);
-        return ownerships;
+        return ownerships.stream().map(this::convertToResponse).toList();
     }
 
     @Override
@@ -119,7 +117,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
     }
 
     @Override
-    public FunctionOwnershipResponse updateOwnership(Long userId, Long functionId, FunctionOwnershipRequest request) {
+    public void updateOwnership(Long userId, Long functionId, FunctionOwnershipRequest request) {
         FunctionOwnershipEntity ownership = getOwnershipDb(userId, functionId);
 
         // Обновляем только funcName, если он предоставлен
@@ -128,46 +126,49 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
             ownershipRepo.updateById(userId, functionId, request.getFuncName());
             log.info("Function ownership updated for user: {}, function: {}", userId, functionId);
         }
-
-        return convertToResponse(ownership);
     }
 
     // Ручное преобразование Entity в Response
-    private FunctionOwnershipResponse convertToResponse(FunctionOwnershipEntity ownership) {
-        FunctionOwnershipResponse response = new FunctionOwnershipResponse();
-        response.setUserId(ownership.getUser().getUserId());
-        response.setFunctionId(ownership.getFunction().getFuncId());
-        response.setFuncName(ownership.getFuncName());
-        return response;
+    private OwnedFunctionResponse convertToResponse(FunctionOwnershipEntity ownership) {
+        FunctionEntity owned = ownership.getFunction();
+        return new OwnedFunctionResponse(
+                new FunctionResponse(owned.getFuncId(),
+                        owned.getTypeId(),
+                        owned.getExpression()),
+                new FunctionOwnershipResponse(ownership.getUser().getUserId(),
+                        owned.getFuncId(),
+                        Timestamp.from(ownership.getCreatedDate().toInstant()),
+                        ownership.getFuncName())
+        );
     }
 
     @Override
-    public MathFunctionResponse createOwnedMath(MathFunctionRequest request, Long userId) {
-        MathFunctionResponse function = functionService.createMathFunction(request);
-        addExistingFunctionToUser(userId, function.getFuncId(),function.getExpression());
-        return function;
+    public Long createOwnedMath(OwnedFunctionCreateRequest<MathFunctionRequest> request, Long userId) {
+        Long funcId = functionService.createMathFunction(request.funcParams);
+        addExistingFunctionToUser(userId, funcId, request.name);
+        return funcId;
     }
     @Override
-    public TabulatedFunctionResponse createOwnedTabulated(TabulatedFunctionRequest request, Long userId) {
-        TabulatedFunctionResponse function = functionService.createTabulatedFunction(request);
-        addExistingFunctionToUser(userId, function.getFuncId(),function.getExpression());
-        return function;
+    public Long createOwnedTabulated(OwnedFunctionCreateRequest<TabulatedFunctionRequest> request, Long userId) {
+        Long funcId = functionService.createTabulatedFunction(request.funcParams);
+        addExistingFunctionToUser(userId, funcId, request.name);
+        return funcId;
     }
     @Override
-    public FunctionResponse createOwnedPure(PureTabulatedRequest request, Long userId) {
-        FunctionResponse function = functionService.createPureTabulatedFunction(request);
-        addExistingFunctionToUser(userId, function.getFuncId(), "<TABULATED>");
-        return function;
+    public Long createOwnedPure(OwnedFunctionCreateRequest<PureTabulatedRequest> request, Long userId) {
+        Long funcId = functionService.createPureTabulatedFunction(request.funcParams);
+        addExistingFunctionToUser(userId, funcId, request.name);
+        return funcId;
     }
     @Override
-    public CompositeFunctionResponse createOwnedComposite(CompositeFunctionRequest request, Long userId) {
-        CompositeFunctionResponse function = functionService.createCompositeFunction(request);
-        addExistingFunctionToUser(userId, function.getCompositeFunctionId(), functionRepo.findById(function.getCompositeFunctionId()).getExpression());
-        return function;
+    public Long createOwnedComposite(OwnedFunctionCreateRequest<CompositeFunctionRequest> request, Long userId) {
+        Long funcId = functionService.createCompositeFunction(request.funcParams);
+        addExistingFunctionToUser(userId, funcId, request.name);
+        return funcId;
     }
 
     @Override
-    public FunctionOwnershipResponse addExistingFunctionToUser(Long userId, Long functionId, String funcName) {
+    public void addExistingFunctionToUser(Long userId, Long functionId, String funcName) {
         log.info("Adding existing function {} to user: {}", functionId, userId);
 
         // Проверяем существование функции через FunctionService
@@ -178,19 +179,7 @@ public class FunctionOwnershipServiceImpl implements FunctionOwnershipService {
         request.setUserId(userId);
         request.setFunctionId(functionId);
         request.setFuncName(funcName);
+        create(request);
 
-        return create(request);
     }
-
-    // Вспомогательные методы
-    private boolean hasAccessToFunction(Long userId, Long functionId) {
-        try {
-            getOwnership(userId, functionId);
-            return true;
-        } catch (CustomException e) {
-            return false;
-        }
-    }
-
-
 }

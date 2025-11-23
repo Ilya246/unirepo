@@ -14,7 +14,7 @@ import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 public class UserRequest {
     @JsonProperty("userType")
     private UserType userType;
-    @JsonProperty("userName")
+    @JsonProperty("username")
     private String userName;
     @JsonProperty("password")
     private String password;

@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private final FunctionRepository functionRepository;
 
     @Override
-    public UserResponse createUser(UserRequest request) {
+    public Long createUser(UserRequest request) {
         UserEntity user = new UserEntity();
         user.setTypeId(request.getUserType().typeId);
         user.setUserName(request.getUserName());
@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         log.info("User created with id: {}", user.getUserId());
 
-        return convertToResponse(user);
+        return user.getUserId();
     }
 
     @Override
@@ -59,9 +59,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(Long id, UserRequest request) {
+    public void updateUser(Long id, UserRequest request) {
         UserEntity user = getUserDb(id);
-
 
         if (request.getUserType() != null) {
             user.setTypeId(request.getUserType().typeId);
@@ -73,10 +72,8 @@ public class UserServiceImpl implements UserService {
             user.setPassword(getBase64Hash(request.getPassword()));
         }
 
-        UserEntity updatedUser = userRepository.update(user);
+        userRepository.update(user);
         log.info("User updated with id: {}", id);
-
-        return convertToResponse(updatedUser);
     }
 
     @Override
@@ -140,8 +137,6 @@ public class UserServiceImpl implements UserService {
         response.setCreatedDate(Timestamp.from(user.getCreatedDate().toInstant()));
         return response;
     }
-
-
 
     @Override
     public UserType toType(int typeId){

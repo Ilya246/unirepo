@@ -3,7 +3,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
@@ -12,9 +11,11 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FunctionResponse {
-    @JsonProperty("id")
+    @JsonProperty("funcId")
     Long funcId;
+    @JsonProperty("funcType")
     int typeId;
+    @JsonProperty("expression")
     String expression;
 
 }

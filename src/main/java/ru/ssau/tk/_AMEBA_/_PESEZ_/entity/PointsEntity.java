@@ -1,13 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.entity;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import jakarta.persistence.*;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import lombok.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
 @Entity
 @Table(name = "Points")

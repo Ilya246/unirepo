@@ -1,7 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.operations;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.*;
+
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.io.Serial;

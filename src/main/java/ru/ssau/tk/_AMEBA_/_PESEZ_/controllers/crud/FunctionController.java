@@ -1,26 +1,19 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controllers.crud;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.persistence.PreUpdate;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.MathFunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.TabulatedFunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.FunctionService;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.*;
 
 @RestController
 @RequestMapping("/functions")
 @RequiredArgsConstructor
 public class FunctionController {
     private final FunctionService functionService;
+    private final CompositeFunctionService compositeService;
 
     @GetMapping
     @Operation(summary = "Получение функции по ID или всех функций")
@@ -28,30 +21,29 @@ public class FunctionController {
         return functionService.getFunction1(id);
     }
 
-
     // Специализированные операции
     @PostMapping("/math")
     @Operation(summary = "Создание математической функции")
-    public MathFunctionResponse createMathFunction(@RequestBody @Valid MathFunctionRequest request) {
+    public Long createMathFunction(@RequestBody @Valid MathFunctionRequest request) {
         return functionService.createMathFunction(request);
     }
 
     @PostMapping("/tabulated")
     @Operation(summary = "Создание табулированной функции")
-    public TabulatedFunctionResponse createTabulatedFunction(@RequestBody @Valid TabulatedFunctionRequest request) {
+    public Long createTabulatedFunction(@RequestBody @Valid TabulatedFunctionRequest request) {
         return functionService.createTabulatedFunction(request);
     }
 
 
     @PostMapping("/composite")
     @Operation(summary = "Создание композитной функции")
-    public CompositeFunctionResponse createCompositeFunction(@RequestBody @Valid CompositeFunctionRequest request) {
+    public Long createCompositeFunction(@RequestBody @Valid CompositeFunctionRequest request) {
         return functionService.createCompositeFunction(request);
     }
 
     @PostMapping("/pure-tabulated")
     @Operation(summary = "Создание табулированной функции из готовых массивов значений")
-    public FunctionResponse createPureTabulatedFunction(@RequestBody @Valid PureTabulatedRequest request) {
+    public Long createPureTabulatedFunction(@RequestBody @Valid PureTabulatedRequest request) {
         return functionService.createPureTabulatedFunction(request);
     }
 
@@ -61,4 +53,9 @@ public class FunctionController {
         return functionService.calculateFunction(id, x);
     }
 
+    @GetMapping("/composite")
+    @Operation(summary = "Получение информации о композитной функции")
+    public CompositeFunctionResponse getComposite(@RequestParam Long id) {
+        return compositeService.getFunction(id);
+    }
 }

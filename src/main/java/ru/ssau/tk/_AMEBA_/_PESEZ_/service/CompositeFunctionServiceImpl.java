@@ -58,10 +58,8 @@ public class CompositeFunctionServiceImpl implements CompositeFunctionService {
 
     // Ручное преобразование Entity в Response (аналогично FunctionServiceImpl)
     private CompositeFunctionResponse convertToResponse(CompositeFunctionEntity function) {
-        CompositeFunctionResponse response = new CompositeFunctionResponse();
-        response.setCompositeFunctionId(function.getCompositeFunction().getFuncId());
-        response.setInnerFunctionId(function.getInnerFunction().getFuncId());
-        response.setOuterFunctionId(function.getOuterFunction().getFuncId());
-        return response;
+        return new CompositeFunctionResponse(
+                function.getInnerFunction().getFuncId(),
+                function.getOuterFunction().getFuncId());
     }
 }

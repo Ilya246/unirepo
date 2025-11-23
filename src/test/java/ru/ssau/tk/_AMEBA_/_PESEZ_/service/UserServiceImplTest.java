@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.UserRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
+import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionOwnershipRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.FunctionRepository;
@@ -40,33 +41,25 @@ class UserServiceImplTest extends BaseRepositoryTest {
         UserRequest request = new UserRequest();
         request.setUserName("test");
         request.setPassword("123");
-        request.setTypeId(1);
 
-        UserResponse created = service.createUser(request);
-        assertNotNull(created.getUserId());
+        Long created = service.createUser(request);
+        assertNotNull(created);
+        UserResponse user = service.getUser(created);
 
-        // Получаем пользователя
-        UserResponse found = service.getUser(created.getUserId());
-        assertEquals("test", found.getUserName());
+        assertEquals("test", user.getUsername());
     }
 
     @Test
     void testUpdateUser() {
         // Создаем пользователя
-        UserEntity user = new UserEntity();
-        user.setUserName("old");
-        user.setPassword("oldpass");
-        user.setTypeId(1);
-        // Сохраняем через репозиторий напрямую
-        UserRepository userRepo = new UserRepository(sessionFactory);
-        userRepo.save(user);
+        Long id = service.createUser(new UserRequest(UserType.Normal, "old", "oldpass"));
 
         // Обновляем
         UserRequest update = new UserRequest();
         update.setUserName("new");
 
-        UserResponse updated = service.updateUser(user.getUserId(), update);
-        assertEquals("new", updated.getUserName());
+        service.updateUser(id, update);
+        assertEquals("new", service.getUser(id).getUsername());
     }
 
     @Test

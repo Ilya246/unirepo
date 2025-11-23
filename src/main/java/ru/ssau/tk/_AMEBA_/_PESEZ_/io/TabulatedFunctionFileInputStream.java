@@ -1,7 +1,5 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.io;
 
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.ArrayTabulatedFunction;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.LinkedListTabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.TabulatedFunction;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.ArrayTabulatedFunctionFactory;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.factory.LinkedListTabulatedFunctionFactory;

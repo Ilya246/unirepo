@@ -4,12 +4,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 
 
 import java.util.List;
-import java.util.Objects;
 
 @Repository
 public class UserRepository {

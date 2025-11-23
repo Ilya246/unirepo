@@ -5,9 +5,9 @@ import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class OwnedFunctionCreateRequest implements FunctionCreateRequest {
+public class OwnedFunctionCreateRequest<T extends FunctionCreateRequest> implements FunctionCreateRequest {
     @JsonProperty
-    public FunctionCreateRequest funcParams;
+    public T funcParams;
     @JsonProperty
     public String name;
 }

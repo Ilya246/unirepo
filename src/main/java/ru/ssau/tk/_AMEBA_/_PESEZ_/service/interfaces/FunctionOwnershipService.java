@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FunctionOwnershipService {
-    FunctionOwnershipResponse create(FunctionOwnershipRequest request);
+    void create(FunctionOwnershipRequest request);
 
-    FunctionOwnershipResponse getOwnership(Long userId, Long functionId);
+    OwnedFunctionResponse getOwnership(Long userId, Long functionId);
 
     FunctionOwnershipEntity getOwnershipDb(Long userId, Long functionId);
 
@@ -20,21 +20,21 @@ public interface FunctionOwnershipService {
 
     List<FunctionOwnershipEntity> getAllOwnerships();
 
-    List<FunctionOwnershipEntity> getOwnershipsByUserId(Long userId);
+    List<OwnedFunctionResponse> getOwnershipsByUserId(Long userId);
 
     Optional<UserEntity> getOwnerByFunctionId(Long functionId);
 
     List<FunctionEntity> getUserFunctionsOrderedByDate(Long userId, Boolean descending);
 
-    FunctionOwnershipResponse updateOwnership(Long userId, Long functionId, FunctionOwnershipRequest request);
+    void updateOwnership(Long userId, Long functionId, FunctionOwnershipRequest request);
 
-    MathFunctionResponse createOwnedMath(MathFunctionRequest request, Long userId);
+    Long createOwnedMath(OwnedFunctionCreateRequest<MathFunctionRequest> request, Long userId);
 
-    TabulatedFunctionResponse createOwnedTabulated(TabulatedFunctionRequest request, Long userId);
+    Long createOwnedTabulated(OwnedFunctionCreateRequest<TabulatedFunctionRequest> request, Long userId);
 
-    FunctionResponse createOwnedPure(PureTabulatedRequest request, Long userId);
+    Long createOwnedPure(OwnedFunctionCreateRequest<PureTabulatedRequest> request, Long userId);
 
-    CompositeFunctionResponse createOwnedComposite(CompositeFunctionRequest request, Long userId);
+    Long createOwnedComposite(OwnedFunctionCreateRequest<CompositeFunctionRequest> request, Long userId);
 
-    FunctionOwnershipResponse addExistingFunctionToUser(Long userId, Long functionId, String funcName);
+    void addExistingFunctionToUser(Long userId, Long functionId, String funcName);
 }

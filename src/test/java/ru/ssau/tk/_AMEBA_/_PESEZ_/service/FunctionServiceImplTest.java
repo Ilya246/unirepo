@@ -1,11 +1,9 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.MathFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.TabulatedFunctionResponse;
@@ -31,7 +29,7 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
     void setUp() {
         sessionFactory  = TestHibernateSessionFactoryUtil.getSessionFactory();
         functionRepository = new FunctionRepository(sessionFactory);
-        functionService = new FunctionServiceImpl(functionRepository, new ObjectMapper());
+        functionService = new FunctionServiceImpl(functionRepository);
     }
 
     @Test
@@ -99,12 +97,13 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         request.setExpression("x * 2");
 
         // When
-        MathFunctionResponse response = functionService.createMathFunction(request);
+        Long response = functionService.createMathFunction(request);
 
         // Then
         assertNotNull(response);
-        assertNotNull(response.getFuncId());
-        assertEquals("x * 2", response.getExpression());
+        FunctionResponse func = functionService.getFunction(response);
+        assertNotNull(func.getFuncId());
+        assertEquals("x * 2", func.getExpression());
     }
 
 /*    @Test
@@ -164,13 +163,15 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         request.setOuterFunctionId(outerFunction.getFuncId());
 
         // When
-        CompositeFunctionResponse response = functionService.createCompositeFunction(request);
+        Long response = functionService.createCompositeFunction(request);
 
         // Then
         assertNotNull(response);
-        assertNotNull(response.getCompositeFunctionId());
+        FunctionResponse func = functionService.getFunction(response);
+        assertNotNull(func.getFuncId());
         assertEquals(innerFunction.getFuncId(), response.getInnerFunctionId());
-        assertEquals(outerFunction.getFuncId(), response.getOuterFunctionId());}
+        assertEquals(outerFunction.getFuncId(), response.getOuterFunctionId());
+    }
 
     @Test
     void testCalculateFunction() {

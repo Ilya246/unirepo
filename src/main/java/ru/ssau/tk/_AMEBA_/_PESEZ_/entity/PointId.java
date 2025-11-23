@@ -1,13 +1,9 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.entity;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility;
 
 import java.io.Serializable;
 

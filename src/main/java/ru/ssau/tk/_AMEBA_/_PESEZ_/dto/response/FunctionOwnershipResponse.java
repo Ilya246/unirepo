@@ -1,11 +1,11 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.CompositeFunctionRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.FunctionOwnershipRequest;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
+
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -14,7 +14,13 @@ import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FunctionOwnershipResponse extends FunctionOwnershipRequest {
+public class FunctionOwnershipResponse {
+    @JsonProperty("userId")
     Long userId;
+    @JsonProperty("funcId")
     Long functionId;
+    @JsonProperty("createdDate")
+    Timestamp createdDate;
+    @JsonProperty("funcName")
+    String funcName;
 }

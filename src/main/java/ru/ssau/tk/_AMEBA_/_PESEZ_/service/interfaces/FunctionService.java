@@ -1,10 +1,7 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.MathFunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.TabulatedFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 
@@ -27,13 +24,13 @@ public interface FunctionService {
     List<FunctionResponse> getFunctionsByType(Integer typeId);
 
     // Специализированные операции
-    MathFunctionResponse createMathFunction(MathFunctionRequest request);
+    Long createMathFunction(MathFunctionRequest request);
 
-    TabulatedFunctionResponse createTabulatedFunction(TabulatedFunctionRequest request);
+    Long createTabulatedFunction(TabulatedFunctionRequest request);
 
-    FunctionResponse createPureTabulatedFunction(PureTabulatedRequest request);
+    Long createPureTabulatedFunction(PureTabulatedRequest request);
 
-    CompositeFunctionResponse createCompositeFunction(CompositeFunctionRequest request);
+    Long createCompositeFunction(CompositeFunctionRequest request);
 
     CompletableFuture<MathFunction> getMathFunction(Long funcId);
 

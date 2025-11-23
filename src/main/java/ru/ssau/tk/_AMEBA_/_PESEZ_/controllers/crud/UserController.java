@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.UserRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 
@@ -20,7 +19,7 @@ public class UserController {
 
     @PostMapping
     @Operation(summary = "Создание пользователя")
-    public UserResponse createUser(@RequestBody @Valid UserRequest request /*@RequestParam String adminUserName,
+    public Long createUser(@RequestBody @Valid UserRequest request /*@RequestParam String adminUserName,
                                           @RequestParam String adminPassword*/) {
         /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
         return userService.createUser(request);
@@ -28,7 +27,7 @@ public class UserController {
 
     @PostMapping("/register")
     @Operation(summary = "Создание пользователя")
-    public UserResponse createUser(@RequestParam String username, @RequestParam String password) {
+    public Long createUser(@RequestParam String username, @RequestParam String password) {
         return userService.createUser(new UserRequest(UserType.Normal, username, password));
     }
 
@@ -40,10 +39,10 @@ public class UserController {
 
     @PutMapping
     @Operation(summary = "Обновление пользователя")
-    public UserResponse updateUser(@RequestParam Long id, @RequestBody @Valid UserRequest request /*@RequestParam String adminUserName,
+    public void updateUser(@RequestParam Long id, @RequestBody @Valid UserRequest request /*@RequestParam String adminUserName,
                                           @RequestParam String adminPassword*/) {
         /*userService.authenticateWithRole(adminUserName, adminPassword, UserType.Admin);*/
-        return userService.updateUser(id, request);
+        userService.updateUser(id, request);
     }
 
     @DeleteMapping

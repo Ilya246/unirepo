@@ -3,8 +3,6 @@ package ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.PointRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 
-import java.util.List;
-
 public interface PointService {
     void createPoint(PointRequest request);
 

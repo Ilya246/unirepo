@@ -1,10 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.entity;
 import jakarta.persistence.*;
 
-import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
-import java.util.function.Function;
+
 import lombok.*;
 @Entity
 @Table(name = "Function_Ownership")

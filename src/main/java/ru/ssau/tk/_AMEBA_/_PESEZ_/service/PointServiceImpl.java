@@ -14,7 +14,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.repository.PointsRepository;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.PointService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service

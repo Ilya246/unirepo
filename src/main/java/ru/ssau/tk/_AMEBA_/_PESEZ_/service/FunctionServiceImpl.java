@@ -1,15 +1,11 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.MathFunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.TabulatedFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
@@ -26,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FunctionServiceImpl implements FunctionService {
     private final FunctionRepository functionRepo;
-    private final ObjectMapper mapper;
 
     @Override
     public FunctionResponse getFunction(Long id) {
@@ -88,16 +83,9 @@ public class FunctionServiceImpl implements FunctionService {
 
     // Специализированные операции
     @Override
-    public MathFunctionResponse createMathFunction(MathFunctionRequest request) {
+    public Long createMathFunction(MathFunctionRequest request) {
         try {
-            Long funcId = functionRepo.createMathFunction(request.getExpression()).get();
-
-            FunctionEntity function = getFunctionDb(funcId);
-            return MathFunctionResponse.builder()
-                    .funcId(funcId)
-                    .expression(function.getExpression())
-                    .build();
-
+            return functionRepo.createMathFunction(request.getExpression()).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error creating math function: {}", e.getMessage());
             throw new CustomException("Failed to create math function: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,17 +93,14 @@ public class FunctionServiceImpl implements FunctionService {
     }
 
     @Override
-    public TabulatedFunctionResponse createTabulatedFunction(TabulatedFunctionRequest request) {
+    public Long createTabulatedFunction(TabulatedFunctionRequest request) {
         try {
-            Long funcId = functionRepo.createTabulated(
+            return functionRepo.createTabulated(
                     request.getExpression(),
                     request.getFrom(),
                     request.getTo(),
                     request.getPointCount()
             ).get();
-
-            FunctionEntity function = getFunctionDb(funcId);
-            return new TabulatedFunctionResponse(funcId, request.getExpression());
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error creating tabulated function: {}", e.getMessage());
             throw new CustomException("Failed to create tabulated function: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -123,10 +108,9 @@ public class FunctionServiceImpl implements FunctionService {
     }
 
     @Override
-    public FunctionResponse createPureTabulatedFunction(PureTabulatedRequest request) {
+    public Long createPureTabulatedFunction(PureTabulatedRequest request) {
         try {
-            Long funcId = functionRepo.createPureTabulated(request.getXValues(), request.getYValues()).get();
-            return getFunction(funcId);
+            return functionRepo.createPureTabulated(request.getXValues(), request.getYValues()).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error creating pure tabulated function: {}", e.getMessage());
             throw new CustomException("Failed to create pure tabulated function: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -134,7 +118,7 @@ public class FunctionServiceImpl implements FunctionService {
     }
 
     @Override
-    public CompositeFunctionResponse createCompositeFunction(CompositeFunctionRequest request) {
+    public Long createCompositeFunction(CompositeFunctionRequest request) {
         try {
             Long innerFuncId = request.getInnerFunctionId();
             Long outerFuncId = request.getOuterFunctionId();
@@ -145,13 +129,8 @@ public class FunctionServiceImpl implements FunctionService {
             FunctionEntity innerFunction = getFunctionDb(innerFuncId);
             FunctionEntity outerFunction = getFunctionDb(outerFuncId);*/
 
-            CompositeFunctionResponse response = new CompositeFunctionResponse();
-            response.setCompositeFunctionId(compositeFuncId);
-            response.setInnerFunctionId(innerFuncId);
-            response.setOuterFunctionId(outerFuncId);
-
             log.info("Composite function created with id: {}", compositeFuncId);
-            return response;
+            return compositeFuncId;
 
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error creating composite function: {}", e.getMessage());
@@ -199,13 +178,6 @@ public class FunctionServiceImpl implements FunctionService {
 
 
     private FunctionResponse convertToResponse(FunctionEntity function) {
-        String typeName = switch (function.getTypeId()) {
-            case 1 -> "MATH";
-            case 2 -> "TABULATED";
-            case 3 -> "COMPOSITE";
-            default -> "UNKNOWN";
-        };
-
-        return new FunctionResponse(Long.valueOf(function.getFuncId()), function.getTypeId(), function.getExpression());
+        return new FunctionResponse(function.getFuncId(), function.getTypeId(), function.getExpression());
     }
 }

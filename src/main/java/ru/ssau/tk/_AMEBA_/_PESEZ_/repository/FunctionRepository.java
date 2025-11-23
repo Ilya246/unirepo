@@ -5,22 +5,19 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.CompositeFunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.PointsEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.operations.TabulatedFunctionOperationService;
-import ru.ssau.tk._AMEBA_._PESEZ_.utility.HibernateSessionFactoryUtil;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+
 @Repository
 public class FunctionRepository {
 

@@ -1,7 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.test;
 
 import org.junit.jupiter.api.Test;
-import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.MultiplyingTask;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.concurrent.SynchronizedTabulatedFunction;
 

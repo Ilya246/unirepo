@@ -1,7 +1,6 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.dto.request;
 
 import com.fasterxml.jackson.annotation.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

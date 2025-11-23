@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.ssau.tk._AMEBA_._PESEZ_.functions.CompositeFunction;
 
 import java.util.ArrayList;
 import java.util.List;

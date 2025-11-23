@@ -3,7 +3,6 @@ package ru.ssau.tk._AMEBA_._PESEZ_.utility;
 import org.hibernate.SessionFactory;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
-import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.UserService;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.getBase64Hash;
 

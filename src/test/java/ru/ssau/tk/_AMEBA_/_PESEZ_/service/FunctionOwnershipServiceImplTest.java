@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.FunctionOwnershipRequest;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionOwnershipResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.OwnedFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionOwnershipEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
@@ -56,23 +57,6 @@ class FunctionOwnershipServiceImplTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testCreate() {
-        // Given - создаем пользователя и функцию
-        UserEntity user = createTestUser("testuser", 1, "test@example.com");
-        FunctionEntity function = createTestFunction("x^2", 1);
-        FunctionOwnershipRequest request = new FunctionOwnershipRequest(user.getUserId(), function.getFuncId(), "My Function");
-
-        // When
-        FunctionOwnershipResponse response = ownershipService.create(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(user.getUserId(), response.getUserId());
-        assertEquals(function.getFuncId(), response.getFunctionId());
-        assertEquals("My Function", response.getFuncName());
-    }
-
-    @Test
     void testGetOwnership() {
         // Given - создаем пользователя, функцию и связь
         UserEntity user = createTestUser("testuser", 1, "test@example.com");
@@ -81,13 +65,13 @@ class FunctionOwnershipServiceImplTest extends BaseRepositoryTest {
         ownershipService.create(request);
 
         // When
-        FunctionOwnershipResponse response = ownershipService.getOwnership(user.getUserId(), function.getFuncId());
+        OwnedFunctionResponse response = ownershipService.getOwnership(user.getUserId(), function.getFuncId());
 
         // Then
         assertNotNull(response);
-        assertEquals(user.getUserId(), response.getUserId());
-        assertEquals(function.getFuncId(), response.getFunctionId());
-        assertEquals("My Function", response.getFuncName());
+        assertEquals(user.getUserId(), response.ownership.getUserId());
+        assertEquals(function.getFuncId(), response.ownership.getFunctionId());
+        assertEquals("My Function", response.ownership.getFuncName());
     }
 
     @Test
@@ -141,39 +125,15 @@ class FunctionOwnershipServiceImplTest extends BaseRepositoryTest {
         ownershipService.create(new FunctionOwnershipRequest(user.getUserId(), function3.getFuncId(), "Cosine"));
 
         // When
-        List<FunctionOwnershipEntity> ownerships = ownershipService.getOwnershipsByUserId(user.getUserId());
+        List<OwnedFunctionResponse> ownerships = ownershipService.getOwnershipsByUserId(user.getUserId());
 
         // Then
         assertNotNull(ownerships);
         assertEquals(3, ownerships.size());
 
         // Проверяем, что все связи принадлежат правильному пользователю
-        for (FunctionOwnershipEntity ownership : ownerships) {
-            assertEquals(user.getUserId(), ownership.getUser().getUserId());
+        for (OwnedFunctionResponse ownership : ownerships) {
+            assertEquals(user.getUserId(), ownership.ownership.getUserId());
         }
     }
-
-    @Test
-    void testUpdateOwnership() {
-        // Given - создаем пользователя, функцию и связь
-        UserEntity user = createTestUser("testuser", 1, "test@example.com");
-        FunctionEntity function = createTestFunction("x^2", 1);
-        FunctionOwnershipRequest createRequest = new FunctionOwnershipRequest(user.getUserId(), function.getFuncId(), "Original Name");
-        ownershipService.create(createRequest);
-
-        FunctionOwnershipRequest updateRequest = new FunctionOwnershipRequest(user.getUserId(), function.getFuncId(), "Updated Name");
-
-        // When
-        FunctionOwnershipResponse response = ownershipService.updateOwnership(user.getUserId(), function.getFuncId(), updateRequest);
-
-        // Then
-        assertNotNull(response);
-        assertEquals("Updated Name", response.getFuncName());
-        assertEquals(user.getUserId(), response.getUserId());
-        assertEquals(function.getFuncId(), response.getFunctionId());
-    }
-
-
-
-
 }
