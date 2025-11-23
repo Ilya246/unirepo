@@ -110,42 +110,42 @@ public class FunctionOwnershipController {
 
     @PostMapping("/math")
     @Operation(summary = "Создать математическую функцию для пользователя")
-    public Long createMath(
+    public IdResponse createMath(
             @RequestParam(required = false) Long userId,
             @RequestBody OwnedFunctionCreateRequest<MathFunctionRequest> request
     ) {
         Long actualUserId = getCurrentUserId(userId);
-        return ownershipService.createOwnedMath(request, actualUserId);
+        return new IdResponse(ownershipService.createOwnedMath(request, actualUserId));
     }
 
     @PostMapping("/tabulated")
     @Operation(summary = "Создать табулированную функцию для пользователя")
-    public Long createTabulated(
+    public IdResponse createTabulated(
             @RequestParam(required = false) Long userId,
             @RequestBody OwnedFunctionCreateRequest<TabulatedFunctionRequest> request
     ) {
         Long actualUserId = getCurrentUserId(userId);
-        return ownershipService.createOwnedTabulated(request, actualUserId);
+        return new IdResponse(ownershipService.createOwnedTabulated(request, actualUserId));
     }
 
     @PostMapping("/pure-tabulated")
     @Operation(summary = "Создать табулированную функцию для пользователя из готовых массивов значений")
-    public Long createPure(
+    public IdResponse createPure(
             @RequestParam(required = false) Long userId,
             @RequestBody OwnedFunctionCreateRequest<PureTabulatedRequest> request
     ) {
         Long actualUserId = getCurrentUserId(userId);
-        return ownershipService.createOwnedPure(request, actualUserId);
+        return new IdResponse(ownershipService.createOwnedPure(request, actualUserId));
     }
 
     @PostMapping("/composite")
     @Operation(summary = "Создать композитную функцию")
-    public Long createComposite(
+    public IdResponse createComposite(
             @RequestParam(required = false) Long userId,
             @RequestBody OwnedFunctionCreateRequest<CompositeFunctionRequest> request
     ) {
         Long actualUserId = getCurrentUserId(userId);
-        return ownershipService.createOwnedComposite(request, actualUserId);
+        return new IdResponse(ownershipService.createOwnedComposite(request, actualUserId));
     }
 
     /**

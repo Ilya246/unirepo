@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.UserRequest;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.IdResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.UserResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
@@ -24,14 +25,14 @@ public class UserController {
 
     @PostMapping
     @Operation(summary = "Создание пользователя")
-    public Long createUser(@RequestBody @Valid UserRequest request ) {
-        return userService.createUser(request);
+    public IdResponse createUser(@RequestBody @Valid UserRequest request ) {
+        return new IdResponse(userService.createUser(request));
     }
 
     @PostMapping("/register")
     @Operation(summary = "Создание пользователя")
-    public Long createUser(@RequestParam String username, @RequestParam String password) {
-        return userService.createUser(new UserRequest(UserType.Normal, username, password));
+    public IdResponse createUser(@RequestParam String username, @RequestParam String password) {
+        return new IdResponse(userService.createUser(new UserRequest(UserType.Normal, username, password)));
     }
 
     @GetMapping("/user")
@@ -61,7 +62,7 @@ public class UserController {
 
     @GetMapping("/self")
     @Operation(summary = "Получение текущего id")
-    public Long getId(){
+    public IdResponse getId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("User not authenticated");
@@ -71,7 +72,7 @@ public class UserController {
         Object credentials = authentication.getCredentials();
 
         if (principal instanceof UserEntity) {
-            return ((UserEntity) principal).getUserId();
+            return new IdResponse(((UserEntity) principal).getUserId());
         } else if (principal instanceof org.springframework.security.core.userdetails.User) {
             org.springframework.security.core.userdetails.User securityUser =
                     (org.springframework.security.core.userdetails.User) principal;
@@ -82,22 +83,22 @@ public class UserController {
                 String password = (String) credentials;
                 try {
                     UserEntity user = userService.findByCredentials(username, password);
-                    return user.getUserId();
+                    return new IdResponse(user.getUserId());
                 } catch (Exception e) {
                     // Fallback to findByUsername если findByCredentials не сработал
                     Log.warn("findByCredentials failed, falling back to findByUsername: {}", e.getMessage());
                     UserEntity user = userService.findByUsername(username);
-                    return user.getUserId();
+                    return new IdResponse(user.getUserId());
                 }
             } else {
                 // Используем findByUsername если нет пароля
                 UserEntity user = userService.findByUsername(username);
-                return user.getUserId();
+                return new IdResponse(user.getUserId());
             }
         } else if (principal instanceof String) {
             String username = (String) principal;
             UserEntity user = userService.findByUsername(username);
-            return user.getUserId();
+            return new IdResponse(user.getUserId());
         } else {
             throw new RuntimeException("Unknown principal type: " + principal.getClass().getName());
         }
