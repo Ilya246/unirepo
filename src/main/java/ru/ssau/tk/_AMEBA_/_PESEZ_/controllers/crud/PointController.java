@@ -17,18 +17,11 @@ public class PointController {
 
     @PostMapping
     @Operation(summary = "Создание точки")
-    public Map<String, Object> createPoint(
+    public void createPoint(
             @RequestParam Long id,
             @RequestParam Double x,
             @RequestParam Double y) {
         pointsService.createPoint(new PointRequest(id, x, y));
-        return Map.of(
-                "success", true,
-                "message", "Point created successfully",
-                "functionId", id,
-                "x", x,
-                "y", y
-        );
     }
 
 

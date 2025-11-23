@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PointsResponse extends PointRequest {
+public class PointsResponse {
     Long functionId;
     double[] xValues;
     double[] yValues;

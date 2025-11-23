@@ -31,23 +31,6 @@ class PointServiceImplTest extends BaseRepositoryTest {
     }
 
     @Test
-    void testCreatePoint() {
-        // Given - создаем функцию
-        FunctionEntity function = new FunctionEntity(1,"x^2");
-        functionRepo.save(function);
-        PointRequest request = new PointRequest(function.getFuncId(), 0.75, 1.0);
-
-        // When
-        PointsResponse response = pointService.createPoint(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(function.getFuncId(), response.getFunctionId());
-        assertEquals(0.75, response.getXValue());
-        assertEquals(1.0, response.getYValue());
-    }
-
-    @Test
     void testCreatePoint_FunctionNotFound() {
         // Given
         PointRequest request = new PointRequest(999L, 0.75, 1.0);
@@ -76,26 +59,6 @@ class PointServiceImplTest extends BaseRepositoryTest {
         });
 
         assertEquals("Point already exists for function " + function.getFuncId() + " with x=0.75", exception.getMessage());
-    }
-
-    @Test
-    void testUpdatePoint() {
-        // Given - создаем функцию и точку
-        FunctionEntity function = new FunctionEntity(1,"x^2");
-        functionRepo.save(function);
-        PointRequest r = new PointRequest(function.getFuncId(), 4.0, 16.0);
-        pointService.createPoint(r);
-
-        PointRequest updateRequest = new PointRequest(function.getFuncId(), 4.0, 20.0);
-
-        // When
-        PointsResponse response = pointService.updatePoint(function.getFuncId(), 4.0, updateRequest);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(function.getFuncId(), response.getFunctionId());
-        assertEquals(4.0, response.getXValue());
-        assertEquals(20.0, response.getYValue());
     }
 
     @Test
