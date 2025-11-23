@@ -408,7 +408,7 @@
             background: white;
             border-radius: 15px;
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
@@ -611,6 +611,81 @@
             opacity: 0.8;
         }
 
+        /* Стили для управления точками */
+        .points-management {
+            margin-top: 25px;
+            border-top: 1px solid #e1e8ed;
+            padding-top: 25px;
+        }
+
+        .points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .points-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .point-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .point-item:last-child {
+            border-bottom: none;
+        }
+
+        .point-coordinates {
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .point-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .point-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .point-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .point-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .point-btn:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .add-point-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
         /* Адаптивность */
         @media (max-width: 768px) {
             .app-container {
@@ -649,6 +724,17 @@
 
             .function-type-buttons {
                 flex-direction: column;
+            }
+
+            .point-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .point-actions {
+                width: 100%;
+                justify-content: flex-end;
             }
         }
 
@@ -695,6 +781,33 @@
         .status.error {
             background: #f8d7da;
             color: #721c24;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .info-value {
+            color: #5d6d7e;
         }
     </style>
 </head>
@@ -806,15 +919,6 @@
                 <input type="text" id="functionName" placeholder="Введите название функции">
             </div>
 
-            <!-- Параметры для математической функции -->
-            <div class="function-params" id="mathParams">
-                <h4>Параметры математической функции</h4>
-                <div class="form-group">
-                    <label for="mathExpression">Математическое выражение:</label>
-                    <input type="text" id="mathExpression" placeholder="например: x^2 + 2*x + 1">
-                    <small style="color: #7f8c8d; font-size: 12px;">Используйте x как переменную</small>
-                </div>
-            </div>
 
             <!-- Параметры для табулированной функции -->
             <div class="function-params hidden" id="tabulatedParams">
@@ -914,6 +1018,72 @@
     </div>
 </div>
 
+<!-- Модальное окно редактирования функции -->
+<div class="modal" id="editFunctionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Редактирование функции</h2>
+            <button class="close-modal" onclick="closeEditModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="editFunctionName">Название функции:</label>
+                <input type="text" id="editFunctionName" placeholder="Введите название функции">
+            </div>
+
+            <!-- Параметры для математической функции -->
+            <div class="function-params" id="editMathParams">
+                <h4>Параметры математической функции</h4>
+                <div class="form-group">
+                    <label for="editMathExpression">Математическое выражение:</label>
+                    <input type="text" id="editMathExpression" placeholder="например: x^2 + 2*x + 1">
+                    <small style="color: #7f8c8d; font-size: 12px;">Используйте x как переменную</small>
+                </div>
+            </div>
+
+            <!-- Управление точками для табулированных функций -->
+            <div class="points-management hidden" id="editPointsManagement">
+                <div class="points-header">
+                    <h4>📊 Управление точками функции</h4>
+                    <button class="btn btn-success" onclick="showAddPointForm()">➕ Добавить точку</button>
+                </div>
+
+                <!-- Форма добавления точки -->
+                <div class="add-point-form hidden" id="addPointForm">
+                    <h5>Добавить новую точку</h5>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="newPointX">X значение</label>
+                            <input type="number" id="newPointX" placeholder="X value" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="newPointY">Y значение</label>
+                            <input type="number" id="newPointY" placeholder="Y value" step="any">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button class="btn btn-secondary" onclick="hideAddPointForm()">Отмена</button>
+                        <button class="btn btn-success" onclick="addNewPoint()">Добавить точку</button>
+                    </div>
+                </div>
+
+                <!-- Список точек -->
+                <div class="points-list" id="pointsList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>Точки не загружены</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
+                <button class="btn btn-success" onclick="saveFunctionChanges()">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Футер -->
 <footer class="footer">
     <div class="footer-content">
@@ -929,6 +1099,8 @@
     const api = new APIClient();
     let currentFunctions = [];
     let currentFunctionType = 'math';
+    let currentEditingFunction = null;
+    let currentPoints = [];
 
     // Выбор типа функции
     function selectFunctionType(type) {
@@ -1155,9 +1327,200 @@
     }
 
     // Редактирование функции
-    function editFunction() {
-        alert('Редактирование функции будет доступно в следующей версии');
+    async function editFunction() {
+        const functionId = document.getElementById('modalFunctionId').textContent;
+
+        try {
+            const func = await api.getOwnedFunction(parseInt(functionId));
+            currentEditingFunction = func;
+            openEditModal(func);
+        } catch (error) {
+            console.error('Failed to load function for editing:', error);
+            showStatus('Ошибка при загрузке данных функции: ' + error.message, 'error');
+        }
     }
+// Открытие модального окна редактирования
+function openEditModal(func) {
+    document.getElementById('editFunctionName').value = func.ownership.funcName || '';
+
+    // Настраиваем интерфейс в зависимости от типа функции
+    const functionType = func.function.funcType;
+
+    // Скрываем все параметры
+    document.getElementById('editMathParams').classList.add('hidden');
+    document.getElementById('editPointsManagement').classList.add('hidden');
+
+    if (functionType === 'math') {
+        // Для математических функций показываем только название
+        document.getElementById('editMathParams').classList.add('hidden');
+    } else if (functionType === 'tabulated' || functionType === 'pure') {
+        document.getElementById('editPointsManagement').classList.remove('hidden');
+        loadFunctionPoints(func.function.funcId);
+    }
+
+    document.getElementById('editFunctionModal').style.display = 'block';
+}
+    // Закрытие модального окна редактирования
+    function closeEditModal() {
+        document.getElementById('editFunctionModal').style.display = 'none';
+        currentEditingFunction = null;
+        currentPoints = [];
+    }
+// Сохранение изменений функции
+async function saveFunctionChanges() {
+    if (!currentEditingFunction) return;
+
+    const newName = document.getElementById('editFunctionName').value.trim();
+    if (!newName) {
+        showStatus('Введите название функции', 'error');
+        return;
+    }
+
+    try {
+        // Обновляем название функции
+        await api.updateOwnedFunction(
+            currentEditingFunction.function.funcId,
+            newName,
+            null
+        );
+
+        showStatus('Функция успешно обновлена!', 'success');
+        closeEditModal();
+        closeModal();
+        await loadUserFunctions();
+
+    } catch (error) {
+        console.error('Failed to update function:', error);
+        showStatus('Ошибка при обновлении функции: ' + error.message, 'error');
+    }
+}
+
+// Загрузка точек функции
+async function loadFunctionPoints(functionId) {
+    try {
+        const points = await api.getPoints(functionId);
+        currentPoints = points;
+        renderPointsList(points);
+    } catch (error) {
+        console.error('Failed to load points:', error);
+        // Если точки не загружаются, показываем пустой список
+        currentPoints = [];
+        renderPointsList([]);
+        showStatus('Не удалось загрузить точки функции', 'error');
+    }
+}
+
+// Отрисовка списка точек
+function renderPointsList(points) {
+    const pointsList = document.getElementById('pointsList');
+
+    if (!points || points.length === 0) {
+        pointsList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📊</div>
+                <p>Нет точек для отображения</p>
+            </div>
+        `;
+        return;
+    }
+
+    pointsList.innerHTML = points.map(point => `
+        <div class="point-item">
+            <div class="point-coordinates">x = ${point.x}, y = ${point.y}</div>
+            <div class="point-actions">
+                <button class="point-btn point-edit" onclick="editPoint(${point.x})">✏️</button>
+                <button class="point-btn point-delete" onclick="deletePoint(${point.x})">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+    // Показать форму добавления точки
+    function showAddPointForm() {
+        document.getElementById('addPointForm').classList.remove('hidden');
+        document.getElementById('newPointX').value = '';
+        document.getElementById('newPointY').value = '';
+    }
+
+    // Скрыть форму добавления точки
+    function hideAddPointForm() {
+        document.getElementById('addPointForm').classList.add('hidden');
+    }
+
+    // Добавление новой точки
+    async function addNewPoint() {
+        if (!currentEditingFunction) return;
+
+        const x = document.getElementById('newPointX').value;
+        const y = document.getElementById('newPointY').value;
+
+        if (!x || !y) {
+            showStatus('Заполните значения X и Y', 'error');
+            return;
+        }
+
+        try {
+            await api.createPoint(
+                currentEditingFunction.function.funcId,
+                parseFloat(x),
+                parseFloat(y)
+            );
+
+            showStatus('Точка успешно добавлена!', 'success');
+            hideAddPointForm();
+            await loadFunctionPoints(currentEditingFunction.function.funcId);
+
+        } catch (error) {
+            console.error('Failed to add point:', error);
+            showStatus('Ошибка при добавлении точки: ' + error.message, 'error');
+        }
+    }
+
+    // Удаление точки
+    async function deletePoint(x) {
+    if (!currentEditingFunction) return;
+
+    if (!confirm('Вы уверены, что хотите удалить эту точку?')) {
+        return;
+    }
+
+    try {
+        await api.deletePoint(
+            currentEditingFunction.function.funcId,
+            parseFloat(x)
+        );
+
+        showStatus('Точка успешно удалена!', 'success');
+        await loadFunctionPoints(currentEditingFunction.function.funcId);
+
+    } catch (error) {
+        console.error('Failed to delete point:', error);
+        showStatus('Ошибка при удалении точки: ' + error.message, 'error');
+    }
+}
+
+    // Редактирование точки
+    async function editPoint(currentX) {
+    if (!currentEditingFunction) return;
+
+    const newY = prompt(`Введите новое значение Y для точки x = ${currentX}:`);
+    if (newY === null) return;
+
+    try {
+        await api.updatePoint(
+            currentEditingFunction.function.funcId,
+            parseFloat(currentX),
+            parseFloat(newY)
+        );
+
+        showStatus('Точка успешно обновлена!', 'success');
+        await loadFunctionPoints(currentEditingFunction.function.funcId);
+
+    } catch (error) {
+        console.error('Failed to update point:', error);
+        showStatus('Ошибка при обновлении точки: ' + error.message, 'error');
+    }
+}
 
     // Показать помощь
     function showHelp() {
@@ -1188,8 +1551,7 @@
         if (func.function.expression != "<TABULATED>") {
             return `Функция: ${func.function.expression}`;
         }
-        const descPoints = api.getPoints(func.function.funcId);
-        return `Табличная функция с ${descPoints.length} точками`;
+        return `Табличная функция`;
     }
 
     function formatDate(dateString) {
@@ -1201,24 +1563,34 @@
         }
     }
 
-    function showStatus(message, type) {
-        const status = document.createElement('div');
-        status.className = `status ${type}`;
-        status.textContent = message;
-        status.style.position = 'fixed';
-        status.style.top = '20px';
-        status.style.right = '20px';
-        status.style.zIndex = '1001';
-        status.style.padding = '15px 20px';
-        status.style.borderRadius = '6px';
-        status.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-
-        document.body.appendChild(status);
-
-        setTimeout(() => {
-            status.remove();
-        }, 3000);
+   function showStatus(message, type) {
+    // Удаляем существующие статусы
+    const existingStatus = document.querySelector('.status-notification');
+    if (existingStatus) {
+        existingStatus.remove();
     }
+
+    const status = document.createElement('div');
+    status.className = `status ${type} status-notification`;
+    status.textContent = message;
+    status.style.position = 'fixed';
+    status.style.top = '20px';
+    status.style.right = '20px';
+    status.style.zIndex = '1001';
+    status.style.padding = '15px 20px';
+    status.style.borderRadius = '6px';
+    status.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    status.style.maxWidth = '400px';
+    status.style.wordWrap = 'break-word';
+
+    document.body.appendChild(status);
+
+    setTimeout(() => {
+        if (status.parentNode) {
+            status.remove();
+        }
+    }, 5000);
+}
 
     // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
@@ -1226,16 +1598,15 @@
         document.getElementById('lastActivity').textContent = new Date().toLocaleString('ru-RU');
 
         // Закрытие модальных окон по клику вне их
-        document.getElementById('createFunctionModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCreateModal();
-            }
-        });
-
-        document.getElementById('functionModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
+        const modals = ['createFunctionModal', 'functionModal', 'editFunctionModal'];
+        modals.forEach(modalId => {
+            document.getElementById(modalId).addEventListener('click', function(e) {
+                if (e.target === this) {
+                    if (modalId === 'createFunctionModal') closeCreateModal();
+                    if (modalId === 'functionModal') closeModal();
+                    if (modalId === 'editFunctionModal') closeEditModal();
+                }
+            });
         });
     });
 </script>
