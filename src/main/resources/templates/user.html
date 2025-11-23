@@ -1452,8 +1452,7 @@ function renderPointsList(points) {
     // Проверяем структуру данных
     console.log('Points data:', points);
 
-    if (!points || (Array.isArray(points) && points.length === 0) ||
-        (points.xValues && points.xValues.length === 0)) {
+    if (!points || !points.xValues || points.xValues.length === 0) {
         pointsList.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📊</div>
@@ -1465,21 +1464,11 @@ function renderPointsList(points) {
 
     let pointsArray = [];
 
-    // Обрабатываем разные форматы данных
-    if (Array.isArray(points)) {
-        // Если points - это массив объектов {x, y}
-        pointsArray = points;
-    } else if (points.xValues && points.yValues) {
-        // Если points - это объект с массивами xValues и yValues
-        for (let i = 0; i < points.xValues.length; i++) {
-            pointsArray.push({
-                x: points.xValues[i],
-                y: points.yValues[i]
-            });
-        }
-    } else if (points.points) {
-        // Если points имеет вложенную структуру
-        pointsArray = points.points;
+    for (let i = 0; i < points.xValues.length; i++) {
+        pointsArray.push({
+            x: points.xValues[i],
+            y: points.yValues[i]
+        });
     }
 
     if (pointsArray.length === 0) {
