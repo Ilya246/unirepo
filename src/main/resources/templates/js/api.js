@@ -151,14 +151,6 @@ class APIClient {
         return this.request(url, { method: 'GET' });
     }
 
-    async getOwnedComposite(id, targetUserId = null) {
-        let url = `/owned-functions/composite?id=${id}`;
-        if (targetUserId) {
-            url += `&user=${targetUserId}`;
-        }
-        return this.request(url, { method: 'GET' });
-    }
-
     async getUserFunctions(targetUserId = null) {
         let url = '/owned-functions/user';
         if (targetUserId) {

@@ -80,23 +80,6 @@ public class FunctionOwnershipController {
         return ownershipService.getOwnershipsByUserId(actualUserId);
     }
 
-    @GetMapping("/composite")
-    @Operation(summary = "Получить информацию о композитной функции пользователя")
-    public CompositeFunctionResponse getUserComposite(
-            @RequestParam(value = "userId", required = false) Long userId,
-            @RequestParam(value = "user", required = false) Long user,
-            @RequestParam(value = "id") Long funcId // изменил на "id"
-    ) {
-        Long actualUserId = userId != null ? userId : user;
-
-        if (actualUserId == null) {
-            actualUserId = getCurrentUserId(actualUserId);
-            Log.info("Using current user ID: {}", actualUserId);
-        }
-        ownershipService.getOwnership(actualUserId, funcId);
-        return compositeService.getFunction(funcId);
-    }
-
     @PostMapping("/own")
     @Operation(summary = "Добавить существующую функцию пользователю")
     public void add(

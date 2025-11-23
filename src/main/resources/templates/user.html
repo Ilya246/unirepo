@@ -1341,7 +1341,7 @@ function selectFunctionType(type) {
         const functionId = document.getElementById('modalFunctionId').textContent;
 
         try {
-            const func = await api.getOwnedFunction(parseInt(functionId));
+            const func = await api.getOwnedFunction(functionId);
             currentEditingFunction = func;
             openEditModal(func);
         } catch (error) {
@@ -1424,7 +1424,10 @@ async function loadFunctionPoints(functionId) {
 function renderPointsList(points) {
     const pointsList = document.getElementById('pointsList');
 
-    if (!points || points.length === 0) {
+    const xValues = points.xValues;
+    const yValues = points.yValues;
+
+    if (!xValues || xValues.length === 0) {
         pointsList.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📊</div>
@@ -1432,6 +1435,11 @@ function renderPointsList(points) {
             </div>
         `;
         return;
+    }
+
+    const points = [];
+    for (var i = 0; i < xValues.length; i++) {
+        points.push({x: xValues[i], y: yValues[i]});
     }
 
     pointsList.innerHTML = points.map(point => `
@@ -1472,8 +1480,8 @@ function renderPointsList(points) {
         try {
             await api.createPoint(
                 currentEditingFunction.function.funcId,
-                parseFloat(x),
-                parseFloat(y)
+                x,
+                y
             );
 
             showStatus('Точка успешно добавлена!', 'success');
