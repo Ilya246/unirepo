@@ -810,6 +810,7 @@
             color: #5d6d7e;
         }
     </style>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" type="image/svg+xml">
 </head>
 <body>
 <div class="app-container">
@@ -1402,16 +1403,18 @@ async function saveFunctionChanges() {
             return;
         }
 
-        // Обновляем название функции
+        // Обновляем название функции - используем тот же формат, что и в рабочем примере
         console.log('Calling api.updateOwnedFunction with:', {
             id: currentEditingFunction.function.funcId,
-            name: newName
+            name: newName,
+            targetUserId: null
         });
 
+        // Вызываем метод API - он уже использует правильный формат с параметрами в URL
         const result = await api.updateOwnedFunction(
-            currentEditingFunction.function.funcId,
+            parseInt(currentEditingFunction.function.funcId),
             newName,
-            null
+            null  // targetUserId = null для текущего пользователя
         );
 
         console.log('Update API call completed, result:', result);
@@ -1498,6 +1501,29 @@ function renderPointsList(points) {
         document.getElementById('newPointX').value = '';
         document.getElementById('newPointY').value = '';
     }
+
+    // Редактирование точки
+async function editPoint(currentX) {
+    if (!currentEditingFunction) return;
+
+    const newY = prompt(`Введите новое значение Y для точки x = ${currentX}:`);
+    if (newY === null) return;
+
+    try {
+        await api.updatePoint(
+            currentEditingFunction.function.funcId,
+            parseFloat(currentX),
+            parseFloat(newY)
+        );
+
+        showStatus('Точка успешно обновлена!', 'success');
+        await loadFunctionPoints(currentEditingFunction.function.funcId);
+
+    } catch (error) {
+        console.error('Failed to update point:', error);
+        showStatus('Ошибка при обновлении точки: ' + error.message, 'error');
+    }
+}
 
     // Скрыть форму добавления точки
     function hideAddPointForm() {
