@@ -2,7 +2,8 @@ package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
@@ -12,6 +13,14 @@ import java.io.*;
 
 @WebServlet("/owned-functions/*")
 public class OwnedFunctionController extends Controller {
+    private FunctionService functionService;
+
+    @Override
+    public void init() {
+        super.init();
+        this.functionService = new FunctionService("main.properties");
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String path = req.getPathInfo();
@@ -35,6 +44,13 @@ public class OwnedFunctionController extends Controller {
             } else if (path.equals("/user")) {
                 OwnedFunctionDTO[] functions = userService.getUserFunctions(userId).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(functions));
+            } else if (path.equals("/composite")) {
+                int id = Integer.parseInt(req.getParameter("id"));
+                if (userService.getUserFunction(userId, id) == null) {
+                    resp.getWriter().write(objectMapper.writeValueAsString(null));
+                }
+                CompositeFunctionDTO composite = functionService.getCompositeData(id).join();
+                resp.getWriter().write(objectMapper.writeValueAsString(new CompositeFunctionResponse(composite.outerFuncId, composite.innerFuncId)));
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
@@ -62,21 +78,21 @@ public class OwnedFunctionController extends Controller {
                 case "/math" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     int response = userService.createUserFunction(userId, request.name, ((MathFunctionCreateRequest)request.funcParams).expression).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(new FunctionResponse(response)));
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/tabulated
                 case "/tabulated" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (TabulatedFunctionCreateRequest)request.funcParams;
                     int response = userService.createUserTabulatedFunction(userId, request.name, params.expression, params.xFrom, params.xTo, params.pointCount).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(new FunctionResponse(response)));
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/pure-tabulated
                 case "/pure-tabulated" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (PureTabulatedCreateRequest)request.funcParams;
                     int response = userService.createUserPureTabulated(userId, request.name, params.xValues, params.yValues).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(new FunctionResponse(response)));
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/composite
                 case "/composite" -> {
@@ -89,7 +105,7 @@ public class OwnedFunctionController extends Controller {
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid function IDs");
                     }
                     int response = userService.createUserComposite(userId, request.name, params.innerId, params.outerId).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(new FunctionResponse(response)));
+                    resp.getWriter().write(objectMapper.writeValueAsString(response));
                 }
                 // POST /owned-functions/own?id={id}&name={name}
                 case "/own" -> {
