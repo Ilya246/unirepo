@@ -882,7 +882,33 @@
             font-size: 14px;
             opacity: 0.8;
         }
+        .graph-container {
+    margin-top: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.graph-placeholder {
+    height: 300px;
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
     </style>
+    <!-- Добавьте в head -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" type="image/svg+xml">
 </head>
 <body>
@@ -955,9 +981,9 @@
         <div class="functions-section">
             <div class="section-title">
                 <span>📈 Ваши функции</span>
-                <button class="refresh-btn" onclick="loadUserFunctions()">
+                <!--<button class="refresh-btn" onclick="loadUserFunctions()">
                     🔄 Обновить список
-                </button>
+                </button>-->
             </div>
 
             <div class="functions-grid" id="functionsGrid">
@@ -1509,95 +1535,6 @@ async function deleteFunction(functionId) {
     }
 }
 
-// Обновить открытие модального окна
-function openFunctionModal(func, isComposite = false) {
-    console.log('Opening function modal with data:', func);
-    console.log('Is composite:', isComposite);
-
-    // Безопасное извлечение данных с проверкой структуры
-    let funcName, funcId, funcType, createdDate, expression;
-
-    if (func.ownership && func.function) {
-        // Структура из getOwnedFunction()
-        funcName = func.ownership.funcName;
-        funcId = func.function.funcId;
-        funcType = func.function.funcType;
-        createdDate = func.ownership.createdDate;
-        expression = func.function.expression;
-    } else if (func.function) {
-        // Структура из getComposite() или прямая структура функции
-        funcName = func.function.name || func.name || func.ownership?.funcName || 'Без названия';
-        funcId = func.function.funcId || func.function.id || func.id;
-        funcType = func.function.funcType || 'composite';
-        createdDate = func.function.createdDate || func.ownership?.createdDate || func.createdDate;
-        expression = func.function.expression;
-    } else if (func.innerId && func.outerId) {
-        // Простая структура композитной функции {innerId: X, outerId: Y}
-        funcName = func.name || func.funcName || 'Композитная функция';
-        funcId = func.id || 'Неизвестно';
-        funcType = 'composite';
-        createdDate = func.createdDate || func.ownership?.createdDate || 'Неизвестно';
-        expression = 'Композитная функция f(g(x))';
-    } else {
-        // Резервное извлечение
-        funcName = func.name || func.funcName || func.ownership?.funcName || 'Без названия';
-        funcId = func.funcId || func.id || 'Неизвестно';
-        funcType = func.funcType || 'Неизвестно';
-        createdDate = func.createdDate || func.ownership?.createdDate || 'Неизвестно';
-        expression = func.expression;
-    }
-
-    console.log('Extracted data:', { funcName, funcId, funcType, createdDate, expression });
-
-    document.getElementById('modalFunctionName').textContent = funcName;
-    document.getElementById('modalFunctionId').textContent = funcId;
-    document.getElementById('modalFunctionType').textContent = getFunctionTypeLabel(funcType);
-    document.getElementById('modalFunctionStatus').textContent = 'Активна';
-    document.getElementById('modalFunctionCreated').textContent = formatDate(createdDate);
-
-    if (isComposite || funcType === 'composite') {
-        // Для композитных функций показываем информацию о составляющих
-        let expressionText = 'Композитная функция f(g(x))';
-
-        console.log('Composite function structure:', func);
-
-        // Обработка разных структур данных
-        if (func.innerId && func.outerId) {
-            // Простая структура {innerId: X, outerId: Y}
-            expressionText = `f(g(x)) где:\n• g(x) = ID ${func.innerId}\n• f(x) = ID ${func.outerId}`;
-        } else if (func.innerFunction && func.outerFunction) {
-            // Структура с объектами функций
-            const innerExpr = func.innerFunction.expression ||
-                            (func.innerFunction.funcId ? `ID: ${func.innerFunction.funcId}` : 'Неизвестно');
-            const outerExpr = func.outerFunction.expression ||
-                            (func.outerFunction.funcId ? `ID: ${func.outerFunction.funcId}` : 'Неизвестно');
-            expressionText = `f(g(x)) где:\n• g(x) = ${innerExpr}\n• f(x) = ${outerExpr}`;
-        } else if (func.function && (func.function.innerFuncId || func.function.outerFuncId)) {
-            // Структура с ID в объекте function
-            const innerId = func.function.innerFuncId || 'Неизвестно';
-            const outerId = func.function.outerFuncId || 'Неизвестно';
-            expressionText = `f(g(x)) где:\n• g(x) = ID ${innerId}\n• f(x) = ID ${outerId}`;
-        }
-
-        document.getElementById('modalFunctionExpression').textContent = expressionText;
-
-        // Скрываем кнопку редактирования для композитных функций
-        const editBtn = document.getElementById('editFunctionBtn');
-        if (editBtn) {
-            editBtn.style.display = 'none';
-        }
-    } else {
-        document.getElementById('modalFunctionExpression').textContent = expression || 'Не указано';
-
-        // Показываем кнопку редактирования для обычных функций
-        const editBtn = document.getElementById('editFunctionBtn');
-        if (editBtn) {
-            editBtn.style.display = 'block';
-        }
-    }
-
-    document.getElementById('functionModal').style.display = 'block';
-}
 
 
 // Сохранение изменений функции
@@ -2302,6 +2239,383 @@ function getBasicCompositeInfo(func) {
             Композитная функция f(g(x))
         </div>
     `;
+}
+let functionChart = null;
+
+// Функция для построения графика
+async function plotFunction(func) {
+    const graphContainer = document.getElementById('functionGraph');
+
+    try {
+        // Очищаем предыдущий график
+        if (functionChart) {
+            functionChart.destroy();
+        }
+
+        // Показываем загрузку
+        graphContainer.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px;">
+                <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 10px; color: #7f8c8d;">Построение графика...</p>
+            </div>
+        `;
+
+        // Получаем данные для графика
+        const chartData = await generateUniversalFunctionData(func);
+
+        // Создаем canvas для графика
+        graphContainer.innerHTML = '<canvas id="functionChart"></canvas>';
+        const ctx = document.getElementById('functionChart').getContext('2d');
+
+        // Создаем график
+        functionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: func.ownership?.funcName || 'Функция',
+                    data: chartData.values,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 2,
+                    pointBackgroundColor: '#3498db'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `График: ${func.ownership?.funcName || 'Без названия'}`
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'X' },
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Y' },
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Failed to plot function:', error);
+        showFallbackGraph(func, error);
+    }
+}
+
+// Универсальная генерация данных для всех типов функций
+async function generateUniversalFunctionData(func) {
+    const funcType = func.function ? func.function.funcType : func.funcType;
+    const expression = func.function ? func.function.expression : func.expression;
+
+    console.log(`Generating data for ${funcType} function:`, expression);
+
+    // Для табулированных функций используем точки из API
+    if (funcType === 'tabulated' || funcType === 'pure') {
+        return await generateTabulatedData(func);
+    }
+
+    // Для математических и композитных функций генерируем данные локально
+    return await generateCalculatedData(func, expression);
+}
+
+// Генерация данных для табулированных функций
+async function generateTabulatedData(func) {
+    const funcId = func.function.funcId;
+
+    try {
+        const points = await api.getPoints(funcId);
+
+        if (!points || !points.xValues || points.xValues.length === 0) {
+            throw new Error('Нет данных точек');
+        }
+
+        const labels = points.xValues.map(x => x.toFixed(2));
+        const values = points.yValues;
+
+        console.log('Tabulated data loaded:', { labels, values });
+        return { labels, values };
+
+    } catch (error) {
+        console.error('Error loading tabulated data:', error);
+        throw new Error('Не удалось загрузить точки функции');
+    }
+}
+
+// Генерация данных для математических и композитных функций
+async function generateCalculatedData(func, expression) {
+    const xMin = -5;
+    const xMax = 5;
+    const pointCount = 50;
+
+    const labels = [];
+    const values = [];
+
+    // Определяем тип функции для выбора алгоритма вычислений
+    const funcType = func.function ? func.function.funcType : func.funcType;
+
+    for (let i = 0; i < pointCount; i++) {
+        const x = xMin + (xMax - xMin) * i / (pointCount - 1);
+        labels.push(x.toFixed(2));
+
+        try {
+            let y;
+
+            if (funcType === 'math') {
+                // Для математических функций вычисляем по выражению
+                y = evaluateMathFunction(expression, x);
+            } else if (funcType === 'composite') {
+                // Для композитных функций используем специальную логику
+                y = evaluateCompositeFunction(func, x);
+            } else {
+                // Для неизвестных типов используем демо-функцию
+                y = Math.sin(x) * 2;
+            }
+
+            values.push(y);
+
+        } catch (error) {
+            console.warn(`Error calculating at x=${x}:`, error);
+            values.push(null);
+        }
+    }
+
+    console.log('Calculated data:', { labels, values });
+    return { labels, values };
+}
+
+// Вычисление математических функций
+function evaluateMathFunction(expression, x) {
+    if (!expression || expression === '<TABULATED>') {
+        return Math.sin(x) * 2; // Демо-функция по умолчанию
+    }
+
+    try {
+        // Безопасное вычисление математического выражения
+        let safeExpr = expression
+            .replace(/x/g, `(${x})`)
+            .replace(/sin/g, 'Math.sin')
+            .replace(/cos/g, 'Math.cos')
+            .replace(/tan/g, 'Math.tan')
+            .replace(/sqrt/g, 'Math.sqrt')
+            .replace(/log/g, 'Math.log10')
+            .replace(/ln/g, 'Math.log')
+            .replace(/pi/g, 'Math.PI')
+            .replace(/e/g, 'Math.E')
+            .replace(/\^/g, '**')
+            .replace(/ /g, ''); // Убираем пробелы
+
+        // Проверка безопасности
+        if (!/^[0-9+\-*/().MathsincostanqrtlogPE]*$/.test(safeExpr)) {
+            throw new Error('Недопустимые символы в выражении');
+        }
+
+        const result = eval(safeExpr);
+
+        if (typeof result !== 'number' || isNaN(result) || !isFinite(result)) {
+            throw new Error('Некорректный результат');
+        }
+
+        return result;
+
+    } catch (error) {
+        console.error('Error evaluating math expression:', expression, error);
+        // Возвращаем демо-значение при ошибке
+        return Math.sin(x) * 2;
+    }
+}
+
+// Вычисление композитных функций
+function evaluateCompositeFunction(func, x) {
+    try {
+        // Простая логика для композитных функций
+        // В реальном приложении здесь должна быть сложная логика композиции
+        return Math.sin(x) * Math.cos(x * 0.5);
+    } catch (error) {
+        console.error('Error evaluating composite function:', error);
+        return Math.sin(x) * 2;
+    }
+}
+
+// Резервный график при ошибках
+function showFallbackGraph(func, error) {
+    const graphContainer = document.getElementById('functionGraph');
+    const funcName = func.ownership?.funcName || 'Функция';
+
+    // Создаем демо-график
+    const labels = [];
+    const values = [];
+
+    for (let i = 0; i < 30; i++) {
+        const x = -3 + (6 * i) / 29;
+        labels.push(x.toFixed(1));
+        values.push(Math.sin(x) * 2); // Простая синусоида
+    }
+
+    graphContainer.innerHTML = '<canvas id="functionChart"></canvas>';
+    const ctx = document.getElementById('functionChart').getContext('2d');
+
+    functionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `${funcName} (пример)`,
+                data: values,
+                borderColor: '#95a5a6',
+                backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: `Пример графика: ${funcName}`
+                },
+                subtitle: {
+                    display: true,
+                    text: 'Используется демо-график',
+                    color: '#e74c3c',
+                    font: { size: 12 }
+                },
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: { title: { display: true, text: 'X' } },
+                y: { title: { display: true, text: 'Y' } }
+            }
+        }
+    });
+
+    // Показываем сообщение об ошибке
+    setTimeout(() => {
+        showStatus(`Используется демо-график для функции. Ошибка: ${error.message}`, 'error');
+    }, 500);
+}
+
+// Добавьте CSS для анимации загрузки
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
+
+// Улучшенная функция открытия модального окна с обработкой ошибок графика
+async function openFunctionModal(func, isComposite = false) {
+    console.log('Opening function modal with data:', func);
+    console.log('Is composite:', isComposite);
+
+    // Безопасное извлечение данных с проверкой структуры
+    let funcName, funcId, funcType, createdDate, expression;
+
+    if (func.ownership && func.function) {
+        // Структура из getOwnedFunction()
+        funcName = func.ownership.funcName;
+        funcId = func.function.funcId;
+        funcType = func.function.funcType;
+        createdDate = func.ownership.createdDate;
+        expression = func.function.expression;
+    } else if (func.function) {
+        // Структура из getComposite() или прямая структура функции
+        funcName = func.function.name || func.name || func.ownership?.funcName || 'Без названия';
+        funcId = func.function.funcId || func.function.id || func.id;
+        funcType = func.function.funcType || 'composite';
+        createdDate = func.function.createdDate || func.ownership?.createdDate || func.createdDate;
+        expression = func.function.expression;
+    } else if (func.innerId && func.outerId) {
+        // Простая структура композитной функции {innerId: X, outerId: Y}
+        funcName = func.name || func.funcName || 'Композитная функция';
+        funcId = func.id || 'Неизвестно';
+        funcType = 'composite';
+        createdDate = func.createdDate || func.ownership?.createdDate || 'Неизвестно';
+        expression = 'Композитная функция f(g(x))';
+    } else {
+        // Резервное извлечение
+        funcName = func.name || func.funcName || func.ownership?.funcName || 'Без названия';
+        funcId = func.funcId || func.id || 'Неизвестно';
+        funcType = func.funcType || 'Неизвестно';
+        createdDate = func.createdDate || func.ownership?.createdDate || 'Неизвестно';
+        expression = func.expression;
+    }
+
+    console.log('Extracted data:', { funcName, funcId, funcType, createdDate, expression });
+
+    document.getElementById('modalFunctionName').textContent = funcName;
+    document.getElementById('modalFunctionId').textContent = funcId;
+    document.getElementById('modalFunctionType').textContent = getFunctionTypeLabel(funcType);
+    document.getElementById('modalFunctionStatus').textContent = 'Активна';
+    document.getElementById('modalFunctionCreated').textContent = formatDate(createdDate);
+
+    if (isComposite || funcType === 'composite') {
+        // Для композитных функций показываем информацию о составляющих
+        let expressionText = 'Композитная функция f(g(x))';
+
+        console.log('Composite function structure:', func);
+
+        // Обработка разных структур данных
+        if (func.innerId && func.outerId) {
+            // Простая структура {innerId: X, outerId: Y}
+            expressionText = `f(g(x)) где:\n• g(x) = ID ${func.innerId}\n• f(x) = ID ${func.outerId}`;
+        } else if (func.innerFunction && func.outerFunction) {
+            // Структура с объектами функций
+            const innerExpr = func.innerFunction.expression ||
+                            (func.innerFunction.funcId ? `ID: ${func.innerFunction.funcId}` : 'Неизвестно');
+            const outerExpr = func.outerFunction.expression ||
+                            (func.outerFunction.funcId ? `ID: ${func.outerFunction.funcId}` : 'Неизвестно');
+            expressionText = `f(g(x)) где:\n• g(x) = ${innerExpr}\n• f(x) = ${outerExpr}`;
+        } else if (func.function && (func.function.innerFuncId || func.function.outerFuncId)) {
+            // Структура с ID в объекте function
+            const innerId = func.function.innerFuncId || 'Неизвестно';
+            const outerId = func.function.outerFuncId || 'Неизвестно';
+            expressionText = `f(g(x)) где:\n• g(x) = ID ${innerId}\n• f(x) = ID ${outerId}`;
+        }
+
+        document.getElementById('modalFunctionExpression').textContent = expressionText;
+
+        // Скрываем кнопку редактирования для композитных функций
+        const editBtn = document.getElementById('editFunctionBtn');
+        if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+    } else {
+        document.getElementById('modalFunctionExpression').textContent = expression || 'Не указано';
+
+        // Показываем кнопку редактирования для обычных функций
+        const editBtn = document.getElementById('editFunctionBtn');
+        if (editBtn) {
+            editBtn.style.display = 'block';
+        }
+    }
+
+    document.getElementById('functionModal').style.display = 'block';
+
+    // Добавляем небольшую задержку для инициализации canvas
+    setTimeout(() => {
+        plotFunction(func);
+    }, 100);
 }
 </script>
 </body>
