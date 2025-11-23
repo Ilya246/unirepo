@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -26,8 +26,8 @@
             min-height: calc(100vh - 80px);
         }
 
-        /* Стили для левой панели профиля */
-        .profile-sidebar {
+        /* Стили для левой панели пользователя */
+        .user-sidebar {
             width: 300px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -37,15 +37,15 @@
             flex-direction: column;
         }
 
-        .profile-header {
+        .user-header {
             text-align: center;
             margin-bottom: 40px;
         }
 
-        .profile-avatar {
+        .user-avatar {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             border-radius: 50%;
             margin: 0 auto 15px;
             display: flex;
@@ -55,25 +55,75 @@
             color: white;
         }
 
-        .profile-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
+        .user-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
         }
 
-        .profile-role {
+        .user-subtitle {
             font-size: 14px;
-            color: #666;
-            background: #f8f9fa;
+            color: #7f8c8d;
+            background: #ecf0f1;
             padding: 4px 12px;
             border-radius: 20px;
             display: inline-block;
         }
 
-        .logout-btn {
+        .user-info {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .info-item {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .user-stats {
+            background: rgba(46, 204, 113, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .stats-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .stats-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .danger-zone {
+            margin-top: auto;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .danger-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #c0392b;
+            margin-bottom: 10px;
+        }
+
+        .danger-btn {
             width: 100%;
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
             border: none;
             padding: 12px;
@@ -81,13 +131,12 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            margin-top: auto;
             transition: all 0.3s ease;
         }
 
-        .logout-btn:hover {
+        .danger-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
         }
 
         /* Стили для основной области контента */
@@ -103,10 +152,10 @@
         }
 
         .welcome-title {
-            font-size: 28px;
+            font-size: 32px;
             color: white;
             margin-bottom: 10px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .welcome-subtitle {
@@ -114,52 +163,438 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        /* Стили для меню функций */
-        .functions-menu {
+        /* Стили для меню пользовательских функций */
+        .user-functions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
             margin-bottom: 40px;
         }
 
-        .function-card {
+        .user-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 25px;
+            padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
         }
 
-        .function-card:hover {
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .user-card.danger::before {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .user-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
 
-        .function-icon {
-            font-size: 32px;
-            margin-bottom: 15px;
-            color: #667eea;
+        .user-icon {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #3498db;
         }
 
-        .function-title {
+        .user-card.danger .user-icon {
+            color: #e74c3c;
+        }
+
+        .user-card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .user-card-description {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Стили для списка функций */
+        .functions-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .function-card {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .function-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .function-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .function-name {
             font-size: 18px;
             font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .function-type {
+            font-size: 12px;
+            color: #7f8c8d;
+            background: #ecf0f1;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .function-id {
+            font-size: 12px;
+            color: #95a5a6;
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 8px;
         }
 
         .function-description {
             font-size: 14px;
-            color: #666;
+            color: #5d6d7e;
             line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .function-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .function-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Стили для модальных окон */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Стили для форм создания функций */
+        .function-type-selector {
+            margin-bottom: 25px;
+        }
+
+        .function-type-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .type-btn.active {
+            border-color: #3498db;
+            background: #3498db;
+            color: white;
+        }
+
+        .type-btn:hover:not(.active) {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .function-params {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+
+        .function-params h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 25px;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
         }
 
         /* Стили для футера */
         .footer {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
             text-align: center;
             padding: 20px;
@@ -182,7 +617,7 @@
                 flex-direction: column;
             }
 
-            .profile-sidebar {
+            .user-sidebar {
                 width: 100%;
                 padding: 20px;
             }
@@ -191,77 +626,297 @@
                 padding: 20px;
             }
 
-            .functions-menu {
+            .user-functions {
                 grid-template-columns: 1fr;
+            }
+
+            .functions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .function-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .function-type-buttons {
+                flex-direction: column;
             }
         }
 
-        /* Дополнительные стили для улучшения UX */
-        .user-info {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: white;
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .info-item {
-            margin-bottom: 5px;
-            font-size: 14px;
+        .function-card {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
 <body>
 <div class="app-container">
-    <!-- Левая панель с профилем -->
-    <div class="profile-sidebar">
-        <div class="profile-header">
-            <div class="profile-avatar">👤</div>
-            <div class="profile-name" id="userName">{{username}}</div>
-            <div class="profile-role" id="userRole">{{role}}</div>
+    <!-- Левая панель пользователя -->
+    <div class="user-sidebar">
+        <div class="user-header">
+            <div class="user-title">Панель Пользователя</div>
+            <div class="user-subtitle" id="userRole">{{role}}</div>
         </div>
 
         <div class="user-info">
-            <div class="info-item"><strong>Статус:</strong> <span>Активен</span></div>
-            <div class="info-item"><strong>Последний вход:</strong> <span id="lastLogin">Только что</span></div>
+            <div class="info-item"><strong>Текущий пользователь:</strong> <span id="userName">{{username}}</span></div>
+            <div class="info-item"><strong>Уровень доступа:</strong> <span>Пользователь</span></div>
+            <div class="info-item"><strong>Последняя активность:</strong> <span id="lastActivity">Только что</span></div>
+            <div class="info-item"><strong>Активных функций:</strong> <span id="functionsCount">0</span></div>
         </div>
 
-        <button class="logout-btn" onclick="forceLogout()">
-            🔄 Перезайти
-        </button>
+        <div class="user-stats">
+            <div class="stats-title">📊 Статистика</div>
+            <div class="stats-value" id="totalFunctions">0 функций</div>
+        </div>
+
+        <div class="danger-zone">
+            <div class="danger-title">⚡ Опасная зона</div>
+            <button class="danger-btn" onclick="forceLogout()">
+                🔄 Выйти из системы
+            </button>
+        </div>
     </div>
 
     <!-- Основная область контента -->
     <div class="main-content">
         <div class="content-header">
-            <h1 class="welcome-title">Добро пожаловать, {{username}}!</h1>
-            <p class="welcome-subtitle">Управляйте функциями и настройками вашего аккаунта</p>
+            <h1 class="welcome-title">Панель управления функциями</h1>
+            <p class="welcome-subtitle">Управление вашими математическими функциями и анализ данных</p>
         </div>
 
-        <!-- Меню функций -->
-        <div class="functions-menu">
-            <div class="function-card" onclick="createFunction()">
-                <div class="function-icon">✨</div>
-                <h3 class="function-title">Создать функцию</h3>
-                <p class="function-description">Создайте новую математическую функцию для анализа и построения графиков</p>
+        <!-- Меню пользовательских функций -->
+        <div class="user-functions">
+            <div class="user-card" onclick="openCreateFunctionModal()">
+                <div class="user-icon">➕</div>
+                <h3 class="user-card-title">Создать функцию</h3>
+                <p class="user-card-description">Создайте новую математическую функцию для анализа</p>
             </div>
 
-            <div class="function-card" onclick="updateFunction()">
-                <div class="function-icon">🔄</div>
-                <h3 class="function-title">Обновить функцию</h3>
-                <p class="function-description">Редактируйте существующие функции и их параметры</p>
+            <div class="user-card" onclick="loadUserFunctions()">
+                <div class="user-icon">📊</div>
+                <h3 class="user-card-title">Мои функции</h3>
+                <p class="user-card-description">Просмотр и управление вашими функциями</p>
+                <div class="user-stats">
+                    <div class="stat-item">📈 Доступно: <span id="availableFunctions">0</span></div>
+                </div>
             </div>
 
-            <div class="function-card" onclick="showGraph()">
-                <div class="function-icon">📊</div>
-                <h3 class="function-title">График функции</h3>
-                <p class="function-description">Визуализируйте математические функции в виде графиков и диаграмм</p>
+            <div class="user-card" onclick="showHelp()">
+                <div class="user-icon">❓</div>
+                <h3 class="user-card-title">Помощь</h3>
+                <p class="user-card-description">Инструкции по работе с системой</p>
+            </div>
+        </div>
+
+        <!-- Секция с функциями пользователя -->
+        <div class="functions-section">
+            <div class="section-title">
+                <span>📈 Ваши функции</span>
+                <button class="refresh-btn" onclick="loadUserFunctions()">
+                    🔄 Обновить список
+                </button>
             </div>
 
-            <div class="function-card" onclick="openSettings()">
-                <div class="function-icon">⚙️</div>
-                <h3 class="function-title">Настройки</h3>
-                <p class="function-description">Настройте параметры системы и персонализируйте интерфейс</p>
+            <div class="functions-grid" id="functionsGrid">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>У вас пока нет функций</h3>
+                    <p>Создайте свою первую функцию чтобы начать работу</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания функции -->
+<div class="modal" id="createFunctionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Создание новой функции</h2>
+            <button class="close-modal" onclick="closeCreateModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="function-type-selector">
+                <h4>Выберите тип функции:</h4>
+                <div class="function-type-buttons">
+                    <button class="type-btn active" data-type="math" onclick="selectFunctionType('math')">
+                        📐 Математическая
+                    </button>
+                    <button class="type-btn" data-type="tabulated" onclick="selectFunctionType('tabulated')">
+                        📊 Табулированная
+                    </button>
+                    <button class="type-btn" data-type="pure" onclick="selectFunctionType('pure')">
+                        📈 Чистая таблица
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="functionName">Название функции:</label>
+                <input type="text" id="functionName" placeholder="Введите название функции">
+            </div>
+
+            <!-- Параметры для математической функции -->
+            <div class="function-params" id="mathParams">
+                <h4>Параметры математической функции</h4>
+                <div class="form-group">
+                    <label for="mathExpression">Математическое выражение:</label>
+                    <input type="text" id="mathExpression" placeholder="например: x^2 + 2*x + 1">
+                    <small style="color: #7f8c8d; font-size: 12px;">Используйте x как переменную</small>
+                </div>
+            </div>
+
+            <!-- Параметры для табулированной функции -->
+            <div class="function-params hidden" id="tabulatedParams">
+                <h4>Параметры табулированной функции</h4>
+                <div class="form-group">
+                    <label for="tabulatedExpression">Математическое выражение:</label>
+                    <input type="text" id="tabulatedExpression" placeholder="например: sin(x)">
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="xFrom">X от:</label>
+                        <input type="number" id="xFrom" placeholder="0" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="xTo">X до:</label>
+                        <input type="number" id="xTo" placeholder="6.28" step="any">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pointCount">Количество точек:</label>
+                    <input type="number" id="pointCount" placeholder="100">
+                </div>
+            </div>
+
+            <!-- Параметры для чистой табличной функции -->
+            <div class="function-params hidden" id="pureParams">
+                <h4>Параметры чистой табличной функции</h4>
+                <div class="form-group">
+                    <label for="xValues">Значения X (через запятую):</label>
+                    <input type="text" id="xValues" placeholder="например: 0, 1, 2, 3">
+                </div>
+                <div class="form-group">
+                    <label for="yValues">Значения Y (через запятую):</label>
+                    <input type="text" id="yValues" placeholder="например: 1, 2, 4, 8">
+                </div>
+                <small style="color: #7f8c8d; font-size: 12px;">Количество значений X и Y должно совпадать</small>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCreateModal()">Отмена</button>
+                <button class="btn btn-success" onclick="createFunction()">Создать функцию</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно просмотра функции -->
+<div class="modal" id="functionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalFunctionName">Название функции</h2>
+            <button class="close-modal" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="function-info-grid">
+                <div class="info-section">
+                    <h3>📋 Основная информация</h3>
+                    <div class="info-item">
+                        <span class="info-label">ID функции:</span>
+                        <span class="info-value" id="modalFunctionId">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Тип:</span>
+                        <span class="info-value" id="modalFunctionType">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Статус:</span>
+                        <span class="info-value" id="modalFunctionStatus">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Создана:</span>
+                        <span class="info-value" id="modalFunctionCreated">-</span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>⚙️ Параметры функции</h3>
+                    <div class="info-item">
+                        <span class="info-label">Выражение:</span>
+                        <span class="info-value" id="modalFunctionExpression">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Диапазон X:</span>
+                        <span class="info-value" id="modalFunctionRange">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Точек:</span>
+                        <span class="info-value" id="modalFunctionPoints">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="graph-container">
+                <h3>📊 График функции</h3>
+                <div class="graph-placeholder" id="functionGraph">
+                    График будет отображен здесь
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
+                <button class="btn btn-primary" onclick="editFunction()">✏️ Редактировать</button>
             </div>
         </div>
     </div>
@@ -270,53 +925,333 @@
 <!-- Футер -->
 <footer class="footer">
     <div class="footer-content">
-        <p class="footer-text">© 2024 Математическая система анализа функций. Все права защищены.</p>
-        <p class="footer-text">Разработано с ❤️ для удобной работы с математическими функциями</p>
+        <p class="footer-text">© 2024 Система управления математическими функциями | Пользовательская панель</p>
     </div>
 </footer>
 
-<script>
-    // Данные пользователя уже переданы через переменные {{username}} и {{role}}
-    // Убираем fetch запрос и используем переданные данные
+<!-- Подключаем внешний API клиент -->
+<script src="js/api.js"></script>
 
-    function forceLogout() {
-        if (confirm('Вы уверены, что хотите перезайти? Текущая сессия будет завершена.')) {
-            localStorage.clear();
-            sessionStorage.clear();
-            fetch('/force-new-auth', {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Basic ' + btoa('logout:logout')
-                },
-                credentials: 'include'
-            }).then(() => {
-                window.location.href = '/';
-            }).catch(error => {
-                console.error('Logout error:', error);
-                window.location.href = '/';
-            });
+<script>
+    // Используем APIClient из внешнего файла
+    const api = new APIClient();
+    let currentFunctions = [];
+    let currentFunctionType = 'math';
+
+    // Выбор типа функции
+    function selectFunctionType(type) {
+        currentFunctionType = type;
+
+        // Обновляем активные кнопки
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-type="${type}"]`).classList.add('active');
+
+        // Показываем соответствующие параметры
+        document.getElementById('mathParams').classList.add('hidden');
+        document.getElementById('tabulatedParams').classList.add('hidden');
+        document.getElementById('pureParams').classList.add('hidden');
+        document.getElementById(`${type}Params`).classList.remove('hidden');
+    }
+
+    // Открытие модального окна создания функции
+    function openCreateFunctionModal() {
+        // Сбрасываем форму
+        document.getElementById('functionName').value = '';
+        document.getElementById('mathExpression').value = '';
+        document.getElementById('tabulatedExpression').value = '';
+        document.getElementById('xFrom').value = '';
+        document.getElementById('xTo').value = '';
+        document.getElementById('pointCount').value = '';
+        document.getElementById('xValues').value = '';
+        document.getElementById('yValues').value = '';
+
+        // Устанавливаем тип по умолчанию
+        selectFunctionType('math');
+
+        document.getElementById('createFunctionModal').style.display = 'block';
+    }
+
+    // Закрытие модального окна создания функции
+    function closeCreateModal() {
+        document.getElementById('createFunctionModal').style.display = 'none';
+    }
+
+    // Создание функции
+    async function createFunction() {
+        const functionName = document.getElementById('functionName').value.trim();
+
+        if (!functionName) {
+            showStatus('Введите название функции', 'error');
+            return;
+        }
+
+        try {
+            let result;
+
+            switch(currentFunctionType) {
+                case 'math':
+                    const mathExpression = document.getElementById('mathExpression').value.trim();
+                    if (!mathExpression) {
+                        throw new Error('Введите математическое выражение');
+                    }
+                    result = await api.createUserMathFunction(functionName, mathExpression);
+                    break;
+
+                case 'tabulated':
+                    const tabExpression = document.getElementById('tabulatedExpression').value.trim();
+                    const xFrom = document.getElementById('xFrom').value;
+                    const xTo = document.getElementById('xTo').value;
+                    const pointCount = document.getElementById('pointCount').value;
+
+                    if (!tabExpression || !xFrom || !xTo || !pointCount) {
+                        throw new Error('Заполните все поля для табулированной функции');
+                    }
+                    result = await api.createUserTabulatedFunction(
+                        functionName,
+                        tabExpression,
+                        parseFloat(xFrom),
+                        parseFloat(xTo),
+                        parseInt(pointCount)
+                    );
+                    break;
+
+                case 'pure':
+                    const xValues = document.getElementById('xValues').value.trim();
+                    const yValues = document.getElementById('yValues').value.trim();
+
+                    if (!xValues || !yValues) {
+                        throw new Error('Заполните значения X и Y');
+                    }
+
+                    // Конвертируем строки в массивы чисел
+                    const xArray = xValues.split(',').map(val => parseFloat(val.trim()));
+                    const yArray = yValues.split(',').map(val => parseFloat(val.trim()));
+
+                    if (xArray.length !== yArray.length) {
+                        throw new Error('Количество значений X и Y должно совпадать');
+                    }
+
+                    result = await api.createUserPureTabulatedFunction(
+                        functionName,
+                        xArray,
+                        yArray
+                    );
+                    break;
+
+                default:
+                    throw new Error('Неизвестный тип функции');
+            }
+
+            showStatus('Функция успешно создана!', 'success');
+            closeCreateModal();
+            await loadUserFunctions(); // Перезагружаем список функций
+
+        } catch (error) {
+            console.error('Failed to create function:', error);
+            showStatus('Ошибка при создании функции: ' + error.message, 'error');
         }
     }
 
-    // Функции для меню
-    function createFunction() {
-        alert('Функция "Создать функцию" будет реализована в ближайшее время');
+    // Загрузка функций пользователя
+    async function loadUserFunctions() {
+        const grid = document.getElementById('functionsGrid');
+        const emptyState = document.getElementById('emptyState');
+
+        try {
+            grid.classList.add('loading');
+
+            const functions = await api.getUserFunctions();
+            currentFunctions = functions;
+
+            // Обновляем счетчики
+            document.getElementById('functionsCount').textContent = functions.length;
+            document.getElementById('totalFunctions').textContent = functions.length + ' функций';
+            document.getElementById('availableFunctions').textContent = functions.length;
+
+            if (functions.length === 0) {
+                emptyState.style.display = 'block';
+                grid.innerHTML = '';
+                grid.appendChild(emptyState);
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = functions.map(func => `
+                <div class="function-card" data-function-id="${func.id}">
+                    <div class="function-header">
+                        <div>
+                            <div class="function-name">${func.name || 'Без названия'}</div>
+                            <div class="function-type">${getFunctionTypeLabel(func.type)}</div>
+                        </div>
+                        <div class="function-id">#${func.id}</div>
+                    </div>
+
+                    <div class="function-description">
+                        ${getFunctionDescription(func)}
+                    </div>
+
+                    <div class="function-details">
+                        <div class="detail-item">🆔 ID: ${func.id}</div>
+                        <div class="detail-item">📊 Точек: ${func.pointCount || 'N/A'}</div>
+                        <div class="detail-item">🕒 Создана: ${formatDate(func.createdDate)}</div>
+                        <div class="detail-item">👤 Владелец: Вы</div>
+                    </div>
+
+                    <div class="function-actions">
+                        <button class="view-btn" onclick="viewFunction(${func.id})">
+                            👁️ Просмотреть
+                        </button>
+                        <button class="delete-btn" onclick="deleteFunction(${func.id})">
+                            🗑️ Удалить
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Failed to load functions:', error);
+            showStatus('Ошибка при загрузке функций: ' + error.message, 'error');
+        } finally {
+            grid.classList.remove('loading');
+        }
     }
 
-    function updateFunction() {
-        alert('Функция "Обновить функцию" будет реализована в ближайшее время');
+    // Просмотр функции
+    async function viewFunction(functionId) {
+        try {
+            const func = await api.getOwnedFunction(functionId);
+            openFunctionModal(func);
+        } catch (error) {
+            console.error('Failed to load function details:', error);
+            showStatus('Ошибка при загрузке данных функции: ' + error.message, 'error');
+        }
     }
 
-    function showGraph() {
-        alert('Функция "График функции" будет реализована в ближайшее время');
+    // Удаление функции
+    async function deleteFunction(functionId) {
+        if (!confirm('Вы уверены, что хотите удалить эту функцию? Это действие нельзя отменить.')) {
+            return;
+        }
+
+        try {
+            await api.deleteOwnedFunction(functionId);
+            await loadUserFunctions();
+            showStatus('Функция успешно удалена', 'success');
+        } catch (error) {
+            console.error('Failed to delete function:', error);
+            showStatus('Ошибка при удалении функции: ' + error.message, 'error');
+        }
     }
 
-    function openSettings() {
-        alert('Функция "Настройки" будет реализована в ближайшее время');
+    // Открытие модального окна просмотра
+    function openFunctionModal(func) {
+        document.getElementById('modalFunctionName').textContent = func.name || 'Без названия';
+        document.getElementById('modalFunctionId').textContent = func.id;
+        document.getElementById('modalFunctionType').textContent = getFunctionTypeLabel(func.type);
+        document.getElementById('modalFunctionStatus').textContent = 'Активна';
+        document.getElementById('modalFunctionCreated').textContent = formatDate(func.createdDate);
+        document.getElementById('modalFunctionExpression').textContent = func.expression || 'Не указано';
+        document.getElementById('modalFunctionRange').textContent = func.xRange || 'Не указано';
+        document.getElementById('modalFunctionPoints').textContent = func.pointCount || 'Не указано';
+
+        document.getElementById('functionModal').style.display = 'block';
     }
 
-    // Обновляем время последнего входа
-    document.getElementById('lastLogin').textContent = new Date().toLocaleString('ru-RU');
+    // Закрытие модального окна просмотра
+    function closeModal() {
+        document.getElementById('functionModal').style.display = 'none';
+    }
+
+    // Редактирование функции
+    function editFunction() {
+        alert('Редактирование функции будет доступно в следующей версии');
+    }
+
+    // Показать помощь
+    function showHelp() {
+        alert('Раздел помощи будет доступен в следующей версии');
+    }
+
+    // Выход из системы
+    function forceLogout() {
+        if (confirm('Вы уверены, что хотите выйти из системы?')) {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/login/logout';
+        }
+    }
+
+    // Вспомогательные функции
+    function getFunctionTypeLabel(type) {
+        const types = {
+            'math': 'Математическая',
+            'tabulated': 'Табулированная',
+            'pure': 'Чистая таблица',
+            'composite': 'Композитная',
+            'owned': 'Пользовательская'
+        };
+        return types[type] || type;
+    }
+
+    function getFunctionDescription(func) {
+        if (func.expression) {
+            return `Функция: ${func.expression}`;
+        }
+        if (func.xValues && func.yValues) {
+            return `Табличная функция с ${func.xValues.length} точками`;
+        }
+        return 'Описание недоступно';
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'Не указано';
+        try {
+            return new Date(dateString).toLocaleDateString('ru-RU');
+        } catch {
+            return dateString;
+        }
+    }
+
+    function showStatus(message, type) {
+        const status = document.createElement('div');
+        status.className = `status ${type}`;
+        status.textContent = message;
+        status.style.position = 'fixed';
+        status.style.top = '20px';
+        status.style.right = '20px';
+        status.style.zIndex = '1001';
+        status.style.padding = '15px 20px';
+        status.style.borderRadius = '6px';
+        status.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+
+        document.body.appendChild(status);
+
+        setTimeout(() => {
+            status.remove();
+        }, 3000);
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUserFunctions();
+        document.getElementById('lastActivity').textContent = new Date().toLocaleString('ru-RU');
+
+        // Закрытие модальных окон по клику вне их
+        document.getElementById('createFunctionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCreateModal();
+            }
+        });
+
+        document.getElementById('functionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    });
 </script>
 </body>
 </html>

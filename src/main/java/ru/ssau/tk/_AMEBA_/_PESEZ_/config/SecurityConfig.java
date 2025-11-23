@@ -1,21 +1,24 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.config;
 
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.*;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.StreamUtils;
-import org.springframework.web.cors.*;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -23,21 +26,17 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final HtmlTemplateLoader htmlTemplateLoader;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authz -> authz
-                        // Разрешаем доступ ко всем статическим ресурсам
-                        .requestMatchers("/", "/index.html", "/api", "/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/public/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
-                        .realmName("RESTRICTED-AREA")
-                        .authenticationEntryPoint(new BasicAuthEntryPoint())
+                        .realmName("SECURE-AREA")
+                        .authenticationEntryPoint(new SimpleBasicAuthEntryPoint())
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -50,7 +49,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*")); // Use patterns instead of specific origins
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"));
         configuration.setAllowCredentials(true);
@@ -61,96 +60,58 @@ public class SecurityConfig {
         return source;
     }
 
-    private class BasicAuthEntryPoint implements AuthenticationEntryPoint {
+    // Простой EntryPoint который всегда показывает браузерное окно аутентификации
+    private static class SimpleBasicAuthEntryPoint implements AuthenticationEntryPoint {
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response,
                              AuthenticationException authException) throws IOException {
 
-            // Add CORS headers to authentication responses too
-            addCorsHeaders(response);
-
-            response.addHeader("WWW-Authenticate", "Basic realm=\"RESTRICTED-AREA\"");
+            // Всегда отправляем заголовок Basic Auth
+            response.addHeader("WWW-Authenticate", "Basic realm=\"SECURE-AREA\"");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("text/html;charset=UTF-8");
 
-            // Проверяем, является ли запрос статическим ресурсом
-            if (isStaticResourceRequest(request)) {
-                // Для статических ресурсов возвращаем 404 вместо страницы аутентификации
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-
-            if (isApiRequest(request)) {
-                response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"Authentication Required\"}");
-            } else {
-                // Показываем HTML интерфейс для не-API запросов
-                response.setContentType("text/html;charset=UTF-8");
-                String html = loadApiTestingInterface();
-                response.getWriter().write(html);
-            }
-        }
-
-        private void addCorsHeaders(HttpServletResponse response) {
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-            response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, X-Requested-With");
-            response.setHeader("Access-Control-Allow-Credentials", "true");
-            response.setHeader("Access-Control-Max-Age", "3600");
-        }
-
-        private boolean isStaticResourceRequest(HttpServletRequest request) {
-            String uri = request.getRequestURI();
-            return uri.startsWith("/js/") ||
-                    uri.startsWith("/css/") ||
-                    uri.startsWith("/images/") ||
-                    uri.endsWith(".js") ||
-                    uri.endsWith(".css") ||
-                    uri.endsWith(".png") ||
-                    uri.endsWith(".jpg") ||
-                    uri.endsWith(".ico");
-        }
-
-        private boolean isApiRequest(HttpServletRequest request) {
-            return request.getRequestURI().startsWith("/api/") ||
-                    "application/json".equals(request.getHeader("Accept")) ||
-                    request.getRequestURI().endsWith(".json");
-        }
-
-        private String loadApiTestingInterface() throws IOException {
-            try {
-                // Загружаем основной HTML файл
-                ClassPathResource resource = new ClassPathResource("templates/api.html");
-                return StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                // Fallback - простая HTML страница
-                return createFallbackAuthPage();
-            }
-        }
-
-        private String createFallbackAuthPage() {
-            return """
+            // Простая HTML страница с инструкцией
+            String html = """
                     <!DOCTYPE html>
                     <html>
                     <head>
-                        <title>API Testing Interface</title>
+                        <title>Authentication Required</title>
                         <style>
-                            body { font-family: Arial, sans-serif; margin: 40px; }
-                            .container { max-width: 800px; margin: 0 auto; }
-                            .auth-form { background: #f5f5f5; padding: 20px; border-radius: 8px; }
-                            input, button { padding: 10px; margin: 5px; }
+                            body { 
+                                font-family: Arial, sans-serif; 
+                                margin: 40px; 
+                                background: #f5f5f5;
+                            }
+                            .container { 
+                                max-width: 500px; 
+                                margin: 100px auto; 
+                                background: white;
+                                padding: 30px;
+                                border-radius: 8px;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                                text-align: center;
+                            }
+                            h1 { color: #2c3e50; }
+                            p { color: #7f8c8d; line-height: 1.6; }
                         </style>
                     </head>
                     <body>
                         <div class="container">
-                            <h1>API Testing Interface</h1>
-                            <div class="auth-form">
-                                <h3>Authentication Required</h3>
-                                <p>Please enter your credentials to access the API testing interface.</p>
-                            </div>
+                            <h1>🔐 Authentication Required</h1>
+                            <p>Please enter your username and password in the browser authentication dialog.</p>
+                            <p><em>If no dialog appears, the page will refresh automatically.</em></p>
                         </div>
+                        <script>
+                            // Автоматически обновляем страницу чтобы вызвать диалог аутентификации
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        </script>
                     </body>
                     </html>
                     """;
+            response.getWriter().write(html);
         }
     }
 }
