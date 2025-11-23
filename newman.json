@@ -142,7 +142,7 @@
             "type": "text/javascript",
             "exec": [
               "var jsonData = pm.response.json();",
-              "pm.environment.set('adminId', jsonData.userId);"
+              "pm.environment.set('adminId', jsonData.id);"
             ]
           }
         }
@@ -217,7 +217,7 @@
             "type": "text/javascript",
             "exec": [
               "var jsonData = pm.response.json();",
-              "pm.environment.set('createdUserId', jsonData.userId);"
+              "pm.environment.set('createdUserId', jsonData.id);"
             ]
           }
         }
@@ -362,7 +362,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "var jsonData = pm.response.json();",
-                  "pm.environment.set('createdUserId', jsonData.userId);"
+                  "pm.environment.set('createdUserId', jsonData.id);"
                 ]
               }
             }

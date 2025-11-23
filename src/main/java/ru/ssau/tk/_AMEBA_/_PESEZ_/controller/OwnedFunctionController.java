@@ -3,6 +3,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.IdResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
@@ -78,21 +79,21 @@ public class OwnedFunctionController extends Controller {
                 case "/math" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     int response = userService.createUserFunction(userId, request.name, ((MathFunctionCreateRequest)request.funcParams).expression).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /owned-functions/tabulated
                 case "/tabulated" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (TabulatedFunctionCreateRequest)request.funcParams;
                     int response = userService.createUserTabulatedFunction(userId, request.name, params.expression, params.xFrom, params.xTo, params.pointCount).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /owned-functions/pure-tabulated
                 case "/pure-tabulated" -> {
                     OwnedFunctionCreateRequest request = parseBody(req, OwnedFunctionCreateRequest.class);
                     var params = (PureTabulatedCreateRequest)request.funcParams;
                     int response = userService.createUserPureTabulated(userId, request.name, params.xValues, params.yValues).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /owned-functions/composite
                 case "/composite" -> {
@@ -105,7 +106,7 @@ public class OwnedFunctionController extends Controller {
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid function IDs");
                     }
                     int response = userService.createUserComposite(userId, request.name, params.innerId, params.outerId).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /owned-functions/own?id={id}&name={name}
                 case "/own" -> {

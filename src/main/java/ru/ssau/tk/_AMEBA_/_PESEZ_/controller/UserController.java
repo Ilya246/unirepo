@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.UserDTO;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.IdResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository;
 import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
@@ -17,12 +18,12 @@ public class UserController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (path.equals("/self")) {
+            if (path != null && path.equals("/self")) {
                 UserDTO user = authenticate(req);
                 if (!checkRequiredRole(user, resp, UserType.Normal))
                     return;
 
-                resp.getWriter().write(objectMapper.writeValueAsString(user.userId));
+                resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(user.userId)));
                 return;
             }
             if (!checkRequiredRole(req, resp, UserType.Admin)) {
@@ -58,14 +59,14 @@ public class UserController extends Controller {
                 }
                 UserCreateRequest request = parseBody(req, UserCreateRequest.class);
                 int response = userService.createUser(request.userType, request.username, request.password).join();
-                resp.getWriter().write(objectMapper.writeValueAsString(response));
+                resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 Log.info("Registered new user {} of role {} with ID {}", request.username, request.userType, response);
             // POST /users/register?username={username}&password={password}
             } else if (path.equals("/register")) {
                 String username = req.getParameter("username");
                 String password = req.getParameter("password");
                 int response = userService.createUser(UserRepository.UserType.Normal, username, password).join();
-                resp.getWriter().write(objectMapper.writeValueAsString(response));
+                resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 Log.info("Registered new user {} with ID {}", username, response);
             } else {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);

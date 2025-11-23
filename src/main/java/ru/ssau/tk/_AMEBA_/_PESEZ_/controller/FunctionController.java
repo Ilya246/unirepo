@@ -1,9 +1,8 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controller;
 
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.CompositeFunctionDTO;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.FunctionDTO;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.FunctionService;
 import static ru.ssau.tk._AMEBA_._PESEZ_.repository.UserRepository.*;
 
@@ -44,7 +43,7 @@ public class FunctionController extends Controller {
                 int id = Integer.parseInt(req.getParameter("id"));
                 double x = Double.parseDouble(req.getParameter("x"));
                 double result = functionService.calculateFunction(id, x).join();
-                resp.getWriter().write(objectMapper.writeValueAsString(result));
+                resp.getWriter().write(objectMapper.writeValueAsString(new ResultResponse(result)));
             } else if (path.equals("/composite")) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 CompositeFunctionDTO data = functionService.getCompositeData(id).join();
@@ -70,25 +69,25 @@ public class FunctionController extends Controller {
                 case "/math" -> {
                     MathFunctionCreateRequest request = parseBody(req, MathFunctionCreateRequest.class);
                     int response = functionService.createMathFunction(request.expression).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /functions/tabulated
                 case "/tabulated" -> {
                     TabulatedFunctionCreateRequest request = parseBody(req, TabulatedFunctionCreateRequest.class);
                     int response = functionService.createTabulated(request.expression, request.xFrom, request.xTo, request.pointCount).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /functions/pure-tabulated
                 case "/pure-tabulated" -> {
                     PureTabulatedCreateRequest request = parseBody(req, PureTabulatedCreateRequest.class);
                     int response = functionService.createPureTabulated(request.xValues, request.yValues).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 // POST /functions/composite
                 case "/composite" -> {
                     CompositeFunctionCreateRequest request = parseBody(req, CompositeFunctionCreateRequest.class);
                     int response = functionService.createComposite(request.innerId, request.outerId).join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(response));
+                    resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(response)));
                 }
                 default -> resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
