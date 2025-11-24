@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.MathFunctionResponse;
-import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.TabulatedFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
@@ -137,12 +135,10 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         request.setYValues(yValues);
 
         // When
-        FunctionResponse response = functionService.createPureTabulatedFunction(request);
+        Long response = functionService.createPureTabulatedFunction(request);
 
         // Then
         assertNotNull(response);
-        assertNotNull(response.getFuncId());
-        assertEquals(2, response.getTypeId()); // TABULATED type
     }
 
     @Test
@@ -169,8 +165,6 @@ class FunctionServiceImplTest extends BaseRepositoryTest {
         assertNotNull(response);
         FunctionResponse func = functionService.getFunction(response);
         assertNotNull(func.getFuncId());
-        assertEquals(innerFunction.getFuncId(), response.getInnerFunctionId());
-        assertEquals(outerFunction.getFuncId(), response.getOuterFunctionId());
     }
 
     @Test

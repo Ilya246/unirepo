@@ -41,6 +41,7 @@ class UserServiceImplTest extends BaseRepositoryTest {
         UserRequest request = new UserRequest();
         request.setUserName("test");
         request.setPassword("123");
+        request.setUserType(UserType.Normal);
 
         Long created = service.createUser(request);
         assertNotNull(created);

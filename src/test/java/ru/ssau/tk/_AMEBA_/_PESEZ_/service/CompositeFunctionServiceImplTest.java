@@ -55,8 +55,7 @@ class CompositeFunctionServiceImplTest extends BaseRepositoryTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(compositeEntity.getCompositeFunction().getFuncId(), response.getCompositeFunctionId());
-        assertEquals("sin(x^2)", functionRepo.findById(response.getCompositeFunctionId()).getExpression());
+        assertEquals("sin(x^2)", functionRepo.findById(compositeEntity.getCompositeFunction().getFuncId()).getExpression());
     }
 
     @Test
@@ -106,10 +105,10 @@ class CompositeFunctionServiceImplTest extends BaseRepositoryTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(newInnerFunction.getFuncId(), response.getInnerFunctionId());
-        assertEquals(newOuterFunction.getFuncId(), response.getOuterFunctionId());
-        assertEquals("x^3",  functionRepo.findById(response.getInnerFunctionId()).getExpression());
-        assertEquals("cos(x)", functionRepo.findById(response.getOuterFunctionId()).getExpression());
+        assertEquals(newInnerFunction.getFuncId(), response.getInnerId());
+        assertEquals(newOuterFunction.getFuncId(), response.getOuterId());
+        assertEquals("x^3",  functionRepo.findById(response.getInnerId()).getExpression());
+        assertEquals("cos(x)", functionRepo.findById(response.getOuterId()).getExpression());
     }
 
     @Test
@@ -132,11 +131,11 @@ class CompositeFunctionServiceImplTest extends BaseRepositoryTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(newInnerFunction.getFuncId(), response.getInnerFunctionId()); // обновился
-        assertEquals("x^3", functionRepo.findById(response.getInnerFunctionId()).getExpression());
+        assertEquals(newInnerFunction.getFuncId(), response.getInnerId()); // обновился
+        assertEquals("x^3", functionRepo.findById(response.getInnerId()).getExpression());
         // outer function остался прежним
-        assertEquals(originalEntity.getOuterFunction().getFuncId(), response.getOuterFunctionId());
-        assertEquals("sin(x)", functionRepo.findById(response.getOuterFunctionId()).getExpression());
+        assertEquals(originalEntity.getOuterFunction().getFuncId(), response.getOuterId());
+        assertEquals("sin(x)", functionRepo.findById(response.getOuterId()).getExpression());
     }
 
     @Test
