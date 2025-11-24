@@ -102,6 +102,9 @@ public class UserService {
     }
 
     public CompletableFuture<Integer> createUserTabulatedFunction(int userId, String name, String expression, double from, double to, int pointCount) {
+        if (pointCount > 10000) {
+            throw new IllegalArgumentException("Amount of points too large! (>10000)");
+        }
         return CompletableFuture.supplyAsync(() -> {
             int funcId = funcRepo.createTabulated(expression, from, to, pointCount).join();
             userRepo.addFunctionOwnership(userId, funcId, name).join();
@@ -111,6 +114,9 @@ public class UserService {
     }
 
     public CompletableFuture<Integer> createUserPureTabulated(int userId, String name, double[] xValues, double[] yValues) {
+        if (xValues.length > 10000) {
+            throw new IllegalArgumentException("Amount of points too large! (>10000)");
+        }
         return CompletableFuture.supplyAsync(() -> {
             int funcId = funcRepo.createPureTabulated(xValues, yValues).join();
             userRepo.addFunctionOwnership(userId, funcId, name).join();

@@ -25,6 +25,9 @@ public class FunctionService {
     }
 
     public CompletableFuture<PointsDTO> calculateFunctionRange(int id, double from, double to, int pts) {
+        if (pts > 20000) {
+            throw new IllegalArgumentException("Amount of points too large! (>20000)");
+        }
         return CompletableFuture.supplyAsync(() -> {
             MathFunction func = funcRepo.getFunction(id).join();
             var xValues = new double[pts];
@@ -53,11 +56,17 @@ public class FunctionService {
     }
 
     public CompletableFuture<Integer> createTabulated(String expression, double from, double to, int pointCount) {
+        if (pointCount > 10000) {
+            throw new IllegalArgumentException("Amount of points too large! (>10000)");
+        }
         Log.info("Creating tabulated function ({}) with {} pts", expression, pointCount);
         return funcRepo.createTabulated(expression, from, to, pointCount);
     }
 
     public CompletableFuture<Integer> createPureTabulated(double[] xValues, double[] yValues) {
+        if (xValues.length > 10000) {
+            throw new IllegalArgumentException("Amount of points too large! (>10000)");
+        }
         Log.info("Creating pure tabulated function with {} pts", xValues.length);
         return funcRepo.createPureTabulated(xValues, yValues);
     }
