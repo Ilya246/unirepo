@@ -6,10 +6,11 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    background: linear-gradient(135deg, #101010 0%, #202020 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    color: #e0e0e0;
 }
 
 .app-container {
@@ -21,12 +22,13 @@ body {
 /* Стили для левой панели пользователя */
 .user-sidebar {
     width: 300px;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(30, 30, 30, 0.95);
     backdrop-filter: blur(10px);
     padding: 30px 20px;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
+    border-right: 1px solid #444;
 }
 
 .user-header {
@@ -37,7 +39,7 @@ body {
 .user-avatar {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
     border-radius: 50%;
     margin: 0 auto 15px;
     display: flex;
@@ -50,25 +52,26 @@ body {
 .user-title {
     font-size: 20px;
     font-weight: 700;
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 8px;
 }
 
 .user-subtitle {
     font-size: 14px;
-    color: #7f8c8d;
-    background: #ecf0f1;
+    color: #b0b0b0;
+    background: #444;
     padding: 4px 12px;
     border-radius: 20px;
     display: inline-block;
 }
 
 .user-info {
-    background: rgba(52, 152, 219, 0.1);
+    background: rgba(41, 128, 185, 0.15);
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    color: #2c3e50;
+    color: #e0e0e0;
+    border: 1px solid #444;
 }
 
 .info-item {
@@ -77,11 +80,12 @@ body {
 }
 
 .user-stats {
-    background: rgba(46, 204, 113, 0.1);
+    background: rgba(39, 174, 96, 0.15);
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    border-left: 4px solid #2ecc71;
+    border-left: 4px solid #27ae60;
+    border: 1px solid #444;
 }
 
 .stats-title {
@@ -94,22 +98,23 @@ body {
 .stats-value {
     font-size: 24px;
     font-weight: 700;
-    color: #2c3e50;
+    color: #f0f0f0;
     text-align: center;
 }
 
 .danger-zone {
     margin-top: auto;
-    background: rgba(231, 76, 60, 0.1);
+    background: rgba(231, 76, 60, 0.15);
     padding: 15px;
     border-radius: 8px;
     border-left: 4px solid #e74c3c;
+    border: 1px solid #444;
 }
 
 .danger-title {
     font-size: 14px;
     font-weight: 600;
-    color: #c0392b;
+    color: #e74c3c;
     margin-bottom: 10px;
 }
 
@@ -145,14 +150,14 @@ body {
 
 .welcome-title {
     font-size: 32px;
-    color: white;
+    color: #f0f0f0;
     margin-bottom: 10px;
     font-weight: 700;
 }
 
 .welcome-subtitle {
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(224, 224, 224, 0.8);
 }
 
 /* Стили для меню пользовательских функций */
@@ -164,14 +169,14 @@ body {
 }
 
 .user-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(30, 30, 30, 0.95);
     backdrop-filter: blur(10px);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid #444;
     position: relative;
     overflow: hidden;
 }
@@ -183,7 +188,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
 }
 
 .user-card.danger::before {
@@ -192,7 +197,8 @@ body {
 
 .user-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    border-color: #555;
 }
 
 .user-icon {
@@ -208,13 +214,13 @@ body {
 .user-card-title {
     font-size: 20px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 12px;
 }
 
 .user-card-description {
     font-size: 14px;
-    color: #7f8c8d;
+    color: #b0b0b0;
     line-height: 1.6;
     margin-bottom: 15px;
 }
@@ -223,7 +229,7 @@ body {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    color: #95a5a6;
+    color: #888;
 }
 
 .stat-item {
@@ -234,18 +240,19 @@ body {
 
 /* Стили для списка функций */
 .functions-section {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(30, 30, 30, 0.95);
     backdrop-filter: blur(10px);
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     margin-bottom: 30px;
+    border: 1px solid #444;
 }
 
 .section-title {
     font-size: 24px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 25px;
     display: flex;
     align-items: center;
@@ -253,7 +260,7 @@ body {
 }
 
 .refresh-btn {
-    background: #3498db;
+    background: #2980b9;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -264,7 +271,7 @@ body {
 }
 
 .refresh-btn:hover {
-    background: #2980b9;
+    background: #1f5f8b;
     transform: translateY(-2px);
 }
 
@@ -275,18 +282,19 @@ body {
 }
 
 .function-card {
-    background: white;
-    border: 1px solid #e1e8ed;
+    background: #2d2d2d;
+    border: 1px solid #444;
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     transition: all 0.3s ease;
     position: relative;
 }
 
 .function-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    border-color: #555;
 }
 
 .function-header {
@@ -299,29 +307,29 @@ body {
 .function-name {
     font-size: 18px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 5px;
 }
 
 .function-type {
     font-size: 12px;
-    color: #7f8c8d;
-    background: #ecf0f1;
+    color: #b0b0b0;
+    background: #444;
     padding: 2px 8px;
     border-radius: 12px;
 }
 
 .function-id {
     font-size: 12px;
-    color: #95a5a6;
-    background: #f8f9fa;
+    color: #888;
+    background: #3a3a3a;
     padding: 2px 8px;
     border-radius: 8px;
 }
 
 .function-description {
     font-size: 14px;
-    color: #5d6d7e;
+    color: #b0b0b0;
     line-height: 1.5;
     margin-bottom: 15px;
 }
@@ -332,7 +340,7 @@ body {
     gap: 10px;
     margin-bottom: 15px;
     font-size: 12px;
-    color: #7f8c8d;
+    color: #888;
 }
 
 .detail-item {
@@ -348,7 +356,7 @@ body {
 
 .view-btn {
     flex: 1;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
     color: white;
     border: none;
     padding: 10px;
@@ -359,7 +367,7 @@ body {
 }
 
 .view-btn:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+    background: linear-gradient(135deg, #1f5f8b 0%, #164a6e 100%);
     transform: translateY(-2px);
 }
 
@@ -387,7 +395,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     z-index: 1000;
     backdrop-filter: blur(5px);
 }
@@ -397,17 +405,18 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: #2d2d2d;
     border-radius: 15px;
     width: 90%;
     max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    border: 1px solid #444;
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
     color: white;
     padding: 20px 30px;
     border-radius: 15px 15px 0 0;
@@ -443,6 +452,7 @@ body {
 
 .modal-body {
     padding: 30px;
+    color: #e0e0e0;
 }
 
 /* Стили для форм создания функций */
@@ -459,25 +469,26 @@ body {
 .type-btn {
     flex: 1;
     padding: 12px;
-    border: 2px solid #e1e8ed;
+    border: 2px solid #555;
     border-radius: 8px;
-    background: white;
+    background: #3a3a3a;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     transition: all 0.3s ease;
     text-align: center;
+    color: #e0e0e0;
 }
 
 .type-btn.active {
-    border-color: #3498db;
-    background: #3498db;
+    border-color: #2980b9;
+    background: #2980b9;
     color: white;
 }
 
 .type-btn:hover:not(.active) {
-    border-color: #3498db;
-    background: #f8f9fa;
+    border-color: #2980b9;
+    background: #444;
 }
 
 .form-group {
@@ -499,35 +510,37 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #f0f0f0;
     font-size: 14px;
 }
 
 input, select {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #555;
     border-radius: 6px;
     font-size: 14px;
     transition: border-color 0.3s ease;
+    background: #3a3a3a;
+    color: #e0e0e0;
 }
 
 input:focus, select:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    border-color: #2980b9;
+    box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.3);
 }
 
 .function-params {
-    background: #f8f9fa;
+    background: #3a3a3a;
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 25px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid #2980b9;
 }
 
 .function-params h4 {
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 15px;
     font-size: 16px;
 }
@@ -537,7 +550,7 @@ input:focus, select:focus {
     gap: 15px;
     justify-content: flex-end;
     padding-top: 25px;
-    border-top: 1px solid #e1e8ed;
+    border-top: 1px solid #555;
 }
 
 .btn {
@@ -551,32 +564,32 @@ input:focus, select:focus {
 }
 
 .btn-primary {
-    background: #3498db;
+    background: #2980b9;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #2980b9;
+    background: #1f5f8b;
     transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background: #95a5a6;
+    background: #666;
     color: white;
 }
 
 .btn-secondary:hover {
-    background: #7f8c8d;
+    background: #555;
     transform: translateY(-2px);
 }
 
 .btn-success {
-    background: #2ecc71;
+    background: #27ae60;
     color: white;
 }
 
 .btn-success:hover {
-    background: #27ae60;
+    background: #219653;
     transform: translateY(-2px);
 }
 
@@ -586,11 +599,12 @@ input:focus, select:focus {
 
 /* Стили для футера */
 .footer {
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
+    background: rgba(20, 20, 20, 0.95);
+    color: #b0b0b0;
     text-align: center;
     padding: 20px;
     margin-top: auto;
+    border-top: 1px solid #444;
 }
 
 .footer-content {
@@ -606,7 +620,7 @@ input:focus, select:focus {
 /* Стили для управления точками */
 .points-management {
     margin-top: 25px;
-    border-top: 1px solid #e1e8ed;
+    border-top: 1px solid #555;
     padding-top: 25px;
 }
 
@@ -620,9 +634,10 @@ input:focus, select:focus {
 .points-list {
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #e1e8ed;
+    border: 1px solid #555;
     border-radius: 8px;
     margin-bottom: 20px;
+    background: #3a3a3a;
 }
 
 .point-item {
@@ -630,7 +645,8 @@ input:focus, select:focus {
     justify-content: space-between;
     align-items: center;
     padding: 12px 15px;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid #555;
+    color: #e0e0e0;
 }
 
 .point-item:last-child {
@@ -657,7 +673,7 @@ input:focus, select:focus {
 }
 
 .point-edit {
-    background: #3498db;
+    background: #2980b9;
     color: white;
 }
 
@@ -672,10 +688,11 @@ input:focus, select:focus {
 }
 
 .add-point-form {
-    background: #f8f9fa;
+    background: #3a3a3a;
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 15px;
+    border: 1px solid #555;
 }
 
 /* Адаптивность */
@@ -748,7 +765,7 @@ input:focus, select:focus {
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #7f8c8d;
+    color: #888;
 }
 
 .empty-state-icon {
@@ -766,13 +783,13 @@ input:focus, select:focus {
 }
 
 .status.success {
-    background: #d4edda;
-    color: #155724;
+    background: #1e3a28;
+    color: #4ade80;
 }
 
 .status.error {
-    background: #f8d7da;
-    color: #721c24;
+    background: #3a1e1e;
+    color: #f87171;
 }
 
 .info-section {
@@ -780,7 +797,7 @@ input:focus, select:focus {
 }
 
 .info-section h3 {
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 15px;
     font-size: 18px;
 }
@@ -790,31 +807,33 @@ input:focus, select:focus {
     justify-content: space-between;
     margin-bottom: 10px;
     padding: 8px 0;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid #555;
 }
 
 .info-label {
     font-weight: 600;
-    color: #2c3e50;
+    color: #f0f0f0;
 }
 
 .info-value {
-    color: #5d6d7e;
+    color: #b0b0b0;
 }
- .composite-selection {
+
+.composite-selection {
     margin-bottom: 25px;
 }
 
 .function-selector {
-    background: #f8f9fa;
+    background: #3a3a3a;
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 15px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid #2980b9;
+    border: 1px solid #555;
 }
 
 .function-selector h4 {
-    color: #2c3e50;
+    color: #f0f0f0;
     margin-bottom: 15px;
     font-size: 16px;
 }
@@ -823,22 +842,24 @@ input:focus, select:focus {
     display: flex;
     align-items: center;
     padding: 12px;
-    border: 1px solid #e1e8ed;
+    border: 1px solid #555;
     border-radius: 6px;
     margin-bottom: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
+    background: #3a3a3a;
+    color: #e0e0e0;
 }
 
 .function-option:hover {
-    background: #e3f2fd;
-    border-color: #3498db;
+    background: #444;
+    border-color: #2980b9;
 }
 
 .function-option.selected {
-    background: #3498db;
+    background: #2980b9;
     color: white;
-    border-color: #2980b9;
+    border-color: #1f5f8b;
 }
 
 .function-info {
@@ -856,12 +877,13 @@ input:focus, select:focus {
 }
 
 .composite-preview {
-    background: #2c3e50;
-    color: white;
+    background: #1a1a1a;
+    color: #e0e0e0;
     padding: 20px;
     border-radius: 8px;
     margin: 20px 0;
     text-align: center;
+    border: 1px solid #444;
 }
 
 .composite-expression {
@@ -878,29 +900,30 @@ input:focus, select:focus {
 .graph-container {
     margin-top: 25px;
     padding: 20px;
-    background: #f8f9fa;
+    background: #3a3a3a;
     border-radius: 8px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid #2980b9;
+    border: 1px solid #555;
 }
 
 .graph-placeholder {
     height: 500px;
-    background: white;
-    border: 1px solid #e1e8ed;
+    background: #2d2d2d;
+    border: 1px solid #555;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #7f8c8d;
+    color: #888;
     font-size: 14px;
 }
 
 .chart-controls {
     margin-bottom: 20px;
     padding: 15px;
-    background: #f8f9fa;
+    background: #3a3a3a;
     border-radius: 8px;
-    border: 1px solid #e1e8ed;
+    border: 1px solid #555;
 }
 
 .chart-range-inputs {
@@ -917,7 +940,7 @@ input:focus, select:focus {
 .chart-range-inputs label {
     font-size: 12px;
     margin-bottom: 4px;
-    color: #5d6d7e;
+    color: #b0b0b0;
 }
 
 .chart-range-inputs input {
@@ -935,4 +958,7 @@ input:focus, select:focus {
 canvas {
     width: 100% !important;
     height: 300px !important;
+    background: #2d2d2d;
+    border-radius: 6px;
+    border: 1px solid #555;
 }
