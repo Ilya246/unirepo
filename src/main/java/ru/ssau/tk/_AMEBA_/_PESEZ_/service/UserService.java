@@ -140,6 +140,8 @@ public class UserService {
         return CompletableFuture.supplyAsync(() -> {
             if (username.isEmpty())
                 throw new InvalidLoginException("Username cannot be empty.");
+            if (username.equals("localhost"))
+                throw new InvalidLoginException("Invalid username.");
             if (password.isEmpty())
                 throw new InvalidLoginException("Password cannot be empty.");
             if (userRepo.getUser(username).join() != null)
