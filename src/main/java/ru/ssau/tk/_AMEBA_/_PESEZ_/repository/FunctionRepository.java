@@ -392,7 +392,8 @@ public class FunctionRepository extends Repository {
     }
 
     public static MathFunction parseFunction(String expression) {
-        Expression expr = new ExpressionBuilder(expression).variable("x").build();
+        Expression expr = new ExpressionBuilder(expression)
+                .variable("x").build();
         return (double x) -> expr.setVariable("x", x).evaluate();
     }
 }

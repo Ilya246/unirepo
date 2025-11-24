@@ -58,6 +58,13 @@ public class FunctionController extends Controller {
                 double x = Double.parseDouble(req.getParameter("x"));
                 double result = functionService.calculateFunction(id, x).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(new ResultResponse(result)));
+            // GET /functions/calculaterange?id={id}&from={from}&to={to}&pts={pts}
+            } else if (path.equals("/calculaterange")) {
+                double from = Double.parseDouble(req.getParameter("from"));
+                double to = Double.parseDouble(req.getParameter("to"));
+                int pts = Integer.parseInt(req.getParameter("pts"));
+                PointsDTO results = functionService.calculateFunctionRange(id, from, to, pts).join();
+                resp.getWriter().write(objectMapper.writeValueAsString(results));
             } else if (path.equals("/composite")) {
                 CompositeFunctionDTO data = functionService.getCompositeData(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(new CompositeFunctionResponse(data.outerFuncId, data.innerFuncId)));

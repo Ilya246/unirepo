@@ -24,6 +24,21 @@ public class FunctionService {
         });
     }
 
+    public CompletableFuture<PointsDTO> calculateFunctionRange(int id, double from, double to, int pts) {
+        return CompletableFuture.supplyAsync(() -> {
+            MathFunction func = funcRepo.getFunction(id).join();
+            var xValues = new double[pts];
+            var yValues = new double[pts];
+            double step = (to - from) / pts;
+            for (int i = 0; i < pts; i++) {
+                double x = from + step * i;
+                xValues[i] = x;
+                yValues[i] = func.apply(x);
+            }
+            return new PointsDTO(id, xValues, yValues, false);
+        });
+    }
+
     public CompletableFuture<FunctionDTO> getFunction(int funcId) {
         return funcRepo.getFunctionData(funcId);
     }

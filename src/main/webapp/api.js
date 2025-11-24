@@ -114,6 +114,10 @@ class APIClient {
         return this.request(`/functions/calculate?id=${id}&x=${x}`, { method: 'GET' });
     }
 
+    async calculateFunctionRange(id, from, to, pts) {
+        return this.request(`/functions/calculaterange?id=${id}&from=${from}&to=${to}&pts=${pts}`, { method: 'GET' });
+    }
+
     async createMathFunction(expression) {
         return this.request('/functions/math', {
             method: 'POST',
