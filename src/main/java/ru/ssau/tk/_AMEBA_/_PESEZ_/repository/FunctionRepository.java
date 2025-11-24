@@ -136,14 +136,9 @@ public class FunctionRepository {
     // Создание композитной функции
     public CompletableFuture<Long> createComposite(Long innerId, Long outerId) {
         return CompletableFuture.supplyAsync(() -> {
-            if (innerId.equals(outerId)) {
-                throw new IllegalArgumentException("Inner and outer function IDs cannot be the same");
-            }
-
             // Получаем функции из базы
             FunctionEntity innerFunc = findById(innerId);
             FunctionEntity outerFunc = findById(outerId);
-
 
             // Формируем выражение композитной функции
             String replaceWith = "(" + innerFunc.getExpression() + ")";
