@@ -62,6 +62,10 @@ public abstract class Controller extends HttpServlet {
         return hasRequiredRole(authenticate(req), requiredRole);
     }
 
+    /**
+     * Проверяет, если у пользователя есть хотя бы требуемая роль.
+     * Если нет, то записывает ошибку в ответе на запрос.
+     */
     public boolean checkRequiredRole(UserDTO user, HttpServletResponse resp, UserType requiredRole) throws IOException {
         if (user == null) {
             resp.setHeader("WWW-Authenticate", "Basic realm=\"Restricted Area\"");
@@ -77,11 +81,19 @@ public abstract class Controller extends HttpServlet {
         return true;
     }
 
+    /**
+     * Проверяет, если у автора запроса есть хотя бы требуемая роль.
+     * Если нет, то записывает ошибку в ответе на запрос.
+     */
     public boolean checkRequiredRole(HttpServletRequest req, HttpServletResponse resp, UserType requiredRole) throws IOException {
         return checkRequiredRole(authenticate(req), resp, requiredRole);
     }
 
     public static boolean isLocalhost(String addr) {
         return addr.equals("127.0.0.1") || addr.equals("0:0:0:0:0:0:0:1");
+    }
+
+    public static String paramOrNull(HttpServletRequest request, String param) {
+        return request.getParameterMap().containsKey(param) ? request.getParameter(param) : null;
     }
 }

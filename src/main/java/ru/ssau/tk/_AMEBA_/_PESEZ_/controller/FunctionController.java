@@ -27,27 +27,38 @@ public class FunctionController extends Controller {
         String path = req.getPathInfo();
         resp.setContentType("application/json");
         try {
-            if (!checkRequiredRole(req, resp, UserType.Admin)) {
+            UserDTO user = authenticate(req);
+            if (!checkRequiredRole(user, resp, UserType.Normal))
                 return;
+            String param = paramOrNull(req, "id");
+            Integer id = param == null ? null : Integer.parseInt(param);
+            if (id == null) {
+                if (!checkRequiredRole(user, resp, UserType.Admin))
+                    return;
+            } else if (!hasRequiredRole(user, UserType.Admin)) {
+                if (userService.getUserFunction(user.userId, id) == null)
+                    throw new RuntimeException("No such function for this user");
             }
-            // GET /functions?id={id}
+            // GET /functions(?id={id})
             if (path == null || path.isEmpty()) {
-                if (!req.getParameterMap().containsKey("id")) {
-                    FunctionDTO[] funcs = functionService.getAllFunctions().join();
-                    resp.getWriter().write(objectMapper.writeValueAsString(funcs));
+                if (id == null) {
+                    FunctionDTO[] functions = functionService.getAllFunctions().join();
+                    resp.getWriter().write(objectMapper.writeValueAsString(functions));
                     return;
                 }
-                int id = Integer.parseInt(req.getParameter("id"));
                 FunctionDTO function = functionService.getFunction(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(function));
+                return;
+            }
+            if (id == null)
+                throw new RuntimeException("Missing parameter id");
+
             // GET /functions/calculate?id={id}&x={x}
-            } else if (path.equals("/calculate")) {
-                int id = Integer.parseInt(req.getParameter("id"));
+            if (path.equals("/calculate")) {
                 double x = Double.parseDouble(req.getParameter("x"));
                 double result = functionService.calculateFunction(id, x).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(new ResultResponse(result)));
             } else if (path.equals("/composite")) {
-                int id = Integer.parseInt(req.getParameter("id"));
                 CompositeFunctionDTO data = functionService.getCompositeData(id).join();
                 resp.getWriter().write(objectMapper.writeValueAsString(new CompositeFunctionResponse(data.outerFuncId, data.innerFuncId)));
             } else {

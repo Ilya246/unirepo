@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="user.css"></link>
+    <!-- Добавьте в head -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" type="image/svg+xml">
+</head>
+<body>
+<div class="app-container">
+    <!-- Левая панель пользователя -->
+    <div class="user-sidebar">
+        <div class="user-header">
+            <div class="user-title">Панель Пользователя</div>
+            <div class="user-subtitle" id="userRole">Загрузка..</div>
+        </div>
+
+        <div class="user-info">
+            <div class="info-item"><strong>Текущий пользователь:</strong> <span id="userName">Загрузка..</span></div>
+            <div class="info-item"><strong>Уровень доступа:</strong> <span>Пользователь</span></div>
+            <div class="info-item"><strong>Последняя активность:</strong> <span id="lastActivity">Только что</span></div>
+            <div class="info-item"><strong>Активных функций:</strong> <span id="functionsCount">0</span></div>
+        </div>
+
+        <div class="user-stats">
+            <div class="stats-title">📊 Статистика</div>
+            <div class="stats-value" id="totalFunctions">0 функций</div>
+        </div>
+
+        <!-- <div class="danger-zone">
+             <div class="danger-title">⚡ Опасная зона</div>
+             <button class="danger-btn" onclick="forceLogout()">
+                 🔄 Выйти из системы
+             </button>
+         </div>-->
+    </div>
+
+    <!-- Основная область контента -->
+    <div class="main-content">
+        <div class="content-header">
+            <h1 class="welcome-title">Панель управления функциями</h1>
+            <p class="welcome-subtitle">Управление вашими математическими функциями и анализ данных</p>
+        </div>
+
+        <!-- Меню пользовательских функций -->
+        <div class="user-functions">
+            <div class="user-card" onclick="openCreateFunctionModal()">
+                <div class="user-icon">➕</div>
+                <h3 class="user-card-title">Создать функцию</h3>
+                <p class="user-card-description">Создайте новую математическую функцию для анализа</p>
+            </div>
+
+            <div class="user-card" onclick="openCreateCompositeModal()">
+                <div class="user-icon">🔄</div>
+                <h3 class="user-card-title">Композитная функция</h3>
+                <p class="user-card-description">Создайте функцию из комбинации существующих функций</p>
+            </div>
+
+            <div class="user-card" onclick="loadUserFunctions()">
+                <div class="user-icon">📊</div>
+                <h3 class="user-card-title">Мои функции</h3>
+                <p class="user-card-description">Просмотр и управление вашими функциями</p>
+                <div class="user-stats">
+                    <div class="stat-item">📈 Доступно: <span id="availableFunctions">0</span></div>
+                </div>
+            </div>
+
+            <div class="user-card" onclick="showHelp()">
+                <div class="user-icon">❓</div>
+                <h3 class="user-card-title">Помощь</h3>
+                <p class="user-card-description">Инструкции по работе с системой</p>
+            </div>
+        </div>
+
+        <!-- Секция с функциями пользователя -->
+        <div class="functions-section">
+            <div class="section-title">
+                <span>📈 Ваши функции</span>
+                <!--<button class="refresh-btn" onclick="loadUserFunctions()">
+                    🔄 Обновить список
+                </button>-->
+            </div>
+
+            <div class="functions-grid" id="functionsGrid">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">📊</div>
+                    <h3>У вас пока нет функций</h3>
+                    <p>Создайте свою первую функцию, чтобы начать работу</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания функции -->
+<div class="modal" id="createFunctionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Создание новой функции</h2>
+            <button class="close-modal" onclick="closeCreateModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="function-type-selector">
+                <h4>Выберите тип функции:</h4>
+                <div class="function-type-buttons">
+                    <button class="type-btn active" data-type="math" onclick="selectFunctionType('math')">
+                        📐 Математическая
+                    </button>
+                    <button class="type-btn" data-type="tabulated" onclick="selectFunctionType('tabulated')">
+                        📊 Табулированная
+                    </button>
+                    <button class="type-btn" data-type="pure" onclick="selectFunctionType('pure')">
+                        📈 Чистая таблица
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="functionName">Название функции:</label>
+                <input type="text" id="functionName" placeholder="Введите название функции">
+            </div>
+
+            <!-- Параметры для математической функции -->
+            <div class="function-params" id="mathParams">
+                <h4>Параметры математической функции</h4>
+                <div class="form-group">
+                    <label for="mathExpression">Математическое выражение:</label>
+                    <input type="text" id="mathExpression" placeholder="например: x^2 + 2*x + 1">
+                    <small style="color: #7f8c8d; font-size: 12px;">Используйте x как переменную</small>
+                </div>
+            </div>
+
+
+            <!-- Параметры для табулированной функции -->
+            <div class="function-params hidden" id="tabulatedParams">
+                <h4>Параметры табулированной функции</h4>
+                <div class="form-group">
+                    <label for="tabulatedExpression">Математическое выражение:</label>
+                    <input type="text" id="tabulatedExpression" placeholder="например: sin(x)">
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="xFrom">X от:</label>
+                        <input type="number" id="xFrom" placeholder="0" step="any">
+                    </div>
+                    <div class="input-group">
+                        <label for="xTo">X до:</label>
+                        <input type="number" id="xTo" placeholder="6.28" step="any">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pointCount">Количество точек:</label>
+                    <input type="number" id="pointCount" placeholder="100">
+                </div>
+            </div>
+
+            <!-- Параметры для чистой табличной функции -->
+            <div class="function-params hidden" id="pureParams">
+                <h4>Параметры чистой табличной функции</h4>
+                <div class="form-group">
+                    <label for="xValues">Значения X (через запятую):</label>
+                    <input type="text" id="xValues" placeholder="например: 0, 1, 2, 3">
+                </div>
+                <div class="form-group">
+                    <label for="yValues">Значения Y (через запятую):</label>
+                    <input type="text" id="yValues" placeholder="например: 1, 2, 4, 8">
+                </div>
+                <small style="color: #7f8c8d; font-size: 12px;">Количество значений X и Y должно совпадать</small>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCreateModal()">Отмена</button>
+                <button class="btn btn-success" onclick="createFunction()">Создать функцию</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно просмотра функции -->
+<div class="modal" id="functionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalFunctionName">Название функции</h2>
+            <button class="close-modal" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="function-info-grid">
+                <div class="info-section">
+                    <h3>📋 Основная информация</h3>
+                    <div class="info-item">
+                        <span class="info-label">ID функции:</span>
+                        <span class="info-value" id="modalFunctionId">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Тип:</span>
+                        <span class="info-value" id="modalFunctionType">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Статус:</span>
+                        <span class="info-value" id="modalFunctionStatus">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Создана:</span>
+                        <span class="info-value" id="modalFunctionCreated">-</span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>⚙️ Параметры функции</h3>
+                    <div class="info-item">
+                        <span class="info-label">Выражение:</span>
+                        <span class="info-value" id="modalFunctionExpression">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="graph-container">
+                <h3>📊 График функции</h3>
+                <div class="graph-placeholder" id="functionGraph">
+                    График будет отображен здесь
+                </div>
+            </div>
+
+            <!-- В модальном окне просмотра функции -->
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Закрыть</button>
+                <button class="btn btn-primary" id="editFunctionBtn" onclick="editFunction()">✏️ Редактировать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания композитной функции -->
+<div class="modal" id="createCompositeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Создание композитной функции</h2>
+            <button class="close-modal" onclick="closeCompositeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="composite-selection">
+                <h4>Выберите функции для композиции:</h4>
+                <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
+                    Композитная функция f(g(x)) - выберите внутреннюю и внешнюю функцию
+                </p>
+
+                <!-- Выбор внутренней функции -->
+                <div class="function-selector">
+                    <h4>📥 Внутренняя функция g(x):</h4>
+                    <div id="innerFunctionsList" class="functions-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <p>Загрузка функций...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Выбор внешней функции -->
+                <div class="function-selector">
+                    <h4>📤 Внешняя функция f(x):</h4>
+                    <div id="outerFunctionsList" class="functions-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📊</div>
+                            <p>Загрузка функций...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Предпросмотр композитной функции -->
+                <div class="composite-preview" id="compositePreview">
+                    <div class="composite-info">Выберите обе функции для предпросмотра</div>
+                    <div class="composite-expression" id="compositeExpression">f(g(x))</div>
+                    <div class="composite-info" id="compositeDetails">-</div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeCompositeModal()">Отмена</button>
+                <button class="btn btn-success" onclick="createCompositeFunction()" id="createCompositeBtn" disabled>
+                    Создать композитную функцию
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования функции -->
+<div class="modal" id="editFunctionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Редактирование функции</h2>
+            <button class="close-modal" onclick="closeEditModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="editFunctionName">Название функции:</label>
+                <input type="text" id="editFunctionName" placeholder="Введите название функции">
+            </div>
+
+
+
+            <!-- Управление точками для табулированных функций -->
+            <div class="points-management hidden" id="editPointsManagement">
+                <div class="points-header">
+                    <h4>📊 Управление точками функции</h4>
+                    <button class="btn btn-success" onclick="showAddPointForm()">➕ Добавить точку</button>
+                </div>
+
+                <!-- Форма добавления точки -->
+                <div class="add-point-form hidden" id="addPointForm">
+                    <h5>Добавить новую точку</h5>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="newPointX">X значение</label>
+                            <input type="number" id="newPointX" placeholder="X value" step="any">
+                        </div>
+                        <div class="input-group">
+                            <label for="newPointY">Y значение</label>
+                            <input type="number" id="newPointY" placeholder="Y value" step="any">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button class="btn btn-secondary" onclick="hideAddPointForm()">Отмена</button>
+                        <button class="btn btn-success" onclick="addNewPoint()">Добавить точку</button>
+                    </div>
+                </div>
+
+                <!-- Список точек -->
+                <div class="points-list" id="pointsList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>Точки не загружены</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
+                <button class="btn btn-success" onclick="saveFunctionChanges()">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Футер -->
+<footer class="footer">
+    <div class="footer-content">
+        <p class="footer-text">© 2024 Система управления математическими функциями | Пользовательская панель</p>
+    </div>
+</footer>
+
+<!-- Подключаем внешний API клиент -->
+<script src="api.js"></script>
+<script src="user.js"></script>
+</body>
+</html>

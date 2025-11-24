@@ -23,7 +23,7 @@ public class UserController extends Controller {
                 if (!checkRequiredRole(user, resp, UserType.Normal))
                     return;
 
-                resp.getWriter().write(objectMapper.writeValueAsString(new IdResponse(user.userId)));
+                resp.getWriter().write(objectMapper.writeValueAsString(user));
                 return;
             }
             if (!checkRequiredRole(req, resp, UserType.Admin)) {
