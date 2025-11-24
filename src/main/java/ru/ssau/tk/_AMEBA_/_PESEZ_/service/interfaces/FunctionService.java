@@ -2,6 +2,7 @@ package ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces;
 
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.functions.MathFunction;
 
@@ -36,8 +37,9 @@ public interface FunctionService {
 
     Double calculateFunction(Long funcId, Double xValue);
 
+    PointsResponse calculateFunctionRange(Long id, Double from, Double to, Long points);
+
     void updatePoint(Long funcId, Double xValue, Double newYValue);
 
     void deletePoint(Long funcId, Double xValue);
-
 }

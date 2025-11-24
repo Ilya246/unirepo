@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.entity.FunctionEntity;
 import ru.ssau.tk._AMEBA_._PESEZ_.enums.FunctionType;
 import ru.ssau.tk._AMEBA_._PESEZ_.exceptions.CustomException;
@@ -149,6 +150,25 @@ public class FunctionServiceImpl implements FunctionService {
         try {
             MathFunction mathFunction = getMathFunction(funcId).get();
             return mathFunction.apply(xValue);
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error calculating function: {}", e.getMessage());
+            throw new CustomException("Failed to calculate function: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public PointsResponse calculateFunctionRange(Long id, Double from, Double to, Long points) {
+        try {
+            MathFunction mathFunction = getMathFunction(id).get();
+            var xValues = new double[points.intValue()];
+            var yValues = new double[points.intValue()];
+            double step = (to - from) / points;
+            for (int i = 0; i < points; i++) {
+                double x = from + step * i;
+                xValues[i] = x;
+                yValues[i] = mathFunction.apply(x);
+            }
+            return new PointsResponse(id, xValues, yValues);
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error calculating function: {}", e.getMessage());
             throw new CustomException("Failed to calculate function: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.CompositeFunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.IdResponse;
+import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.ResultResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.interfaces.*;
 
@@ -59,6 +60,22 @@ public class FunctionController {
             Double result = functionService.calculateFunction(id, x);
             Log.info("Calculation result: {}", result);
             return new ResultResponse(result);
+        } catch (Exception e) {
+            Log.error("Error calculating function: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/calculaterange")
+    @Operation(summary = "Вычисление значения функции в точке")
+    public PointsResponse calculateFunction(@RequestParam Long id,
+                                            @RequestParam Double from,
+                                            @RequestParam Double to,
+                                            @RequestParam("pts") Long points) {
+        Log.info("Calculating function {} in range {}, {} with {} points", id, from, to, points);
+        try {
+            PointsResponse result = functionService.calculateFunctionRange(id, from, to, points);
+            return result;
         } catch (Exception e) {
             Log.error("Error calculating function: {}", e.getMessage(), e);
             throw e;
