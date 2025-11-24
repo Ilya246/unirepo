@@ -21,6 +21,7 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
 
     @Override
     public double apply(double x) {
+        if (Double.isNaN(x)) return Double.NaN;
         if (x < leftBound()) return extrapolateLeft(x);
         if (x > rightBound()) return extrapolateRight(x);
 
