@@ -71,7 +71,7 @@ class UserServiceTest {
         int funcId = service.createUserFunction(userId, "MyFunc", expr).join();
         OwnedFunctionDTO func = service.getUserFunction(userId, funcId).join();
 
-        assertEquals(MathFunctionID, func.function.funcType);
+        assertEquals(FunctionType.math, func.function.funcType);
         assertEquals(funcId, func.function.funcId);
         assertEquals(expr, func.function.expression);
         assertEquals(userId, func.ownership.userId);
@@ -105,10 +105,10 @@ class UserServiceTest {
         assertEquals("MyTabulated", functions[1].ownership.funcName);
         assertEquals("MyPure", functions[2].ownership.funcName);
         assertEquals("MyComposite", functions[3].ownership.funcName);
-        assertEquals(MathFunctionID, functions[0].function.funcType);
-        assertEquals(TabulatedID, functions[1].function.funcType);
-        assertEquals(PureTabulatedID, functions[2].function.funcType);
-        assertEquals(CompositeID, functions[3].function.funcType);
+        assertEquals(FunctionType.math, functions[0].function.funcType);
+        assertEquals(FunctionType.tabulated, functions[1].function.funcType);
+        assertEquals(FunctionType.pure, functions[2].function.funcType);
+        assertEquals(FunctionType.composite, functions[3].function.funcType);
 
         service.deleteFunctionOwnership(userId, tabId).join();
         functions = service.getUserFunctions(userId).join();

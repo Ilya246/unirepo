@@ -224,7 +224,7 @@ class FunctionRepositoryTest {
         FunctionDTO function = repository.getFunctionData(id).join();
         assertEquals(id, function.funcId);
         assertEquals(expr, function.expression);
-        assertEquals(MathFunctionID, function.funcType);
+        assertEquals(FunctionType.math, function.funcType);
     }
 
     @Test
