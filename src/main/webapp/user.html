@@ -220,9 +220,31 @@
 
             <div class="graph-container">
                 <h3>📊 График функции</h3>
+                <div class="chart-controls">
+                    <div class="chart-range-inputs">
+                        <div class="input-group">
+                            <label for="xMin">X Min:</label>
+                            <input type="number" id="xMin" step="any" value="-5">
+                        </div>
+                        <div class="input-group">
+                            <label for="xMax">X Max:</label>
+                            <input type="number" id="xMax" step="any" value="5">
+                        </div>
+                        <div class="input-group">
+                            <label for="yMin">Y Min:</label>
+                            <input type="number" id="yMin" step="any" value="-5">
+                        </div>
+                        <div class="input-group">
+                            <label for="yMax">Y Max:</label>
+                            <input type="number" id="yMax" step="any" value="5">
+                        </div>
+                        <button class="btn btn-primary" onclick="updateChartRange()">Обновить график</button>
+                    </div>
+                </div>
                 <div class="graph-placeholder" id="functionGraph">
                     График будет отображен здесь
                 </div>
+
             </div>
 
             <!-- В модальном окне просмотра функции -->

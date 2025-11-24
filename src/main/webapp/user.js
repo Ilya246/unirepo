@@ -4,6 +4,7 @@ let currentFunctions = [];
 let currentFunctionType = 'math';
 let currentEditingFunction = null;
 let currentPoints = [];
+let currentViewedFunction = null;
 
 // Выбор типа функции
 function selectFunctionType(type) {
@@ -780,9 +781,28 @@ function closeModal() {
 }
 
 let functionChart = null;
+let currentChartRange = {
+    xMin: -5,
+    xMax: 5,
+    yMin: -5,
+    yMax: 5
+};
 
-// Функция для построения графика
-async function plotFunction(func) {
+// Update chart range from input fields
+function updateChartRange() {
+    currentChartRange = {
+        xMin: parseFloat(document.getElementById('xMin').value) || -5,
+        xMax: parseFloat(document.getElementById('xMax').value) || 5,
+        yMin: parseFloat(document.getElementById('yMin').value) || -5,
+        yMax: parseFloat(document.getElementById('yMax').value) || 5
+    };
+
+    if (currentViewedFunction) {
+        plotFunction(currentViewedFunction);
+    }
+}
+
+async function plotFunction(func, initial = false) {
     let graphContainer = document.getElementById('functionGraph');
 
     try {
@@ -793,18 +813,54 @@ async function plotFunction(func) {
 
         // Показываем загрузку
         graphContainer.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 500px;">
                 <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 <p style="margin-top: 10px; color: #7f8c8d;">Построение графика...</p>
             </div>
         `;
 
+        if (initial) {
+            currentChartRange.xMin = -5;
+            currentChartRange.xMax = 5;
+        }
+
         // Получаем данные для графика
         let chartData = await generateUniversalFunctionData(func);
+
+        if (initial) {
+            let newXMin = parseFloat(chartData.labels[0]);
+            let newXMax = parseFloat(chartData.labels[chartData.labels.length - 1]);
+            let newXRange = newXMax - newXMin;
+            let xFigures = Math.max(Math.ceil(2 - Math.log10(newXRange)), 1);
+            newXMin = parseFloat(newXMin.toFixed(xFigures));
+            newXMax = parseFloat(newXMax.toFixed(xFigures));
+            let newYMin = parseFloat(Math.min(...chartData.values));
+            let newYMax = parseFloat(Math.max(...chartData.values));
+            let newYRange = newYMax - newYMin;
+            let yFigures = Math.max(Math.ceil(2 - Math.log10(newYRange)), 1);
+            newYMin = parseFloat(newYMin.toFixed(yFigures));
+            newYMax = parseFloat(newYMax.toFixed(yFigures));
+            currentChartRange = {
+                xMin: newXMin,
+                xMax: newXMax,
+                yMin: newYMin,
+                yMax: newYMax
+            };
+            document.getElementById('xMin').value = currentChartRange.xMin;
+            document.getElementById('xMax').value = currentChartRange.xMax;
+            document.getElementById('yMin').value = currentChartRange.yMin;
+            document.getElementById('yMax').value = currentChartRange.yMax;
+        }
 
         // Создаем canvas для графика
         graphContainer.innerHTML = '<canvas id="functionChart"></canvas>';
         let ctx = document.getElementById('functionChart').getContext('2d');
+        let minLabel = parseFloat(chartData.labels[0]);
+        let maxLabel = parseFloat(chartData.labels[chartData.labels.length - 1]);
+        let labelRange = maxLabel - minLabel;
+        let minFrac = (currentChartRange.xMin - minLabel) / labelRange;
+        let maxFrac = (currentChartRange.xMax - minLabel) / labelRange;
+        let maxFrac = (currentChartRange.xMax - minLabel) / labelRange;
 
         // Создаем график
         functionChart = new Chart(ctx, {
@@ -817,15 +873,12 @@ async function plotFunction(func) {
                     borderColor: '#3498db',
                     backgroundColor: 'rgba(52, 152, 219, 0.1)',
                     borderWidth: 2,
-                    fill: true,
                     tension: 0.3,
                     pointRadius: 2,
                     pointBackgroundColor: '#3498db'
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
                 plugins: {
                     title: {
                         display: true,
@@ -837,12 +890,18 @@ async function plotFunction(func) {
                 },
                 scales: {
                     x: {
+                        offset: true,
                         title: { display: true, text: 'X' },
-                        grid: { color: 'rgba(0,0,0,0.1)' }
+                        grid: { color: 'rgba(0,0,0,0.1)' },
+                        min: 100 * minFrac,
+                        max: 100 * maxFrac // это %
                     },
                     y: {
+                        offset: true,
                         title: { display: true, text: 'Y' },
-                        grid: { color: 'rgba(0,0,0,0.1)' }
+                        grid: { color: 'rgba(0,0,0,0.1)' },
+                        min: currentChartRange.yMin,
+                        max: currentChartRange.yMax
                     }
                 }
             }
@@ -850,6 +909,11 @@ async function plotFunction(func) {
 
     } catch (error) {
         console.error('Failed to plot function:', error);
+        graphContainer.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; height: 300px; color: #e74c3c;">
+                Ошибка при построении графика: ${error.message}
+            </div>
+        `;
     }
 }
 
@@ -894,9 +958,9 @@ async function generateTabulatedData(func) {
 
 // Генерация данных для математических и композитных функций
 async function generateCalculatedData(func, expression) {
-    let xMin = -5;
-    let xMax = 5;
-    let pointCount = 50;
+    let xMin = currentChartRange.xMin;
+    let xMax = currentChartRange.xMax;
+    let pointCount = 100;
 
     let labels = [];
     let values = [];
@@ -947,6 +1011,13 @@ document.head.appendChild(style);
 
 async function openFunctionModal(func) {
     console.log('Opening function modal with data:', func);
+    currentViewedFunction = func;
+
+    // Initialize range inputs
+    document.getElementById('xMin').value = currentChartRange.xMin;
+    document.getElementById('xMax').value = currentChartRange.xMax;
+    document.getElementById('yMin').value = currentChartRange.yMin;
+    document.getElementById('yMax').value = currentChartRange.yMax;
 
     // Безопасное извлечение данных с проверкой структуры
     let funcName, funcId, funcType, createdDate, expression;
@@ -991,7 +1062,7 @@ async function openFunctionModal(func) {
 
     // Добавляем небольшую задержку для инициализации canvas
     setTimeout(() => {
-        plotFunction(func);
+        plotFunction(func, true);
     }, 100);
 }
 
