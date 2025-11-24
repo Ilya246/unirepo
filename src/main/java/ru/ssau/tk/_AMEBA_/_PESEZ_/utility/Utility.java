@@ -22,5 +22,14 @@ public class Utility {
 
     public static String getBase64Hash(String from) {
         return Base64Encode.encodeToString(Hasher.digest(from.getBytes()));
+    }
 
-}}
+    public static String getErrorInitMessage(Throwable error) {
+        while (true) {
+            Throwable cause = error.getCause();
+            if (cause == null)
+                return error.getMessage();
+            error = cause;
+        }
+    }
+}

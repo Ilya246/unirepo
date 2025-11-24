@@ -737,8 +737,8 @@ function updateCompositePreview() {
     if (selectedInnerFunction && selectedOuterFunction) {
         let innerData = currentFunctions.find((fun) => fun.function.funcId == selectedInnerFunction);
         let outerData = currentFunctions.find((fun) => fun.function.funcId == selectedOuterFunction);
-        let expr = outerData.function.expression;
-        expr = expr.replaceAll(/x/g, `(${innerData.function.expression})`);
+        let expr = outerData ? outerData.function.expression : '?';
+        expr = expr.replaceAll(/x/g, `(${innerData ? innerData.function.expression : '?'})`);
         expression.textContent = expr;
         details.textContent = `Внешняя: ID ${selectedOuterFunction}, Внутренняя: ID ${selectedInnerFunction}`;
         preview.style.background = '#27ae60';
@@ -1037,7 +1037,7 @@ async function openFunctionModal(func) {
         let innerData = currentFunctions.find((fun) => fun.function.funcId == compositeData.innerId);
         let outerData = currentFunctions.find((fun) => fun.function.funcId == compositeData.outerId);
         // Для композитных функций показываем информацию о составляющих
-        let expressionText = `Композитная функция f(g(x)): g(x)=${innerData.function.expression}, f(x)=${outerData.function.expression}`;
+        let expressionText = `Композитная функция f(g(x)): g(x)=${innerData ? innerData.function.expression : '?'}, f(x)=${outerData ? outerData.function.expression : '?'}`;
         document.getElementById('modalFunctionExpression').textContent = expressionText;
     } else {
         // Показываем кнопку редактирования для обычных функций
