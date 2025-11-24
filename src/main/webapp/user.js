@@ -195,9 +195,6 @@ async function loadUserFunctions() {
             `;
         }).join('');
 
-        // Затем асинхронно загружаем детали композитных функций
-        await enhanceCompositeFunctionsDisplay();
-
     } catch (error) {
         console.error('Failed to load functions:', error);
         showStatus('Ошибка при загрузке функций: ' + error.message, 'error');
@@ -718,8 +715,11 @@ function updateCompositePreview() {
     let createBtn = document.getElementById('createCompositeBtn');
 
     if (selectedInnerFunction && selectedOuterFunction) {
-        // Здесь можно добавить логику для получения имен функций
-        expression.textContent = `f(g(x))`;
+        let innerData = currentFunctions.find((fun) => fun.function.funcId == selectedInnerFunction);
+        let outerData = currentFunctions.find((fun) => fun.function.funcId == selectedOuterFunction);
+        let expr = outerData.function.expression;
+        expr = expr.replaceAll(/x/g, `(${innerData.function.expression})`);
+        expression.textContent = expr;
         details.textContent = `Внешняя: ID ${selectedOuterFunction}, Внутренняя: ID ${selectedInnerFunction}`;
         preview.style.background = '#27ae60';
         createBtn.disabled = false;
@@ -761,143 +761,7 @@ async function createCompositeFunction() {
         showStatus('Ошибка при создании композитной функции: ' + error.message, 'error');
     }
 }
-// Получение деталей композитной функции (теперь используется только для отладки)
-async function getCompositeFunctionDetails(func) {
-    let funcType = func.function ? func.function.funcType : func.funcType;
-    if (funcType !== 'composite') return '';
 
-    try {
-        let compositeDetails = await api.getComposite(func.function.funcId || func.funcId);
-
-        // Безопасное извлечение данных о внутренней функции
-        let innerFunc = compositeDetails.innerFunction || {};
-        let innerFuncId = compositeDetails.function ? compositeDetails.function.innerFuncId : compositeDetails.innerFuncId;
-        let innerExpr = innerFunc.expression || (innerFuncId ? `ID: ${innerFuncId}` : 'Неизвестно');
-
-        // Безопасное извлечение данных о внешней функции
-        let outerFunc = compositeDetails.outerFunction || {};
-        let outerFuncId = compositeDetails.function ? compositeDetails.function.outerFuncId : compositeDetails.outerFuncId;
-        let outerExpr = outerFunc.expression || (outerFuncId ? `ID: ${outerFuncId}` : 'Неизвестно');
-
-        return `
-            <div style="margin-top: 8px; font-size: 12px; color: #3498db;">
-                <strong>Внутренняя:</strong> ${innerExpr}
-            </div>
-            <div style="margin-top: 4px; font-size: 12px; color: #e74c3c;">
-                <strong>Внешняя:</strong> ${outerExpr}
-            </div>
-        `;
-
-    } catch (error) {
-        console.error('Failed to load composite details:', error);
-        // Если не удалось загрузить детали, показываем базовую информацию
-        let innerFuncId = func.function ? func.function.innerFuncId : func.innerFuncId;
-        let outerFuncId = func.function ? func.function.outerFuncId : func.outerFuncId;
-
-        if (innerFuncId && outerFuncId) {
-            return `<div style="margin-top: 8px; font-size: 12px; color: #7f8c8d;">
-                Композиция: ID${innerFuncId} → ID${outerFuncId}
-            </div>`;
-        }
-
-        return `<div style="margin-top: 8px; font-size: 12px; color: #7f8c8d;">
-            Композитная функция f(g(x))
-        </div>`;
-    }
-}
-
-// Загрузка детальной информации о композитной функции
-async function loadCompositeDetails(compositeId) {
-    try {
-        let compositeDetails = await api.getComposite(compositeId);
-        return compositeDetails;
-    } catch (error) {
-        console.error('Failed to load composite details:', error);
-        return null;
-    }
-}
-// Асинхронное обновление деталей композитных функций
-async function enhanceCompositeFunctionsDisplay() {
-    let compositeCards = document.querySelectorAll('.function-card');
-
-    for (let card of compositeCards) {
-        let functionId = card.dataset.functionId;
-        let functionTypeElement = card.querySelector('.function-type');
-        if (!functionTypeElement) continue;
-
-        let functionType = functionTypeElement.textContent;
-
-        if (functionType === 'Композитная') {
-            try {
-                console.log('Loading composite details for function ID:', functionId);
-                let compositeDetails = await api.getComposite(parseInt(functionId));
-                console.log('Composite details received:', compositeDetails);
-
-                let detailsContainer = card.querySelector('#composite-details-' + functionId);
-                if (!detailsContainer) continue;
-
-                let detailsHtml = '';
-
-                // Обработка разных структур данных
-                if (compositeDetails.innerId && compositeDetails.outerId) {
-                    // Простая структура {innerId: X, outerId: Y}
-                    detailsHtml = `
-                        <div style="margin-top: 8px; font-size: 12px; color: #3498db;">
-                            <strong>Внутренняя:</strong> ID ${compositeDetails.innerId}
-                        </div>
-                        <div style="margin-top: 4px; font-size: 12px; color: #e74c3c;">
-                            <strong>Внешняя:</strong> ID ${compositeDetails.outerId}
-                        </div>
-                    `;
-                } else if (compositeDetails.innerFunction && compositeDetails.outerFunction) {
-                    // Структура с innerFunction и outerFunction объектами
-                    let innerExpr = compositeDetails.innerFunction.expression ||
-                                    (compositeDetails.innerFunction.funcId ? `ID: ${compositeDetails.innerFunction.funcId}` : 'Неизвестно');
-                    let outerExpr = compositeDetails.outerFunction.expression ||
-                                    (compositeDetails.outerFunction.funcId ? `ID: ${compositeDetails.outerFunction.funcId}` : 'Неизвестно');
-
-                    detailsHtml = `
-                        <div style="margin-top: 8px; font-size: 12px; color: #3498db;">
-                            <strong>Внутренняя:</strong> ${innerExpr}
-                        </div>
-                        <div style="margin-top: 4px; font-size: 12px; color: #e74c3c;">
-                            <strong>Внешняя:</strong> ${outerExpr}
-                        </div>
-                    `;
-                } else if (compositeDetails.function && (compositeDetails.function.innerFuncId || compositeDetails.function.outerFuncId)) {
-                    // Структура с ID функций
-                    let innerId = compositeDetails.function.innerFuncId || 'Неизвестно';
-                    let outerId = compositeDetails.function.outerFuncId || 'Неизвестно';
-
-                    detailsHtml = `
-                        <div style="margin-top: 8px; font-size: 12px; color: #3498db;">
-                            <strong>Внутренняя:</strong> ID ${innerId}
-                        </div>
-                        <div style="margin-top: 4px; font-size: 12px; color: #e74c3c;">
-                            <strong>Внешняя:</strong> ID ${outerId}
-                        </div>
-                    `;
-                } else {
-                    // Базовая информация
-                    detailsHtml = `
-                        <div style="margin-top: 8px; font-size: 12px; color: #7f8c8d;">
-                            Композитная функция f(g(x))
-                        </div>
-                    `;
-                }
-
-                detailsContainer.innerHTML = detailsHtml;
-
-            } catch (error) {
-                console.error('Failed to enhance composite function display:', error);
-                let detailsContainer = card.querySelector('#composite-details-' + functionId);
-                if (detailsContainer) {
-                    detailsContainer.innerHTML = '<div style="margin-top: 8px; font-size: 12px; color: #7f8c8d;">Не удалось загрузить детали</div>';
-                }
-            }
-        }
-    }
-}
 // Закрытие модального окна создания композитной функции
 function closeCompositeModal() {
     document.getElementById('createCompositeModal').style.display = 'none';
@@ -1098,7 +962,7 @@ async function openFunctionModal(func) {
     document.getElementById('modalFunctionType').textContent = getFunctionTypeLabel(funcType);
     document.getElementById('modalFunctionStatus').textContent = 'Активна';
     document.getElementById('modalFunctionCreated').textContent = formatDate(createdDate);
-    document.getElementById('modalFunctionExpression').textContent = expression;
+    document.getElementById('modalFunctionExpression').textContent = funcType == 'pure' ? "Табулированная Функция" : expression;
 
     if (funcType === 'composite') {
         let compositeData = await api.getComposite(funcId);
