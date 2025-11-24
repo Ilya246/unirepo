@@ -15,7 +15,7 @@ public class HtmlTemplateLoader {
     }
 
     public static String loadTemplate(String templateName, Map<String, String> variables) throws IOException {
-        ClassPathResource resource = new ClassPathResource("templates/" + templateName);
+        ClassPathResource resource = new ClassPathResource("static/templates/" + templateName);
         String content = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         // Замена переменных в шаблоне

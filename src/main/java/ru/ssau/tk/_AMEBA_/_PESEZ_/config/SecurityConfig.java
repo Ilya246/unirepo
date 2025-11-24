@@ -31,12 +31,24 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/index.html", "/js/**", "/css/**", "/images/**", "/favicon.ico").permitAll()
-                        .anyRequest().authenticated()
+                        // Разрешаем доступ к статическим ресурсам и login endpoint
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/user.html",
+                                "/api.html",
+                                "/js/**",
+                                "/css/**",
+                                "/favicon.ico",
+                                "/login" // ← ДОБАВЬТЕ ЭТО
+                        ).permitAll()
+                        // Все API endpoints требуют аутентификации
+                        .requestMatchers("/api/**", "/users/**", "/functions/**", "/owned-functions/**", "/points/**").authenticated()
+                        // Все остальные запросы запрещаем
+                        .anyRequest().denyAll()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("SECURE-AREA")
-                        .authenticationEntryPoint(new SimpleBasicAuthEntryPoint())
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -60,44 +72,73 @@ public class SecurityConfig {
         return source;
     }
 
-    // Простой EntryPoint который всегда показывает браузерное окно аутентификации
     private static class SimpleBasicAuthEntryPoint implements AuthenticationEntryPoint {
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response,
                              AuthenticationException authException) throws IOException {
 
-            // Всегда отправляем заголовок Basic Auth
-            response.addHeader("WWW-Authenticate", "Basic realm=\"SECURE-AREA\"");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("text/html;charset=UTF-8");
+            // Для API endpoints отправляем Basic Auth заголовок
+            if (isApiRequest(request)) {
+                response.addHeader("WWW-Authenticate", "Basic realm=\"SECURE-AREA\"");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"error\":\"Authentication required\"}");
+            } else {
+                // Для HTML страниц отправляем HTML с инструкцией
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("text/html;charset=UTF-8");
+                response.getWriter().write(createAuthHtmlPage());
+            }
+        }
 
-            // Простая HTML страница с инструкцией
-            String html = """
+        private boolean isApiRequest(HttpServletRequest request) {
+            String path = request.getRequestURI();
+            return path.startsWith("/api/") ||
+                    path.startsWith("/users/") ||
+                    path.startsWith("/functions/") ||
+                    path.startsWith("/owned-functions/") ||
+                    path.startsWith("/points/");
+        }
+
+        private String createAuthHtmlPage() {
+            return """
                     <!DOCTYPE html>
                     <html>
                     <head>
                         <title>Authentication Required</title>
                         <style>
-                            body { 
-                                font-family: Arial, sans-serif; 
-                                margin: 40px; 
-                                background: #f5f5f5;
+                            body {
+                                font-family: Arial, sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                min-height: 100vh;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
                             }
-                            .container { 
-                                max-width: 500px; 
-                                margin: 100px auto; 
+                            .auth-container {
                                 background: white;
-                                padding: 30px;
-                                border-radius: 8px;
-                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                                padding: 40px;
+                                border-radius: 10px;
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
                                 text-align: center;
+                                max-width: 400px;
+                                width: 100%;
                             }
-                            h1 { color: #2c3e50; }
-                            p { color: #7f8c8d; line-height: 1.6; }
+                            h1 {
+                                color: #2c3e50;
+                                margin-bottom: 20px;
+                            }
+                            p {
+                                color: #7f8c8d;
+                                line-height: 1.6;
+                                margin-bottom: 20px;
+                            }
                         </style>
                     </head>
                     <body>
-                        <div class="container">
+                        <div class="auth-container">
                             <h1>🔐 Authentication Required</h1>
                             <p>Please enter your username and password in the browser authentication dialog.</p>
                             <p><em>If no dialog appears, the page will refresh automatically.</em></p>
@@ -111,7 +152,6 @@ public class SecurityConfig {
                     </body>
                     </html>
                     """;
-            response.getWriter().write(html);
         }
     }
 }

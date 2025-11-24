@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Functions System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .auth-message {
+            color: #e74c3c;
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffeaa7;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+        .manual-auth {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Система управления математическими функциями</h1>
+    <div id="status">Проверка авторизации...</div>
+
+    <div id="authMessage" class="auth-message" style="display: none;">
+        <strong>Требуется авторизация</strong>
+        <p>Браузер должен показать диалог для ввода логина и пароля</p>
+    </div>
+
+    <div id="manualAuth" class="manual-auth" style="display: none;">
+        <h3>Ручной вход</h3>
+        <button onclick="manualAuth()">Войти с текущими учетными данными</button>
+    </div>
+</div>
+
+<script>
+    let authAttempts = 0;
+    const maxAuthAttempts = 1;
+
+    function checkAuth() {
+        console.log('Проверка авторизации...');
+
+        // Прямой запрос к защищенному endpoint
+        fetch('/api/user-info', {
+            method: 'GET',
+            credentials: 'include' // Важно для передачи cookies/auth
+        })
+        .then(response => {
+            console.log('Status:', response.status);
+
+            if (response.status === 200) {
+                // Успешная авторизация - перенаправляем
+                determineUserRole();
+            } else if (response.status === 401) {
+                // Требуется аутентификация
+                handleUnauthorized();
+            } else if (response.status === 403) {
+                // Доступ запрещен (уже авторизован, но нет прав)
+                document.getElementById('status').innerHTML =
+                    '<span style="color: #e74c3c;">Доступ запрещен. Недостаточно прав.</span>';
+                document.getElementById('manualAuth').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Auth check error:', error);
+            document.getElementById('status').innerHTML =
+                '<span style="color: #e74c3c;">Ошибка подключения к серверу</span>';
+        });
+    }
+
+    function handleUnauthorized() {
+        authAttempts++;
+
+        if (authAttempts <= maxAuthAttempts) {
+            document.getElementById('authMessage').style.display = 'block';
+            document.getElementById('status').textContent = 'Ожидание авторизации...';
+
+            // Даем время браузеру показать Basic Auth диалог
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            document.getElementById('status').innerHTML =
+                '<span style="color: #e74c3c;">Авторизация не удалась</span>';
+            document.getElementById('manualAuth').style.display = 'block';
+        }
+    }
+
+    function determineUserRole() {
+        fetch('/api/redirect-by-role', {
+            credentials: 'include'
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                window.location.href = '/user.html';
+            }
+        })
+        .catch(error => {
+            console.error('Role determination error:', error);
+            window.location.href = '/user.html';
+        });
+    }
+
+    function manualAuth() {
+        // Принудительно запрашиваем аутентификацию
+        fetch('/api/user-info', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'include'
+        })
+        .then(response => {
+            if (response.status === 401) {
+                alert('Введите логин и пароль в диалоговом окне браузера');
+                window.location.reload();
+            } else if (response.status === 200) {
+                window.location.reload();
+            }
+        });
+    }
+
+    // Запускаем проверку при загрузке
+    checkAuth();
+</script>
+</body>
+</html>
