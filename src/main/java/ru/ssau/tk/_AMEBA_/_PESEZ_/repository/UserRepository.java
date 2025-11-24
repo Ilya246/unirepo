@@ -83,10 +83,12 @@ public class UserRepository {
         }
     }
 
-
     public UserEntity findByUsername(String username) {
         try (Session session = sessionFactory.openSession()) {
-            return session.find(UserEntity.class, username);
+            return session.createQuery(
+                    "FROM UserEntity WHERE userName = :username",UserEntity.class)
+                    .setParameter("username", username)
+                    .getSingleResultOrNull();
         }
     }
 }

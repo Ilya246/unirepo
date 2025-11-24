@@ -8,7 +8,6 @@ import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 public class SecurityUtils {
     public static UserEntity getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null || !authentication.isAuthenticated()) {
             return null;
         }
@@ -17,10 +16,6 @@ public class SecurityUtils {
 
         if (principal instanceof UserEntity) {
             return (UserEntity) principal;
-        }
-
-        if (principal instanceof String && "anonymousUser".equals(principal)) {
-            return null;
         }
 
         return null;

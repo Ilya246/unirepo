@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.config.SecurityUtils;
 import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
 import ru.ssau.tk._AMEBA_._PESEZ_.service.LoginService;
+import static ru.ssau.tk._AMEBA_._PESEZ_.utility.Utility.*;
 
 import java.io.IOException;
 
@@ -16,6 +17,7 @@ public class AutoController {
 
     @GetMapping("/login")
     public void getLogin(@RequestParam String date, HttpServletResponse response) throws IOException {
+        Log.info("Got login attempt with date {}, user: {}", date, SecurityUtils.getCurrentUserId());
         // Check if we already had login attempt for this date and user has required role
         if (loginService.hasGotLoginFor(date) && SecurityUtils.hasRequiredRole(UserType.Normal)) {
             loginService.removeGotLoginFor(date);

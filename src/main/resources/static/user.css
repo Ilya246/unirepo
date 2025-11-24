@@ -962,3 +962,176 @@ canvas {
     border-radius: 6px;
     border: 1px solid #555;
 }
+
+.nuclear-modal {
+    background: linear-gradient(135deg, #000000 0%, #8b0000 100%);
+    border: 3px solid #ff0000;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.7);
+}
+
+.nuclear-header {
+    background: linear-gradient(135deg, #8b0000 0%, #ff0000 100%);
+    border-bottom: 2px solid #ff4444;
+}
+
+.nuclear-body {
+    background: #000;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.nuclear-visuals {
+    position: relative;
+    height: 300px;
+    background: radial-gradient(circle, #330000, #000000);
+    border: 2px solid #ff0000;
+    border-radius: 10px;
+    margin: 20px 0;
+    padding: 20px;
+}
+
+.nuclear-warning {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255, 0, 0, 0.2);
+    border: 2px solid #ff0000;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.warning-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.nuclear-warning h3 {
+    color: #ff0000;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.targeting-system {
+    background: rgba(139, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ff4444;
+}
+
+.targeting-system h4 {
+    color: #ff4444;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.targeting-system input {
+    background: #330000;
+    border: 1px solid #ff0000;
+    color: #fff;
+    font-family: monospace;
+}
+
+.targeting-system input:focus {
+    border-color: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.launch-status {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.nuclear-status {
+    padding: 15px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.nuclear-status.ready {
+    background: rgba(0, 100, 0, 0.3);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.nuclear-status.error {
+    background: rgba(139, 0, 0, 0.5);
+    color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+.nuclear-status.countdown {
+    background: rgba(255, 165, 0, 0.3);
+    color: #ffa500;
+    border: 1px solid #ffa500;
+    animation: nuclearPulse 1s infinite;
+}
+
+.nuclear-status.launching {
+    background: rgba(255, 0, 0, 0.3);
+    color: #ff0000;
+    border: 1px solid #ff0000;
+    animation: nuclearPulse 0.5s infinite;
+}
+
+.nuclear-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.nuclear-abort {
+    background: linear-gradient(135deg, #666 0%, #333 100%);
+    color: white;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.nuclear-launch {
+    background: linear-gradient(135deg, #ff0000 0%, #8b0000 100%);
+    color: white;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    animation: nuclearPulse 2s infinite;
+}
+
+.nuclear-launch:hover {
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+}
+
+.nuclear-footer {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #ff4444;
+    font-size: 12px;
+    color: #ff8888;
+}
+
+/* Анимации для ядерного интерфейса */
+@keyframes nuclearPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(255, 0, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+@keyframes radiation {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+.radiation-wave {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 2px solid #ff0000;
+    border-radius: 50%;
+    animation: radiation 2s infinite linear;
+}

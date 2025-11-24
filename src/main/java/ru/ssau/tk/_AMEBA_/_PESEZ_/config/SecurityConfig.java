@@ -43,7 +43,7 @@ public class SecurityConfig {
                                 "/api.html",
                                 "/api.js",
                                 "/favicon.ico",
-                                "/login" // ← ДОБАВЬТЕ ЭТО
+                                "/login"
                         ).permitAll()
                         // Все API endpoints требуют аутентификации
                         .requestMatchers("/users/**", "/functions/**", "/owned-functions/**", "/points/**").authenticated()
@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .anyRequest().denyAll()
                 )
                 .httpBasic(httpBasic -> httpBasic
-                        .realmName("SECURE-AREA")
+                        .realmName("Restricted Area")
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -82,7 +82,7 @@ public class SecurityConfig {
 
             // Для API endpoints отправляем Basic Auth заголовок
             if (isApiRequest(request)) {
-                response.addHeader("WWW-Authenticate", "Basic realm=\"SECURE-AREA\"");
+                response.addHeader("WWW-Authenticate", "Basic realm=\"Restricted Area\"");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().write("{\"error\":\"Authentication required\"}");

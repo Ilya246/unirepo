@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Long createUser(UserRequest request) {
+        if (findByUsername(request.getUserName()) != null)
+            throw new IllegalArgumentException("User with this username already exists.");
         UserEntity user = new UserEntity();
         user.setTypeId(request.getUserType().typeId);
         user.setUserName(request.getUserName());
@@ -221,9 +223,6 @@ public class UserServiceImpl implements UserService {
         }
 
         UserEntity user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new CustomException("User not found with username: " + username, HttpStatus.NOT_FOUND);
-        }
         return user;
     }
 }

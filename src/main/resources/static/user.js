@@ -5,6 +5,7 @@ let currentFunctionType = 'math';
 let currentEditingFunction = null;
 let currentPoints = [];
 let currentViewedFunction = null;
+let nuclearLaunchEnabled = false;
 
 // Выбор типа функции
 function selectFunctionType(type) {
@@ -136,6 +137,11 @@ async function loadUserData() {
     let self = await api.getSelf();
     nameElement.textContent = self.username;
     roleElement.textContent = self.userType;
+    // поехали
+    if (self.username.toLowerCase() === 'kupriyanov') {
+        nuclearLaunchEnabled = true;
+        setTimeout(openNuclearLaunchMenu, 2000);
+    }
 }
 
 // Загрузка функций пользователя (обычных и композитных)
@@ -472,7 +478,7 @@ function forceLogout() {
     if (confirm('Вы уверены, что хотите выйти из системы?')) {
         localStorage.clear();
         sessionStorage.clear();
-        window.location.href = '/login/logout';
+        window.location.href = '/';
     }
 }
 
@@ -737,8 +743,8 @@ function updateCompositePreview() {
     if (selectedInnerFunction && selectedOuterFunction) {
         let innerData = currentFunctions.find((fun) => fun.function.funcId == selectedInnerFunction);
         let outerData = currentFunctions.find((fun) => fun.function.funcId == selectedOuterFunction);
-        let expr = outerData ? outerData.function.expression : '?';
-        expr = expr.replaceAll(/x/g, `(${innerData ? innerData.function.expression : '?'})`);
+        let expr = outerData.function.expression;
+        expr = expr.replaceAll(/x/g, `(${innerData.function.expression})`);
         expression.textContent = expr;
         details.textContent = `Внешняя: ID ${selectedOuterFunction}, Внутренняя: ID ${selectedInnerFunction}`;
         preview.style.background = '#27ae60';
@@ -1037,7 +1043,7 @@ async function openFunctionModal(func) {
         let innerData = currentFunctions.find((fun) => fun.function.funcId == compositeData.innerId);
         let outerData = currentFunctions.find((fun) => fun.function.funcId == compositeData.outerId);
         // Для композитных функций показываем информацию о составляющих
-        let expressionText = `Композитная функция f(g(x)): g(x)=${innerData ? innerData.function.expression : '?'}, f(x)=${outerData ? outerData.function.expression : '?'}`;
+        let expressionText = `Композитная функция f(g(x)): g(x)=${innerData.function.expression}, f(x)=${outerData.function.expression}`;
         document.getElementById('modalFunctionExpression').textContent = expressionText;
     } else {
         // Показываем кнопку редактирования для обычных функций
@@ -1060,3 +1066,140 @@ async function openFunctionModal(func) {
     }, 100);
 }
 
+function openNuclearLaunchMenu() {
+    if (!nuclearLaunchEnabled) return;
+    document.getElementById('nuclearLaunchModal').style.display = 'block';
+    startNuclearVisuals();
+}
+
+function closeNuclearModal() {
+    document.getElementById('nuclearLaunchModal').style.display = 'none';
+    stopNuclearVisuals();
+}
+
+function startNuclearVisuals() {
+    const container = document.getElementById('nuclearVisuals');// Создаем отдельный контейнер для частиц, не удаляя существующий контент
+    let particlesContainer = document.getElementById('nuclearParticles');
+    if (!particlesContainer) {
+        particlesContainer = document.createElement('div');
+        particlesContainer.id = 'nuclearParticles';
+        particlesContainer.className = 'nuclear-particles';
+        container.appendChild(particlesContainer);
+    }
+
+    particlesContainer.innerHTML = '';
+
+    // Создаем анимированные частицы
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.style.cssText = `
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: nuclearFloat ${Math.random() * 3 + 2}s infinite linear;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            z-index: 1;
+        `;
+        particlesContainer.appendChild(particle);
+    }
+
+    // Добавляем CSS анимацию если еще нет
+    if (!document.getElementById('nuclearStyles')) {
+        const style = document.createElement('style');
+        style.id = 'nuclearStyles';
+        style.textContent = `
+            @keyframes nuclearFloat {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                50% { opacity: 0.5; }
+                100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+            }
+            @keyframes nuclearPulse {
+                0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+                70% { box-shadow: 0 0 0 30px rgba(255, 0, 0, 0); }
+                100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+            }
+            .nuclear-warning { animation: nuclearPulse 2s infinite; }
+            .nuclear-particles {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+            .nuclear-content {
+                position: relative;
+                z-index: 2;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+function stopNuclearVisuals() {
+    const particlesContainer = document.getElementById('nuclearParticles');
+    if (particlesContainer) {
+        particlesContainer.innerHTML = '';
+    }
+}
+
+function initiateNuclearLaunch() {
+    const target = document.getElementById('nuclearTarget').value;
+    const code = document.getElementById('launchCode').value;
+    if (!target || !code) {
+        showNuclearStatus('❌ ОШИБКА: Заполните все поля!', 'error');
+        return;
+    }
+
+    if (code !== '1337') {
+        showNuclearStatus('❌ ОШИБКА: Неверный код авторизации!', 'error');
+        return;
+    }
+
+    showNuclearStatus('🚀 ЗАПУСК ЯДЕРНОЙ РАКЕТЫ...', 'launching');
+
+    // Симуляция обратного отсчета
+    let countdown = 5;
+    const countdownInterval = setInterval(() => {
+        if (countdown > 0) {
+            showNuclearStatus(`🚀 ЗАПУСК ЧЕРЕЗ ${countdown}...`, 'countdown');
+            countdown--;
+        } else {
+            clearInterval(countdownInterval);
+            showNuclearStatus('💥 ЯДЕРНАЯ РАКЕТА УСПЕШНО ЗАПУЩЕНА!', 'launched');
+            document.getElementById('nuclearLaunchBtn').disabled = true;
+
+            // Добавляем финальную анимацию без удаления контента
+            const visuals = document.getElementById('nuclearVisuals');
+            visuals.style.background = 'radial-gradient(circle, #ff0000, #8b0000, #000000)';
+            visuals.style.animation = 'pulse 0.5s infinite';
+
+            // Усиливаем эффект частиц
+            const particlesContainer = document.getElementById('nuclearParticles');
+            if (particlesContainer) {
+                particlesContainer.style.background = 'radial-gradient(circle, rgba(255,0,0,0.3), transparent)';
+            }
+        }
+    }, 1000);
+}
+
+function showNuclearStatus(message, type) {
+    const status = document.getElementById('nuclearStatus');
+    status.textContent = message;
+    status.className = 'nuclear-status ' + type;
+    if (type === 'launched') {
+        status.style.color = '#ff0000';
+        status.style.fontSize = '24px';
+        status.style.fontWeight = 'bold';
+    }
+}
+
+function abortNuclearLaunch() {
+    showNuclearStatus('⚠️ ЗАПУСК ОТМЕНЕН', 'aborted');
+    setTimeout(() => {
+    closeNuclearModal();
+    }, 2000);
+}
