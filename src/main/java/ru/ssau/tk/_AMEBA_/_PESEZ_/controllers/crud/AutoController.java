@@ -1,61 +1,33 @@
 package ru.ssau.tk._AMEBA_._PESEZ_.controllers.crud;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.ssau.tk._AMEBA_._PESEZ_.entity.UserEntity;
-import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.config.SecurityUtils;
+import ru.ssau.tk._AMEBA_._PESEZ_.enums.UserType;
+import ru.ssau.tk._AMEBA_._PESEZ_.service.LoginService;
 
-import java.util.Map;
+import java.io.IOException;
 
 @RestController
-@RequestMapping("/api")
+@RequiredArgsConstructor
 public class AutoController {
+    private final LoginService loginService;
 
-    @GetMapping("/user-info")
-    public ResponseEntity<?> getUserInfo() {
-        UserEntity user = SecurityUtils.getCurrentUser();
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .header("WWW-Authenticate", "Basic realm=\"SECURE-AREA\"")
-                    .body("Authentication required");
+    @GetMapping("/login")
+    public void getLogin(@RequestParam String date, HttpServletResponse response) throws IOException {
+        // Check if we already had login attempt for this date and user has required role
+        if (loginService.hasGotLoginFor(date) && SecurityUtils.hasRequiredRole(UserType.Normal)) {
+            loginService.removeGotLoginFor(date);
+            response.sendRedirect("/user.html");
+            return;
         }
 
-        UserType userType = SecurityUtils.getCurrentUserType();
+        // Add this date to track login attempts and schedule cleanup
+        loginService.addGotLoginFor(date);
 
-        return ResponseEntity.ok()
-                .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                .body(Map.of(
-                        "id", user.getUserId(),
-                        "username", user.getUserName(),
-                        "userType", userType.toString()
-                ));
-    }
-
-    @GetMapping("/redirect-by-role")
-    public ResponseEntity<String> redirectByRole() {
-        UserEntity user = SecurityUtils.getCurrentUser();
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .header("WWW-Authenticate", "Basic realm=\"SECURE-AREA\"")
-                    .build();
-        }
-
-        UserType userType = SecurityUtils.getCurrentUserType();
-
-        if (userType == UserType.Admin) {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .header("Location", "/api.html")
-                    .build();
-        } else {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .header("Location", "/user.html")
-                    .build();
-        }
+        // Send Basic Auth challenge
+        response.setHeader("WWW-Authenticate", "Basic realm=\"Restricted Area\"");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

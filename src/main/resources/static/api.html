@@ -260,7 +260,6 @@
                 gap: 10px;
             }
         }
-
     </style>
 </head>
 <body>
@@ -629,6 +628,27 @@
 
             <div class="endpoint">
                 <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-url">/owned-functions/composite?id={id}</span>
+                </div>
+                <p>Get the composite function data of an owned function</p>
+                <div class="endpoint-body">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="getOwnedCompositeId">Function ID</label>
+                            <input type="number" id="getOwnedCompositeId" placeholder="Function ID">
+                        </div>
+                        <div class="input-group">
+                            <label for="getOwnedCompositeUserId">Target User ID (Admin only)</label>
+                            <input type="number" id="getOwnedCompositeUserId" placeholder="Leave empty for current user">
+                        </div>
+                    </div>
+                    <button class="send-request" data-endpoint="getOwnedComposite">Send Request</button>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
                     <span class="method post">POST</span>
                     <span class="endpoint-url">/owned-functions/math</span>
                 </div>
@@ -936,7 +956,7 @@
     </section>
 </div>
 
-<script src="../js/api.js"></script>
+<script src="api.js"></script>
 <script>
     // UI Logic
     const api = new APIClient();
@@ -1149,6 +1169,15 @@
                         result = await api.getOwnedFunction(
                             parseInt(ownedFunctionId),
                             ownedFunctionUserId ? parseInt(ownedFunctionUserId) : null
+                        );
+                        break;
+
+                    case 'getOwnedComposite':
+                        const ownedCompositeId = document.getElementById('getOwnedCompositeId').value;
+                        const ownedCompositeUserId = document.getElementById('getOwnedCompositeUserId').value;
+                        result = await api.getOwnedComposite(
+                            parseInt(ownedCompositeId),
+                            ownedCompositeUserId ? parseInt(ownedCompositeUserId) : null
                         );
                         break;
 
@@ -1366,7 +1395,6 @@
             }, 3000);
         }
     }
-
 </script>
 </body>
 </html>

@@ -30,16 +30,8 @@ public class SecurityUtils {
      * Проверить роль пользователя через Spring Security authorities
      */
     public static boolean hasRequiredRole(UserType requiredRole) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return false;
-        }
-
-        String requiredRoleString = requiredRole == UserType.Admin ? "ROLE_ADMIN" : "ROLE_USER";
-
-        return authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals(requiredRoleString));
+        if (requiredRole == UserType.Normal && getCurrentUserType() != null) return true;
+        return getCurrentUserType() == requiredRole;
     }
 
     /**

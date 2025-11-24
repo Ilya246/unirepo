@@ -41,7 +41,7 @@ class APIClient {
             const response = await fetch(url, config);
 
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${await response.text()}`);
             }
 
             if (response.status === 204) {
@@ -114,6 +114,10 @@ class APIClient {
         return this.request(`/functions/calculate?id=${id}&x=${x}`, { method: 'GET' });
     }
 
+    async calculateFunctionRange(id, from, to, pts) {
+        return this.request(`/functions/calculaterange?id=${id}&from=${from}&to=${to}&pts=${pts}`, { method: 'GET' });
+    }
+
     async createMathFunction(expression) {
         return this.request('/functions/math', {
             method: 'POST',
@@ -145,6 +149,14 @@ class APIClient {
     // Owned Function endpoints
     async getOwnedFunction(id, targetUserId = null) {
         let url = `/owned-functions?id=${id}`;
+        if (targetUserId) {
+            url += `&user=${targetUserId}`;
+        }
+        return this.request(url, { method: 'GET' });
+    }
+
+    async getOwnedComposite(id, targetUserId = null) {
+        let url = `/owned-functions/composite?id=${id}`;
         if (targetUserId) {
             url += `&user=${targetUserId}`;
         }

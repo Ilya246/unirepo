@@ -450,14 +450,7 @@ async function editFunction() {
     let functionId = document.getElementById('modalFunctionId').textContent;
     let functionType = document.getElementById('modalFunctionType').textContent;
 
-    // Проверяем, не является ли функция композитной
-    if (functionType === 'Композитная') {
-        showStatus('Редактирование композитных функций не поддерживается', 'error');
-        return;
-    }
-
     console.log('Editing function ID:', functionId);
-
     try {
         let func = await api.getOwnedFunction(parseInt(functionId));
         console.log('Function data:', func);
@@ -469,30 +462,30 @@ async function editFunction() {
     }
 }
 
-    // Показать помощь
-    function showHelp() {
-        alert('Раздел помощи будет доступен в следующей версии');
-    }
+// Показать помощь
+function showHelp() {
+    alert('Раздел помощи будет доступен в следующей версии');
+}
 
-    // Выход из системы
-    function forceLogout() {
-        if (confirm('Вы уверены, что хотите выйти из системы?')) {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href = '/login/logout';
-        }
+// Выход из системы
+function forceLogout() {
+    if (confirm('Вы уверены, что хотите выйти из системы?')) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/login/logout';
     }
+}
 
-    // Вспомогательные функции
-    function getFunctionTypeLabel(type) {
-        let types = {
-            'math': 'Математическая',
-            'tabulated': 'Табулированная',
-            'pure': 'Чистая таблица',
-            'composite': 'Композитная'
-        };
-        return types[type] || type;
-    }
+// Вспомогательные функции
+function getFunctionTypeLabel(type) {
+    let types = {
+        'math': 'Математическая',
+        'tabulated': 'Табулированная',
+        'pure': 'Чистая таблица',
+        'composite': 'Композитная'
+    };
+    return types[type] || type;
+}
 
 function getFunctionDescription(func) {
     let descName = func.function.funcType === 'composite' ? "Композитная функция" : "Функция";
@@ -596,6 +589,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Открытие модального окна редактирования
+function openEditModal(func) {
+    console.log('Opening edit modal for function:', func);
+
+    document.getElementById('editFunctionName').value = func.ownership.funcName || '';
+
+    // Настраиваем интерфейс в зависимости от типа функции
+    const functionType = func.function.funcType;
+    console.log('Function type:', functionType);
+
+    // Скрываем все параметры (только points management теперь)
+    document.getElementById('editPointsManagement').classList.add('hidden');
+
+    if (functionType === 'math') {
+        // Для математических функций показываем только название
+        console.log('Math function - showing only name');
+        // Ничего дополнительного не показываем для математических функций
+    } else if (functionType === 'tabulated' || functionType === 'pure') {
+        console.log('Tabulated/pure function - loading points');
+        document.getElementById('editPointsManagement').classList.remove('hidden');
+        loadFunctionPoints(func.function.funcId);
+    }
+
+    document.getElementById('editFunctionModal').style.display = 'block';
+}
 
 function closeEditModal() {
     document.getElementById('editFunctionModal').style.display = 'none';
@@ -785,16 +804,18 @@ let currentChartRange = {
     xMin: -5,
     xMax: 5,
     yMin: -5,
-    yMax: 5
+    yMax: 5,
+    points: 100
 };
 
 // Update chart range from input fields
 function updateChartRange() {
     currentChartRange = {
-        xMin: parseFloat(document.getElementById('xMin').value) || -5,
-        xMax: parseFloat(document.getElementById('xMax').value) || 5,
-        yMin: parseFloat(document.getElementById('yMin').value) || -5,
-        yMax: parseFloat(document.getElementById('yMax').value) || 5
+        xMin: parseFloat(document.getElementById('xMin').value),
+        xMax: parseFloat(document.getElementById('xMax').value),
+        yMin: parseFloat(document.getElementById('yMin').value),
+        yMax: parseFloat(document.getElementById('yMax').value),
+        points: parseInt(document.getElementById('pointsIn').value) || 100
     };
 
     if (currentViewedFunction) {
@@ -828,24 +849,27 @@ async function plotFunction(func, initial = false) {
         let chartData = await generateUniversalFunctionData(func);
 
         if (initial) {
-            let newXMin = parseFloat(chartData.labels[0]);
-            let newXMax = parseFloat(chartData.labels[chartData.labels.length - 1]);
+            let newXMin = parseFloat(chartData[0][0]);
+            if (isNaN(-newXMin)) newXMin = -5;
+            let newXMax = parseFloat(chartData[chartData.length - 1][0]);
+            if (isNaN(newXMax)) newXMax = 5;
             let newXRange = newXMax - newXMin;
             let xFigures = Math.max(Math.ceil(2 - Math.log10(newXRange)), 1);
             newXMin = parseFloat(newXMin.toFixed(xFigures));
             newXMax = parseFloat(newXMax.toFixed(xFigures));
-            let newYMin = parseFloat(Math.min(...chartData.values));
-            let newYMax = parseFloat(Math.max(...chartData.values));
+            let yValues = chartData.map(pt => pt[1]);
+            let newYMin = parseFloat(Math.min(...yValues));
+            if (isNaN(newYMin)) newYMin = -5;
+            let newYMax = parseFloat(Math.max(...yValues));
+            if (isNaN(newYMax)) newYMax = 5;
             let newYRange = newYMax - newYMin;
             let yFigures = Math.max(Math.ceil(2 - Math.log10(newYRange)), 1);
             newYMin = parseFloat(newYMin.toFixed(yFigures));
             newYMax = parseFloat(newYMax.toFixed(yFigures));
-            currentChartRange = {
-                xMin: newXMin,
-                xMax: newXMax,
-                yMin: newYMin,
-                yMax: newYMax
-            };
+            currentChartRange.xMin = newXMin;
+            currentChartRange.xMax = newXMax;
+            currentChartRange.yMin = newYMin;
+            currentChartRange.yMax = newYMax;
             document.getElementById('xMin').value = currentChartRange.xMin;
             document.getElementById('xMax').value = currentChartRange.xMax;
             document.getElementById('yMin').value = currentChartRange.yMin;
@@ -855,21 +879,14 @@ async function plotFunction(func, initial = false) {
         // Создаем canvas для графика
         graphContainer.innerHTML = '<canvas id="functionChart"></canvas>';
         let ctx = document.getElementById('functionChart').getContext('2d');
-        let minLabel = parseFloat(chartData.labels[0]);
-        let maxLabel = parseFloat(chartData.labels[chartData.labels.length - 1]);
-        let labelRange = maxLabel - minLabel;
-        let minFrac = (currentChartRange.xMin - minLabel) / labelRange;
-        let maxFrac = (currentChartRange.xMax - minLabel) / labelRange;
-        let maxFrac = (currentChartRange.xMax - minLabel) / labelRange;
 
         // Создаем график
         functionChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: chartData.labels,
                 datasets: [{
                     label: func.ownership?.funcName || 'Функция',
-                    data: chartData.values,
+                    data: chartData,
                     borderColor: '#3498db',
                     backgroundColor: 'rgba(52, 152, 219, 0.1)',
                     borderWidth: 2,
@@ -890,11 +907,12 @@ async function plotFunction(func, initial = false) {
                 },
                 scales: {
                     x: {
+                        type: 'linear',
                         offset: true,
                         title: { display: true, text: 'X' },
                         grid: { color: 'rgba(0,0,0,0.1)' },
-                        min: 100 * minFrac,
-                        max: 100 * maxFrac // это %
+                        min: currentChartRange.xMin,
+                        max: currentChartRange.xMax
                     },
                     y: {
                         offset: true,
@@ -944,11 +962,15 @@ async function generateTabulatedData(func) {
             throw new Error('Нет данных точек');
         }
 
-        let labels = points.xValues.map(x => x.toFixed(2));
-        let values = points.yValues;
+        let labels = points.xValues.map(x => parseFloat(x.toFixed(2)));
+        let values = points.yValues.map(y => parseFloat(y));
+        let pts = [];
+        for (let i = 0; i < labels.length; i++) {
+            pts.push([labels[i], values[i]]);
+        }
 
-        console.log('Tabulated data loaded:', { labels, values });
-        return { labels, values };
+        console.log('Tabulated data loaded:', pts);
+        return pts;
 
     } catch (error) {
         console.error('Error loading tabulated data:', error);
@@ -960,43 +982,16 @@ async function generateTabulatedData(func) {
 async function generateCalculatedData(func, expression) {
     let xMin = currentChartRange.xMin;
     let xMax = currentChartRange.xMax;
-    let pointCount = 100;
+    let pointCount = currentChartRange.points;
+    let pts = [];
 
-    let labels = [];
-    let values = [];
-
-    // Определяем тип функции для выбора алгоритма вычислений
-    let funcType = func.function ? func.function.funcType : func.funcType;
-
-    let parsed = expression
-        .replace(/sin/g, 'Math.sin')
-        .replace(/cos/g, 'Math.cos')
-        .replace(/tan/g, 'Math.tan')
-        .replace(/sqrt/g, 'Math.sqrt')
-        .replace(/log/g, 'Math.log10')
-        .replace(/ln/g, 'Math.log')
-        .replace(/pi/g, 'Math.PI')
-        .replace(/e/g, 'Math.E')
-        .replace(/\^/g, '**')
-        .replace(/ /g, '')
-        .replace(/([0-9])([(a-zA-Z])/g, '$1*$2');
-    console.log('Parsed function:', parsed);
-
+    let gotPoints = await api.calculateFunctionRange(func.function.funcId, xMin, xMax, pointCount);
     for (let i = 0; i < pointCount; i++) {
-        let x = xMin + (xMax - xMin) * i / (pointCount - 1);
-        labels.push(x.toFixed(2));
-
-        try {
-            let y = eval(parsed.replace(/x/g, `(${x})`));
-            values.push(y);
-        } catch (error) {
-            console.warn(`Error calculating at x=${x}:`, error);
-            values.push(null);
-        }
+        pts.push([gotPoints.xValues[i], gotPoints.yValues[i]]);
     }
 
-    console.log('Calculated data:', { labels, values });
-    return { labels, values };
+    console.log('Calculated data:', pts);
+    return pts;
 }
 
 // Добавьте CSS для анимации загрузки
@@ -1044,12 +1039,6 @@ async function openFunctionModal(func) {
         // Для композитных функций показываем информацию о составляющих
         let expressionText = `Композитная функция f(g(x)): g(x)=${innerData.function.expression}, f(x)=${outerData.function.expression}`;
         document.getElementById('modalFunctionExpression').textContent = expressionText;
-
-        // Скрываем кнопку редактирования для композитных функций
-        let editBtn = document.getElementById('editFunctionBtn');
-        if (editBtn) {
-            editBtn.style.display = 'none';
-        }
     } else {
         // Показываем кнопку редактирования для обычных функций
         let editBtn = document.getElementById('editFunctionBtn');
@@ -1060,6 +1049,11 @@ async function openFunctionModal(func) {
 
     document.getElementById('functionModal').style.display = 'block';
 
+    if (funcType === 'tabulated' || funcType == 'pure') {
+        document.getElementById('pointsInput').classList.add('hidden');
+    } else {
+        document.getElementById('pointsInput').classList.remove('hidden');
+    }
     // Добавляем небольшую задержку для инициализации canvas
     setTimeout(() => {
         plotFunction(func, true);

@@ -34,16 +34,19 @@ public class SecurityConfig {
                         // Разрешаем доступ к статическим ресурсам и login endpoint
                         .requestMatchers(
                                 "/",
+                                "/heartbeat",
+                                "/users/register",
                                 "/index.html",
                                 "/user.html",
+                                "/user.css",
+                                "/user.js",
                                 "/api.html",
-                                "/js/**",
-                                "/css/**",
+                                "/api.js",
                                 "/favicon.ico",
                                 "/login" // ← ДОБАВЬТЕ ЭТО
                         ).permitAll()
                         // Все API endpoints требуют аутентификации
-                        .requestMatchers("/api/**", "/users/**", "/functions/**", "/owned-functions/**", "/points/**").authenticated()
+                        .requestMatchers("/users/**", "/functions/**", "/owned-functions/**", "/points/**").authenticated()
                         // Все остальные запросы запрещаем
                         .anyRequest().denyAll()
                 )
