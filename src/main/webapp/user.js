@@ -478,7 +478,7 @@ function forceLogout() {
     if (confirm('Вы уверены, что хотите выйти из системы?')) {
         localStorage.clear();
         sessionStorage.clear();
-        window.location.href = '/login/logout';
+        window.location.href = '/';
     }
 }
 
