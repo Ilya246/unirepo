@@ -21,7 +21,6 @@
 
         <div class="user-info">
             <div class="info-item"><strong>Текущий пользователь:</strong> <span id="userName">Загрузка..</span></div>
-            <div class="info-item"><strong>Уровень доступа:</strong> <span>Пользователь</span></div>
             <div class="info-item"><strong>Последняя активность:</strong> <span id="lastActivity">Только что</span></div>
             <div class="info-item"><strong>Активных функций:</strong> <span id="functionsCount">0</span></div>
         </div>
@@ -367,6 +366,55 @@
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeEditModal()">Отмена</button>
                 <button class="btn btn-success" onclick="saveFunctionChanges()">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="nuclearLaunchModal" style="display: none;">
+    <div class="modal-content nuclear-modal">
+        <div class="modal-header nuclear-header">
+            <h2 class="modal-title">⚡ СИСТЕМА ЯДЕРНОГО ЗАПУСКА</h2>
+            <button class="close-modal" onclick="closeNuclearModal()">×</button>
+        </div>
+        <div class="modal-body nuclear-body">
+            <div class="nuclear-warning">
+                <div class="warning-icon">⚠️</div>
+                <h3>ПРЕДУПРЕЖДЕНИЕ: СИСТЕМА ПОВЫШЕННОЙ ОПАСНОСТИ</h3>
+                <p>Доступ разрешен только уполномоченному персоналу</p>
+            </div>
+            <div class="nuclear-visuals" id="nuclearVisuals">
+                <div class="nuclear-content">
+                    <div class="targeting-system">
+                        <h4>🎯 СИСТЕМА НАВЕДЕНИЯ</h4>
+                        <div class="form-group">
+                            <label for="nuclearTarget">ЦЕЛЬ:</label>
+                            <input type="text" id="nuclearTarget" placeholder="Введите координаты цели">
+                        </div>
+                        <div class="form-group">
+                            <label for="launchCode">КОД АВТОРИЗАЦИИ:</label>
+                            <input type="password" id="launchCode" placeholder="0000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="launch-status">
+                <div id="nuclearStatus" class="nuclear-status ready">
+                    СИСТЕМА ГОТОВА К ЗАПУСКУ
+                </div>
+            </div>
+
+            <div class="nuclear-actions">
+                <button class="btn nuclear-abort" onclick="abortNuclearLaunch()">
+                    🚫 ОТМЕНА ЗАПУСКА
+                </button>
+                <button class="btn nuclear-launch" onclick="initiateNuclearLaunch()" id="nuclearLaunchBtn">
+                    🚀 ИНИЦИИРОВАТЬ ЗАПУСК
+                </button>
+            </div>
+
+            <div class="nuclear-footer">
+                <p>⚠️ ВНИМАНИЕ: Несанкционированный доступ преследуется по закону</p>
             </div>
         </div>
     </div>
