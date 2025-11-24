@@ -19,7 +19,7 @@ public class LoginController extends Controller {
         String date = req.getParameter("date");
         if (gotLoginFor.contains(date) && hasRequiredRole(req, UserType.Normal)) {
             gotLoginFor.remove(date);
-            resp.sendRedirect("/");
+            resp.sendRedirect("/user.html");
             return;
         }
         gotLoginFor.add(date);
