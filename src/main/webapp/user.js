@@ -450,14 +450,7 @@ async function editFunction() {
     let functionId = document.getElementById('modalFunctionId').textContent;
     let functionType = document.getElementById('modalFunctionType').textContent;
 
-    // Проверяем, не является ли функция композитной
-    if (functionType === 'Композитная') {
-        showStatus('Редактирование композитных функций не поддерживается', 'error');
-        return;
-    }
-
     console.log('Editing function ID:', functionId);
-
     try {
         let func = await api.getOwnedFunction(parseInt(functionId));
         console.log('Function data:', func);
@@ -469,30 +462,30 @@ async function editFunction() {
     }
 }
 
-    // Показать помощь
-    function showHelp() {
-        alert('Раздел помощи будет доступен в следующей версии');
-    }
+// Показать помощь
+function showHelp() {
+    alert('Раздел помощи будет доступен в следующей версии');
+}
 
-    // Выход из системы
-    function forceLogout() {
-        if (confirm('Вы уверены, что хотите выйти из системы?')) {
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href = '/login/logout';
-        }
+// Выход из системы
+function forceLogout() {
+    if (confirm('Вы уверены, что хотите выйти из системы?')) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/login/logout';
     }
+}
 
-    // Вспомогательные функции
-    function getFunctionTypeLabel(type) {
-        let types = {
-            'math': 'Математическая',
-            'tabulated': 'Табулированная',
-            'pure': 'Чистая таблица',
-            'composite': 'Композитная'
-        };
-        return types[type] || type;
-    }
+// Вспомогательные функции
+function getFunctionTypeLabel(type) {
+    let types = {
+        'math': 'Математическая',
+        'tabulated': 'Табулированная',
+        'pure': 'Чистая таблица',
+        'composite': 'Композитная'
+    };
+    return types[type] || type;
+}
 
 function getFunctionDescription(func) {
     let descName = func.function.funcType === 'composite' ? "Композитная функция" : "Функция";
@@ -596,6 +589,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Открытие модального окна редактирования
+function openEditModal(func) {
+    console.log('Opening edit modal for function:', func);
+
+    document.getElementById('editFunctionName').value = func.ownership.funcName || '';
+
+    // Настраиваем интерфейс в зависимости от типа функции
+    const functionType = func.function.funcType;
+    console.log('Function type:', functionType);
+
+    // Скрываем все параметры (только points management теперь)
+    document.getElementById('editPointsManagement').classList.add('hidden');
+
+    if (functionType === 'math') {
+        // Для математических функций показываем только название
+        console.log('Math function - showing only name');
+        // Ничего дополнительного не показываем для математических функций
+    } else if (functionType === 'tabulated' || functionType === 'pure') {
+        console.log('Tabulated/pure function - loading points');
+        document.getElementById('editPointsManagement').classList.remove('hidden');
+        loadFunctionPoints(func.function.funcId);
+    }
+
+    document.getElementById('editFunctionModal').style.display = 'block';
+}
 
 function closeEditModal() {
     document.getElementById('editFunctionModal').style.display = 'none';
@@ -1020,12 +1039,6 @@ async function openFunctionModal(func) {
         // Для композитных функций показываем информацию о составляющих
         let expressionText = `Композитная функция f(g(x)): g(x)=${innerData.function.expression}, f(x)=${outerData.function.expression}`;
         document.getElementById('modalFunctionExpression').textContent = expressionText;
-
-        // Скрываем кнопку редактирования для композитных функций
-        let editBtn = document.getElementById('editFunctionBtn');
-        if (editBtn) {
-            editBtn.style.display = 'none';
-        }
     } else {
         // Показываем кнопку редактирования для обычных функций
         let editBtn = document.getElementById('editFunctionBtn');

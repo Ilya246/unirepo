@@ -234,7 +234,7 @@ class APIClient {
     async assignOwnership(functionId, name, targetUserId) {
         return this.request(`/owned-functions/own?id=${functionId}&name=${encodeURIComponent(name)}`, {
             method: 'POST'
-        });
+        }, false);
     }
 
     async updateOwnedFunction(id, name, targetUserId = null) {
@@ -259,7 +259,7 @@ class APIClient {
     }
 
     async createPoint(functionId, x, y) {
-        return this.request(`/points?id=${functionId}&x=${x}&y=${y}`, { method: 'POST' });
+        return this.request(`/points?id=${functionId}&x=${x}&y=${y}`, { method: 'POST' }, false);
     }
 
     async updatePoint(functionId, x, y) {
