@@ -914,7 +914,9 @@ async function generateCalculatedData(func, expression) {
         .replace(/pi/g, 'Math.PI')
         .replace(/e/g, 'Math.E')
         .replace(/\^/g, '**')
-        .replace(/ /g, '');
+        .replace(/ /g, '')
+        .replace(/([0-9])([(a-zA-Z])/g, '$1*$2');
+    console.log('Parsed function:', parsed);
 
     for (let i = 0; i < pointCount; i++) {
         let x = xMin + (xMax - xMin) * i / (pointCount - 1);
