@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.tags.ArgumentTag;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.request.*;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.FunctionResponse;
 import ru.ssau.tk._AMEBA_._PESEZ_.dto.response.PointsResponse;
@@ -162,11 +163,15 @@ public class FunctionServiceImpl implements FunctionService {
             MathFunction mathFunction = getMathFunction(id).get();
             var xValues = new double[points.intValue()];
             var yValues = new double[points.intValue()];
-            double step = (to - from) / points;
+            double step = (to - from) / (points - 1);
             for (int i = 0; i < points; i++) {
                 double x = from + step * i;
                 xValues[i] = x;
-                yValues[i] = mathFunction.apply(x);
+                try {
+                    yValues[i] = mathFunction.apply(x);
+                } catch (ArithmeticException e) {
+                    yValues[i] = Double.NaN;
+                }
             }
             return new PointsResponse(id, xValues, yValues);
         } catch (InterruptedException | ExecutionException e) {
