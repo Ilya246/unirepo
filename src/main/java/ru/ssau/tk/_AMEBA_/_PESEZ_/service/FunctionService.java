@@ -32,11 +32,15 @@ public class FunctionService {
             MathFunction func = funcRepo.getFunction(id).join();
             var xValues = new double[pts];
             var yValues = new double[pts];
-            double step = (to - from) / pts;
+            double step = (to - from) / (pts - 1);
             for (int i = 0; i < pts; i++) {
                 double x = from + step * i;
                 xValues[i] = x;
-                yValues[i] = func.apply(x);
+                try {
+                    yValues[i] = func.apply(x);
+                } catch (ArithmeticException e) {
+                    yValues[i] = Double.NaN;
+                }
             }
             return new PointsDTO(id, xValues, yValues, false);
         });
