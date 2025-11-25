@@ -1182,6 +1182,10 @@ function initiateNuclearLaunch() {
             if (particlesContainer) {
                 particlesContainer.style.background = 'radial-gradient(circle, rgba(255,0,0,0.3), transparent)';
             }
+
+            setTimeout(() => {
+                playExplosion();
+            }, 2000);
         }
     }, 1000);
 }
@@ -1200,6 +1204,29 @@ function showNuclearStatus(message, type) {
 function abortNuclearLaunch() {
     showNuclearStatus('⚠️ ЗАПУСК ОТМЕНЕН', 'aborted');
     setTimeout(() => {
-    closeNuclearModal();
+        closeNuclearModal();
     }, 2000);
+}
+
+function playExplosion() {
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.zIndex = '9999';
+  overlay.style.backgroundImage = 'url(explosion.gif)';
+  overlay.style.backgroundSize = 'cover';
+  overlay.style.backgroundPosition = 'center';
+  overlay.style.backgroundRepeat = 'no-repeat';
+  overlay.style.pointerEvents = 'none';
+
+  document.body.appendChild(overlay);
+
+  setTimeout(() => {
+    if (overlay.parentNode) {
+      overlay.parentNode.removeChild(overlay);
+    }
+  }, 1800);
 }
